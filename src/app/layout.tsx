@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
-// @ts-ignore
+// @ts-expect-error
 import "./globals.css";
 import Provider from "@/contexts/Provider";
 
