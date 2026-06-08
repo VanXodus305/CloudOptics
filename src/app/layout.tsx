@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
-// @ts-expect-error
+// @ts-expect-error - Ignore import error for now, as this is a Next.js 15 app and the import path is correct.
 import "./globals.css";
 import Provider from "@/contexts/Provider";
 
