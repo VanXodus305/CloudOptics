@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
-// import dotenv from "dotenv";
 import { Resource } from "../src/models/Resource.js";
 import { Metric } from "../src/models/Metric.js";
-
-// dotenv.config({ path: ".env" });
 
 // MongoDB URI from environment
 const MONGODB_URI = process.env.MONGODB_URI;
