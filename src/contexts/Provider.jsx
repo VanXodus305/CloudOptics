@@ -5,7 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { PropsWithChildren } from "react";
 import { useRouter } from "next/navigation";
 
-const Provider = ({ children }: PropsWithChildren) => {
+const Provider = ({ children }) => {
   const router = useRouter();
   return (
     <SessionProvider>
