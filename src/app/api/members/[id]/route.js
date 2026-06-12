@@ -1,6 +1,6 @@
-import { auth } from "/src/app/api/auth/[...nextauth]/route";
-import { connectDB } from "/src/lib/mongodb";
-import { Member } from "/src/models/Member";
+import { auth } from "../../../../app/api/auth/[...nextauth]/route";
+import { connectDB } from "../../../../lib/mongodb";
+import { Member } from "../../../../models/Member";
 import { Types } from "mongoose";
 
 export async function DELETE(request, { params }) {

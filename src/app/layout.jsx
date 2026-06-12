@@ -1,6 +1,6 @@
 import { Geist_Mono, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import Provider from "/src/contexts/Provider";
+import Provider from "../contexts/Provider";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
