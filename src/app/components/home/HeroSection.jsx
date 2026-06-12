@@ -155,6 +155,7 @@ export default function HeroSection() {
             }}
             className="mt-10"
           >
+            <a href="/auth/signin">
             <Button
               size="lg"
               className="
@@ -166,6 +167,7 @@ export default function HeroSection() {
             >
               Explore Dashboard
             </Button>
+            </a>
           </motion.div>
 
         </div>
