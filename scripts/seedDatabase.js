@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
+import { faker } from "@faker-js/faker";
 import { Resource } from "../src/models/Resource.js";
 import { Metric } from "../src/models/Metric.js";
+import dotenv from "dotenv";
 
-// MongoDB URI from environment
+dotenv.config({ path: ".env" });
+
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
@@ -10,271 +13,276 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
-// Helper functions
-function generateResourceId(serviceType, index) {
-  if (serviceType === "EC2")
-    return `i-${Math.random().toString(16).substr(2, 12).padEnd(12, "0")}`;
-  if (serviceType === "S3") return `s3-bucket-${index}`;
-  if (serviceType === "RDS")
-    return `rds-db-${Math.random().toString(16).substr(2, 12).padEnd(12, "0")}`;
+// AWS Instance types
+const EC2_INSTANCES = [
+  "t3.micro",
+  "t3.small",
+  "t3.medium",
+  "t3.large",
+  "t3.xlarge",
+  "t3.2xlarge",
+  "m5.large",
+  "m5.xlarge",
+  "c5.large",
+  "c5.xlarge",
+];
+
+const RDS_INSTANCES = [
+  "db.t3.micro",
+  "db.t3.small",
+  "db.t3.medium",
+  "db.r5.large",
+  "db.r5.xlarge",
+  "db.m5.large",
+];
+
+const AWS_REGIONS = [
+  "us-east-1",
+  "us-west-2",
+  "eu-west-1",
+  "ap-southeast-1",
+  "ap-northeast-1",
+];
+
+const ENVIRONMENTS = ["Production", "Development", "Testing"];
+const DEPARTMENTS = [
+  "Engineering",
+  "Marketing",
+  "Data Science",
+];
+
+function generateEC2ResourceId() {
+  return `i-${faker.string.hexadecimal({ length: 17 }).substring(2)}`;
 }
 
-function getRandomElement(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+function generateRDSResourceId() {
+  return `rds-${faker.database.collation().replace(/[_]/g, "-").toLowerCase()}-${faker.string.alphanumeric({ length: 8 }).toLowerCase()}`;
 }
 
-function generateRandomMetrics(
-  resourceType,
-  costPerHour,
-  isAnomaly = false,
-  anomalyType = null,
-) {
-  let cpu, memory;
+function generateS3BucketName() {
+  return `${faker.word.adjective()}-${faker.word.noun()}-${faker.number.int(
+    {
+      min: 1000,
+      max: 9999,
+    },
+  )}`.toLowerCase();
+}
 
-  if (anomalyType === "idle") {
-    // Idle resource: very low CPU
-    cpu = Math.random() * 4; // 0-4%
-    memory = Math.random() * 3; // 0-3%
-  } else if (anomalyType === "oversized") {
-    // Oversized resource: low utilization
-    cpu = Math.random() * 14; // 0-14%
-    memory = Math.random() * 19; // 0-19%
-  } else {
-    // Normal resource
-    cpu = Math.random() * 100;
-    memory = Math.random() * 100;
+function generateResourceMetrics(serviceType) {
+  if (serviceType === "EC2") {
+    return {
+      cpuUtilization: faker.number.int({ min: 5, max: 85 }),
+      memoryUtilization: faker.number.int({ min: 10, max: 80 }),
+      storageSizeGB: 0,
+      readOperations: faker.number.int({ min: 100, max: 5000 }),
+      writeOperations: faker.number.int({ min: 50, max: 3000 }),
+    };
+  } else if (serviceType === "RDS") {
+    return {
+      cpuUtilization: faker.number.int({ min: 10, max: 70 }),
+      memoryUtilization: faker.number.int({ min: 20, max: 75 }),
+      storageSizeGB: faker.number.int({ min: 10, max: 500 }),
+      readOperations: faker.number.int({ min: 500, max: 10000 }),
+      writeOperations: faker.number.int({ min: 200, max: 5000 }),
+    };
+  } else if (serviceType === "S3") {
+    return {
+      cpuUtilization: 0,
+      memoryUtilization: 0,
+      storageSizeGB: faker.number.int({ min: 100, max: 5000 }),
+      readOperations: faker.number.int({ min: 0, max: 50000 }),
+      writeOperations: faker.number.int({ min: 0, max: 10000 }),
+    };
   }
-
-  const storageGB =
-    resourceType === "S3" ? Math.random() * 500 + 100 : undefined;
-  const readOps = resourceType === "S3" ? Math.random() * 1000 : undefined;
-  const writeOps = resourceType === "S3" ? Math.random() * 500 : undefined;
-
-  return {
-    cpuUtilization: cpu,
-    memoryUtilization: memory,
-    storageSizeGB: storageGB,
-    readOperations: readOps,
-    writeOperations: writeOps,
-    costIncurred: costPerHour,
-  };
 }
 
 async function seedDatabase() {
   try {
-    console.log("Connecting to MongoDB...");
+    console.log("📦 Connecting to MongoDB...");
 
     await mongoose.connect(MONGODB_URI, {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
     });
 
-    console.log("Connected to MongoDB");
+    console.log("✓ Connected to MongoDB");
 
     // Clear existing data
-    console.log("Clearing existing data...");
+    console.log("🧹 Clearing existing data...");
     await Resource.deleteMany({});
     await Metric.deleteMany({});
     console.log("✓ Cleared existing data");
 
     const resources = [];
-    const serviceTypes = ["EC2", "S3", "RDS"];
-    const environments = ["Production", "Development", "Testing"];
-    const departments = ["Engineering", "Marketing", "Data Science"];
-    const ec2Instances = [
-      "t3.micro",
-      "t3.small",
-      "t3.medium",
-      "t3.large",
-      "t3.xlarge",
-      "t3.2xlarge",
-    ];
-    const rdsInstances = [
-      "db.t3.micro",
-      "db.t3.small",
-      "db.r5.large",
-      "db.r5.xlarge",
-    ];
 
-    // Create normal resources
-    console.log("Creating normal resources...");
+    // Create 40 normal resources
+    console.log("📝 Creating 40 normal resources...");
     for (let i = 0; i < 40; i++) {
-      const serviceType = getRandomElement(serviceTypes);
-      const environment = getRandomElement(environments);
-      const department = getRandomElement(departments);
+      const serviceType = faker.helpers.arrayElement(["EC2", "S3", "RDS"]);
 
-      let instanceType = "";
-      let costPerHour = 0;
+      let resourceId, instanceType, costPerHour;
 
       if (serviceType === "EC2") {
-        instanceType = getRandomElement(ec2Instances);
-        costPerHour = parseFloat((Math.random() * 1 + 0.1).toFixed(3)); // $0.1 to $1.1 per hour
+        resourceId = generateEC2ResourceId();
+        instanceType = faker.helpers.arrayElement(EC2_INSTANCES);
+        costPerHour = faker.number.float({
+          min: 0.1,
+          max: 2.5,
+          fractionDigits: 3,
+        });
       } else if (serviceType === "S3") {
-        costPerHour = parseFloat((Math.random() * 0.5 + 0.01).toFixed(3)); // $0.01 to $0.5 per hour
-      } else if (serviceType === "RDS") {
-        instanceType = getRandomElement(rdsInstances);
-        costPerHour = parseFloat((Math.random() * 1.5 + 0.2).toFixed(3)); // $0.2 to $1.7 per hour
+        resourceId = generateS3BucketName();
+        costPerHour = faker.number.float({
+          min: 0.01,
+          max: 0.5,
+          fractionDigits: 3,
+        });
+      } else {
+        resourceId = generateRDSResourceId();
+        instanceType = faker.helpers.arrayElement(RDS_INSTANCES);
+        costPerHour = faker.number.float({
+          min: 0.2,
+          max: 3.0,
+          fractionDigits: 3,
+        });
       }
-
-      const resourceId = generateResourceId(serviceType, i);
-      const launchTimestamp = new Date(
-        Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000,
-      ); // Random date in last 90 days
 
       resources.push({
         resourceId,
         serviceType,
-        region: "us-east-1",
+        region: faker.helpers.arrayElement(AWS_REGIONS),
         instanceType: instanceType || undefined,
-        launchTimestamp,
+        launchTimestamp: faker.date.past({ years: 1 }),
         status: "running",
         costPerHour,
-        environment,
-        department,
+        environment: faker.helpers.arrayElement(ENVIRONMENTS),
+        department: faker.helpers.arrayElement(DEPARTMENTS),
       });
     }
 
-    // Create idle resources (5 EC2/RDS instances with very low CPU)
-    console.log("Creating idle resources...");
+    // Create 5 idle resources
+    console.log("📝 Creating 5 idle resources (CPU < 5%)...");
     for (let i = 0; i < 5; i++) {
-      const serviceType = getRandomElement(["EC2", "RDS"]);
+      const serviceType = faker.helpers.arrayElement(["EC2", "RDS"]);
+      const resourceId =
+        serviceType === "EC2"
+          ? generateEC2ResourceId()
+          : generateRDSResourceId();
       const instanceType =
         serviceType === "EC2"
-          ? getRandomElement(ec2Instances)
-          : getRandomElement(rdsInstances);
-      const costPerHour = parseFloat((Math.random() * 0.5 + 0.2).toFixed(3));
+          ? faker.helpers.arrayElement(EC2_INSTANCES)
+          : faker.helpers.arrayElement(RDS_INSTANCES);
 
       resources.push({
-        resourceId: generateResourceId(serviceType, 40 + i),
+        resourceId,
         serviceType,
-        region: "us-east-1",
+        region: faker.helpers.arrayElement(AWS_REGIONS),
         instanceType,
-        launchTimestamp: new Date(
-          Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000,
-        ),
+        launchTimestamp: faker.date.past({ years: 1 }),
         status: "running",
-        costPerHour,
-        environment: "Development",
-        department: getRandomElement(departments),
+        costPerHour: faker.number.float({
+          min: 0.2,
+          max: 1.0,
+          fractionDigits: 3,
+        }),
+        environment: faker.helpers.arrayElement(ENVIRONMENTS),
+        department: faker.helpers.arrayElement(DEPARTMENTS),
       });
     }
 
-    // Create oversized resources (3 EC2 instances with high cost and low utilization)
-    console.log("Creating oversized resources...");
+    // Create 3 oversized instances
+    console.log("📝 Creating 3 oversized instances...");
     for (let i = 0; i < 3; i++) {
       resources.push({
-        resourceId: generateResourceId("EC2", 45 + i),
+        resourceId: generateEC2ResourceId(),
         serviceType: "EC2",
-        region: "us-east-1",
-        instanceType: "t3.2xlarge", // Expensive instance type
-        launchTimestamp: new Date(
-          Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000,
-        ),
+        region: faker.helpers.arrayElement(AWS_REGIONS),
+        instanceType: "t3.2xlarge",
+        launchTimestamp: faker.date.past({ years: 1 }),
         status: "running",
-        costPerHour: 1.2, // ~$28.8 per day, ~$864 per month
-        environment: "Development",
-        department: getRandomElement(departments),
+        costPerHour: 1.2, // High cost but low utilization
+        environment: faker.helpers.arrayElement(ENVIRONMENTS),
+        department: faker.helpers.arrayElement(DEPARTMENTS),
       });
     }
 
-    // Create unused S3 buckets (some will have no read/write operations)
-    console.log("Creating unattached storage resources...");
+    // Create 2 unattached storage
+    console.log("📝 Creating 2 unattached S3 storage buckets...");
     for (let i = 0; i < 2; i++) {
       resources.push({
-        resourceId: generateResourceId("S3", 48 + i),
+        resourceId: generateS3BucketName(),
         serviceType: "S3",
-        region: "us-east-1",
-        launchTimestamp: new Date(
-          Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000,
-        ),
+        region: faker.helpers.arrayElement(AWS_REGIONS),
+        launchTimestamp: faker.date.past({ years: 1 }),
         status: "running",
         costPerHour: 0.1,
-        environment: "Testing",
-        department: getRandomElement(departments),
+        environment: faker.helpers.arrayElement(ENVIRONMENTS),
+        department: faker.helpers.arrayElement(DEPARTMENTS),
       });
     }
 
     // Insert all resources
-    console.log(`Inserting ${resources.length} resources...`);
-    const insertedResources = await Resource.insertMany(resources);
-    console.log(`✓ Inserted ${insertedResources.length} resources`);
+    await Resource.insertMany(resources);
+    console.log(`✓ Created ${resources.length} resources`);
 
-    // Generate metrics for each resource
-    console.log("Generating metrics for last 30 days...");
-    const metrics = [];
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    // Generate 30 days of hourly metrics
+    console.log("📊 Generating metrics for 30 days (hourly data)...");
 
-    for (let i = 0; i < resources.length; i++) {
-      const resource = resources[i];
-      const isIdleResource = i >= 40 && i < 45;
-      const isOversizedResource = i >= 45 && i < 48;
-      const isUnattachedStorage = i >= 48;
+    const metricsPerBatch = 10000;
+    let metricsCreated = 0;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      // Generate hourly metrics for the last 30 days
-      for (let day = 0; day < 30; day++) {
-        for (let hour = 0; hour < 24; hour++) {
-          const timestamp = new Date(
-            thirtyDaysAgo.getTime() + (day * 24 + hour) * 60 * 60 * 1000,
-          );
-          const metric = generateRandomMetrics(
-            resource.serviceType,
-            resource.costPerHour,
-            true,
-            isIdleResource ? "idle" : isOversizedResource ? "oversized" : null,
-          );
+    // For each hour in the last 30 days
+    for (
+      let timestamp = new Date(thirtyDaysAgo);
+      timestamp < new Date();
+      timestamp.setHours(timestamp.getHours() + 1)
+    ) {
+      const metricsForThisHour = [];
 
-          // For unattached storage, set read/write operations to 0
-          if (isUnattachedStorage) {
-            metric.readOperations = 0;
-            metric.writeOperations = 0;
-          }
-
-          metrics.push({
-            resourceId: resource.resourceId,
-            timestamp,
-            ...metric,
-          });
-        }
+      for (const resource of resources) {
+        const metrics = generateResourceMetrics(resource.serviceType);
+        metricsForThisHour.push({
+          resourceId: resource.resourceId,
+          timestamp: new Date(timestamp),
+          cpuUtilization: metrics.cpuUtilization,
+          memoryUtilization: metrics.memoryUtilization,
+          storageSizeGB: metrics.storageSizeGB,
+          readOperations: metrics.readOperations,
+          writeOperations: metrics.writeOperations,
+          costIncurred: resource.costPerHour,
+        });
       }
+
+      // Show batch progress
+      if (metricsCreated % metricsPerBatch === 0 && metricsCreated > 0) {
+        const batchNumber = Math.floor(metricsCreated / metricsPerBatch);
+        console.log(
+          `  ✓ Batch ${batchNumber}: ${metricsCreated} metrics created`,
+        );
+      }
+
+      await Metric.insertMany(metricsForThisHour);
+      metricsCreated += metricsForThisHour.length;
     }
 
-    console.log(`Inserting ${metrics.length} metrics...`);
-    // Insert in batches to avoid memory issues
-    const batchSize = 10000;
-    for (let i = 0; i < metrics.length; i += batchSize) {
-      const batch = metrics.slice(i, i + batchSize);
-      await Metric.insertMany(batch, { ordered: false });
-    }
-    console.log(`✓ Inserted ${metrics.length} metrics`);
+    console.log(`✓ Created ${metricsCreated} metrics`);
 
-    console.log("\n✓ Database seeding completed successfully!");
-    console.log("\nSummary:");
-    console.log(`- Total Resources: ${resources.length}`);
-    console.log(
-      `  - EC2 Instances: ${resources.filter((r) => r.serviceType === "EC2").length}`,
-    );
-    console.log(
-      `  - S3 Buckets: ${resources.filter((r) => r.serviceType === "S3").length}`,
-    );
-    console.log(
-      `  - RDS Databases: ${resources.filter((r) => r.serviceType === "RDS").length}`,
-    );
-    console.log(`- Total Metrics: ${metrics.length}`);
-    console.log(`- Anomalies Created:`);
-    console.log(`  - Idle Resources: 5`);
-    console.log(`  - Oversized Instances: 3`);
-    console.log(`  - Unattached Storage: 2`);
-
-    await mongoose.connection.close();
+    await mongoose.disconnect();
+    console.log("\n✅ Database seeding completed successfully!");
+    console.log(`\n📈 Summary:`);
+    console.log(`   Resources: ${resources.length}`);
+    console.log(`   Metrics: ${metricsCreated}`);
+    console.log(`   Data: Last 30 days of hourly metrics`);
     process.exit(0);
   } catch (error) {
-    console.error("Error seeding database:", error.message);
+    console.error("✗ Error:", error.message);
     if (mongoose.connection) {
-      await mongoose.connection.close();
+      await mongoose.disconnect();
     }
     process.exit(1);
   }
 }
 
-// Run the seed function
 seedDatabase();
