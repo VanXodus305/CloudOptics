@@ -1,6 +1,6 @@
-import { auth } from "@/app/api/auth/[...nextauth]/route";
-import { connectDB } from "@/lib/mongodb";
-import { Metric } from "@/models/Metric";
+import { auth } from "/src/app/api/auth/[...nextauth]/route";
+import { connectDB } from "/src/lib/mongodb";
+import { Metric } from "/src/models/Metric";
 
 export async function GET(request) {
   try {

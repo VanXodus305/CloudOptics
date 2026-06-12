@@ -1,6 +1,6 @@
-import { auth } from '@/app/api/auth/[...nextauth]/route';
-import { connectDB } from '@/lib/mongodb';
-import { Member } from '@/models/Member';
+import { auth } from "/src/app/api/auth/[...nextauth]/route";
+import { connectDB } from '/src/lib/mongodb';
+import { Member } from '/src/models/Member';
 
 export async function GET(request) {
   const session = await auth();
