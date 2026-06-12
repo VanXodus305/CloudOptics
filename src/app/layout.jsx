@@ -1,12 +1,9 @@
 import { Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import Provider from "@/contexts/Provider";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-});
-
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
@@ -17,8 +14,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="bg-background text-primary">
-      <body className={`${inter.className} ${geistMono.className}`}>
+    <html lang="en">
+      <body className={jakarta.className}>
         <Provider>{children}</Provider>
       </body>
     </html>

@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import LandingPage from "./pages/LandingPage";
+import { useEffect } from "react";
 
-export default function HomePage() {
+export default function Home() {
   useEffect(() => {
     // Ensure page stays at top on load
     window.scrollTo(0, 0);
   }, []);
-
-  return (
-    <div className="relative overflow-hidden bg-slate-50">Hello Cloud!</div>
-  );
+  return <LandingPage />;
 }
