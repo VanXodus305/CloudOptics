@@ -83,18 +83,7 @@ export default function DashboardPreview() {
   <li>• Intelligent cost-saving recommendations</li>
   <li>• Real-time alerts for risks and anomalies</li>
 </ul>
-            <a href="/auth/signin">
-            <Button
-              className="
-              mt-10
-              bg-[#792CA2]
-              text-white
-              px-8
-              "
-            >
-              Sign In
-            </Button>
-            </a>
+            
 
           </div>
 
