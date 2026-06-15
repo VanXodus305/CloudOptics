@@ -354,9 +354,9 @@ export default function SignInPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                <h1 className="text-3xl font-bold text-[#111844] mb-2">Welcome Back</h1>
+                <h1 className="text-3xl font-bold text-[#111844] mb-2">Welcome To CloudOptics</h1>
                 <p className="text-sm text-gray-500 mb-8">
-                  Monitor and optimize your cloud spend.
+                  Your cloud monitoring and optimization buddy!!
                 </p>
               </motion.div>
 

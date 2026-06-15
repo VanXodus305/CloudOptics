@@ -1,110 +1,973 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { Button, Avatar } from '@heroui/react';
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import {
+  BellAlertIcon,
+  ArrowRightOnRectangleIcon,
+  Squares2X2Icon,
+  CpuChipIcon,
+  SparklesIcon,
+  Cog6ToothIcon,
+  ArrowUpRightIcon,
+  CheckIcon,
+  XMarkIcon,
+  ArrowDownTrayIcon,
+  InformationCircleIcon,
+  DocumentDuplicateIcon,
+  UserIcon,
+  Bars3Icon,
+} from "@heroicons/react/24/outline";
+import { motion, AnimatePresence } from "framer-motion";
+import CountUp from "react-countup";
 
-export default function DashboardPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+// Canvas Particle Background matching the landing page/sign-in page network animations
+function ParticleBackground() {
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId;
+    let particles = [];
+    const maxParticles = 40;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4; // slow drift
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 2 + 1;
+        this.color = "rgba(121, 44, 162, 0.12)"; // matching landing page purple theme
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
     }
-  }, [status, router]);
 
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+    for (let i = 0; i < maxParticles; i++) {
+      particles.push(new Particle());
+    }
 
-  if (!session) {
-    return null;
-  }
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+
+        // draw connections
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < 150) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            const opacity = ((150 - dist) / 150) * 0.05;
+            ctx.strokeStyle = `rgba(121, 44, 162, ${opacity})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", resizeCanvas);
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">CloudOptics Dashboard</h1>
-            <p className="text-sm text-gray-600 mt-1">Cloud Cost Monitoring & Optimization</p>
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+    />
+  );
+}
+
+export const dynamic = "force-dynamic";
+
+export default function DashboardPage() {
+  // Access actual next-auth session context
+  const { data: session } = useSession();
+  const userName = session?.user?.name || "Admin User";
+  const userImage = session?.user?.image || null;
+
+  // Dropdown & Hover states
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isBellHovered, setIsBellHovered] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+
+  const profileRef = useRef(null);
+  const notificationsRef = useRef(null);
+
+  // Clipboard copy state helper
+  const [copiedId, setCopiedId] = useState(null);
+
+  const handleCopy = (idText) => {
+    navigator.clipboard.writeText(idText);
+    setCopiedId(idText);
+    setTimeout(() => setCopiedId(null), 1000);
+  };
+
+  // Close dropdowns on click-away
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setIsNotificationsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSignOut = () => {
+    setIsProfileOpen(false);
+    setIsSigningOut(true);
+    setTimeout(() => {
+      window.location.href = "/auth/signin";
+    }, 1500);
+  };
+
+  // Cost Timeframes & Donut Resource filter state
+  const [chartTimeframe, setChartTimeframe] = useState("Monthly");
+  const [hoveredBar, setHoveredBar] = useState(null);
+  const [donutFilter, setDonutFilter] = useState("All");
+  const [donutHoveredSegment, setDonutHoveredSegment] = useState(null);
+  const [donutSelectedSegment, setDonutSelectedSegment] = useState(null);
+
+
+  // Hardcoded chart data switcher
+  const chartDatasets = {
+    Monthly: [
+      { label: "Jan", value: 12500 },
+      { label: "Feb", value: 14200 },
+      { label: "Mar", value: 13800 },
+      { label: "Apr", value: 15100 },
+      { label: "May", value: 16400 },
+      { label: "Jun", value: 14800 },
+    ],
+    Weekly: [
+      { label: "Week 1", value: 3200 },
+      { label: "Week 2", value: 3800 },
+      { label: "Week 3", value: 3500 },
+      { label: "Week 4", value: 4392 },
+    ],
+    Daily: [
+      { label: "Mon", value: 510 },
+      { label: "Tue", value: 480 },
+      { label: "Wed", value: 620 },
+      { label: "Thu", value: 580 },
+      { label: "Fri", value: 650 },
+      { label: "Sat", value: 420 },
+      { label: "Sun", value: 390 },
+    ],
+  };
+
+  const currentChartData = chartDatasets[chartTimeframe];
+  const maxChartValue = useMemo(() => {
+    return Math.max(...currentChartData.map(d => d.value)) * 1.1;
+  }, [currentChartData]);
+
+  // Donut data changes according to dropdown filter (Hardcoded splits)
+  const donutDatasets = {
+    All: [
+      { name: "Compute (EC2/Lambda)", value: 45, colorHex: "#792CA2" },
+      { name: "Storage (S3/EBS)", value: 25, colorHex: "#9A4DCC" },
+      { name: "Database (RDS/Dynamo)", value: 15, colorHex: "#1F215D" },
+      { name: "Networking", value: 10, colorHex: "#111844" },
+      { name: "Other Services", value: 5, colorHex: "#DCCBFF" },
+    ],
+    Production: [
+      { name: "Compute (EC2/Lambda)", value: 60, colorHex: "#792CA2" },
+      { name: "Storage (S3/EBS)", value: 15, colorHex: "#9A4DCC" },
+      { name: "Database (RDS/Dynamo)", value: 15, colorHex: "#1F215D" },
+      { name: "Networking", value: 8, colorHex: "#111844" },
+      { name: "Other Services", value: 2, colorHex: "#DCCBFF" },
+    ],
+    Staging: [
+      { name: "Compute (EC2/Lambda)", value: 40, colorHex: "#792CA2" },
+      { name: "Storage (S3/EBS)", value: 30, colorHex: "#9A4DCC" },
+      { name: "Database (RDS/Dynamo)", value: 12, colorHex: "#1F215D" },
+      { name: "Networking", value: 12, colorHex: "#111844" },
+      { name: "Other Services", value: 6, colorHex: "#DCCBFF" },
+    ],
+    Development: [
+      { name: "Compute (EC2/Lambda)", value: 30, colorHex: "#792CA2" },
+      { name: "Storage (S3/EBS)", value: 35, colorHex: "#9A4DCC" },
+      { name: "Database (RDS/Dynamo)", value: 10, colorHex: "#1F215D" },
+      { name: "Networking", value: 15, colorHex: "#111844" },
+      { name: "Other Services", value: 10, colorHex: "#DCCBFF" },
+    ],
+  };
+
+  const donutData = donutDatasets[donutFilter];
+  const donutTotal = donutData.reduce((acc, curr) => acc + curr.value, 0);
+  const donutRadius = 38;
+  const donutCircumference = 2 * Math.PI * donutRadius;
+
+  // Alerts array with criteria-severity levels
+  const alerts = [
+    { id: "a1", title: "Underutilized EC2 Instance", desc: "Instance i-09f482d8c3 has average CPU < 5%", savings: 180, severity: "Critical" },
+    { id: "a2", title: "Unattached EBS Volume found", desc: "Volume vol-028a49c has been unattached for 15 days", savings: 45, severity: "High" },
+    { id: "a3", title: "S3 Bucket Lifecycle Warning", desc: "Bucket s3-archive-media is storing files without expiration policy", savings: 120, severity: "Medium" },
+    { id: "a4", title: "Idle Elastic IP detected", desc: "EIP 54.210.12.89 is unassociated with any instance", savings: 15, severity: "Low" }
+  ];
+
+  // Resources list with regions
+  const resources = [
+    { id: "1", name: "i-09f482d8c3", service: "EC2", cost: 1420.50, status: "Running", region: "us-east-1" },
+    { id: "2", name: "s3-archive-media", service: "S3", cost: 980.20, status: "Active", region: "us-west-2" },
+    { id: "3", name: "db-prod-replica", service: "RDS", cost: 850.00, status: "Running", region: "eu-west-1" },
+  ];
+
+  return (
+    <div className="min-h-screen relative overflow-hidden bg-[#F9F7F7] text-[#111844] transition-colors duration-300">
+      
+      {/* SIGN OUT TRANSITION SCREEN */}
+      <AnimatePresence>
+        {isSigningOut && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[#111844]/80 backdrop-blur-md z-[100] flex flex-col items-center justify-center text-white"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl text-center max-w-sm flex flex-col items-center shadow-2xl"
+            >
+              <div className="w-12 h-12 rounded-full border-4 border-[#DCCBFF] border-t-transparent animate-spin mb-4" />
+              <h3 className="text-lg font-bold tracking-tight">Signing Out</h3>
+              <p className="text-xs text-white/70 mt-2">Clearing session credentials and closing CloudOptics vault...</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CANVAS BACKGROUND DRAPES */}
+      <ParticleBackground />
+
+      {/* DYNAMIC BACKDROP BLOBS */}
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#792CA2]/15 blur-[120px]" />
+        <div className="absolute bottom-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-[#DCCBFF]/20 blur-[120px]" />
+      </div>
+
+      {/* NAVBAR */}
+      <header className="h-16 sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-white/40 flex items-center justify-between px-8 shadow-sm">
+        <div className="flex items-center gap-3">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#792CA2] via-[#9A4DCC] to-[#5E1A86] flex items-center justify-center text-white font-black text-sm shadow-md"
+          >
+            CO
+          </motion.div>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#9A4DCC] bg-clip-text text-transparent">
+            CloudOptics
+          </h1>
+        </div>
+
+        <div className="flex items-center gap-4">
+          
+          {/* Bell Icon Hover Expandable warning message */}
+          <div className="relative" ref={notificationsRef}>
+            <motion.button
+              onMouseEnter={() => setIsBellHovered(true)}
+              onMouseLeave={() => setIsBellHovered(false)}
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              className="h-10 px-3 rounded-xl bg-white hover:bg-gray-50 flex items-center gap-2 border border-gray-200/30 shadow-sm relative active:scale-95 transition-all overflow-hidden"
+              animate={{ width: isBellHovered ? 210 : 40 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
+              <AnimatePresence mode="wait">
+                {isBellHovered ? (
+                  <motion.div
+                    key="info"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <InformationCircleIcon className="w-5 h-5 text-[#792CA2]" />
+                    <span className="text-[11px] font-bold text-gray-600">{alerts.length} Warnings received</span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="bell"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="flex items-center justify-center w-full"
+                  >
+                    <BellAlertIcon className="w-5 h-5 text-gray-600" />
+                    {alerts.length > 0 && (
+                      <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full" />
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
+
+            <AnimatePresence>
+              {isNotificationsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 12, scale: 0.95 }}
+                  className="absolute right-0 mt-3 w-80 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-xl border border-gray-100 p-4 z-[999] text-left"
+                >
+                  <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
+                    <h4 className="font-semibold text-xs text-[#111844] uppercase tracking-wider">Active Alerts</h4>
+                    <span className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-bold">
+                      {alerts.length} Warnings
+                    </span>
+                  </div>
+                  <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                    {alerts.map((alert) => (
+                      <div key={alert.id} className="p-2.5 bg-gray-50 rounded-xl">
+                        <div className="flex justify-between items-start">
+                          <h5 className="font-bold text-xs text-gray-800">{alert.title}</h5>
+                          <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
+                            alert.severity === "Critical" ? "bg-red-100 text-red-700" :
+                            alert.severity === "High" ? "bg-orange-100 text-orange-700" :
+                            alert.severity === "Medium" ? "bg-yellow-100 text-yellow-700" :
+                            "bg-green-100 text-green-700"
+                          }`}>{alert.severity}</span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 mt-1">{alert.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* User Info & Sign Out */}
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{session.user?.name}</p>
-              <p className="text-xs text-gray-500">{session.user?.email}</p>
-              {session.user?.role && (
-                <span className="inline-block mt-1 px-2 py-1 text-xs font-semibold bg-cyan-100 text-cyan-800 rounded">
-                  {session.user.role}
-                </span>
-              )}
-            </div>
+          {/* Download Symbol in Report Button */}
+          <button
+            className="bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-xs px-4 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm font-semibold flex items-center gap-2"
+          >
+            <span>Report</span>
+            <ArrowDownTrayIcon className="w-4 h-4 text-white" />
+          </button>
 
-            <Avatar
-              showFallback
-              src={session.user?.image || undefined}
-              className="h-10 w-10"
-            />
-
-            <Button
-              auto
-              color="danger"
-              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
-              className="ml-4"
+          {/* User Image Logo in Navbar */}
+          <div className="relative" ref={profileRef}>
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex items-center focus:outline-none"
             >
-              Sign Out
-            </Button>
+              {userImage ? (
+                <img
+                  src={userImage}
+                  alt={userName}
+                  className="w-10 h-10 rounded-full border border-gray-200 shadow-md object-cover hover:scale-105 active:scale-95 transition-transform"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#792CA2] to-[#DCCBFF] p-0.5 shadow-md active:scale-95 transition-transform hover:brightness-105 flex items-center justify-center">
+                  <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+                    <UserIcon className="w-5 h-5 text-[#792CA2]" />
+                  </div>
+                </div>
+              )}
+            </button>
+
+            <AnimatePresence>
+              {isProfileOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 12, scale: 0.95 }}
+                  className="absolute right-0 mt-3 w-52 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-xl border border-gray-100 p-2 z-[999] text-left"
+                >
+                  <div className="p-2.5 border-b border-gray-100">
+                    <p className="font-bold text-xs text-[#111844] truncate">{userName}</p>
+                    <p className="text-[10px] text-gray-400 truncate">{session?.user?.email || "alex.carter@cloudoptics.io"}</p>
+                    <span className="inline-block text-[8px] font-bold px-1.5 py-0.5 rounded-full mt-1.5 bg-[#792CA2] text-white">
+                      Google Session Active
+                    </span>
+                  </div>
+                  <div className="pt-2">
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left text-xs px-2.5 py-2 rounded-xl hover:bg-red-50 text-red-600 transition-colors flex items-center gap-2 font-medium"
+                    >
+                      <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Dashboard Coming Soon
-          </h2>
-          <p className="text-gray-600">
-            The dashboard content will be implemented here. This includes:
-          </p>
-          <ul className="mt-4 text-left inline-block text-gray-600 space-y-2">
-            <li>• KPI Cards (Total Spend, Budget, Active Alerts)</li>
-            <li>• Cost Trends Chart</li>
-            <li>• Service Breakdown Chart</li>
-            <li>• Top Cost-Consuming Resources</li>
-            <li>• Optimization Recommendations</li>
-          </ul>
-        </div>
+      <div className="flex">
+        
+        {/* SIDEBAR */}
+        <motion.aside
+          animate={{ width: isSidebarExpanded ? 240 : 76 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="flex-shrink-0 min-h-screen bg-[#111844] text-white p-5 flex flex-col justify-between overflow-hidden"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-8">
+              {isSidebarExpanded && (
+                <motion.h2 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="font-semibold text-lg tracking-wide text-gray-200 uppercase text-xs font-bold"
+                >
+                  Navigation
+                </motion.h2>
+              )}
+              <button
+                onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                className={`p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors focus:outline-none ${!isSidebarExpanded ? "mx-auto" : ""}`}
+                title={isSidebarExpanded ? "Collapse Menu" : "Expand Menu"}
+              >
+                <Bars3Icon className="w-5 h-5" />
+              </button>
+            </div>
 
-        {/* Debug Info */}
-        <div className="mt-8 bg-blue-50 rounded-lg p-6 border border-blue-200">
-          <h3 className="text-sm font-semibold text-blue-900 mb-2">Session Info (Debug)</h3>
-          <pre className="text-xs text-blue-800 overflow-auto">
-            {JSON.stringify(
-              {
-                name: session.user?.name,
-                email: session.user?.email,
-                role: session.user?.role,
-                id: session.user?.id,
-              },
-              null,
-              2
-            )}
-          </pre>
-        </div>
-      </main>
+            <nav className="space-y-3">
+              <button
+                className="w-full text-left text-xs px-4 py-3 rounded-xl bg-[#792CA2] font-semibold text-white relative shadow-md flex items-center gap-3"
+              >
+                <Squares2X2Icon className="w-5 h-5 flex-shrink-0" />
+                {isSidebarExpanded && (
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    Dashboard
+                  </motion.span>
+                )}
+              </button>
+
+              {[
+                { name: "Resources", icon: CpuChipIcon },
+                { name: "Recommendations", icon: SparklesIcon },
+                { name: "Alerts", icon: BellAlertIcon },
+                { name: "Settings", icon: Cog6ToothIcon },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.name}
+                    className="w-full text-left text-xs px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-[#792CA2]/25 transition-all font-medium flex items-center gap-3"
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {isSidebarExpanded && (
+                      <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="truncate"
+                      >
+                        {item.name}
+                      </motion.span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        </motion.aside>
+
+        {/* MAIN DASHBOARD CONTENT */}
+        <main className="flex-grow p-8 relative">
+          
+          {/* WELCOME BANNER (Dynamic Background & Orbital Animation) */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="rounded-3xl p-8 mb-8 bg-gradient-to-r from-[#792CA2] via-[#9A4DCC] to-[#1F215D] text-white shadow-xl relative overflow-hidden"
+          >
+            {/* Custom Interactive SVG Background Pattern */}
+            <div className="absolute inset-0 opacity-15 pointer-events-none">
+              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="banner-dots" width="24" height="24" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1.5" fill="#fff" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#banner-dots)" />
+                <path d="M-100 80 C 150 -20, 200 130, 500 60 C 800 -10, 850 130, 1200 80" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="3" />
+                <path d="M-50 110 C 200 20, 150 150, 600 80 C 900 10, 800 160, 1250 100" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
+              </svg>
+            </div>
+
+            {/* Glowing Orbital graphics filling the empty right banner spot */}
+            <div className="absolute right-14 top-1/2 -translate-y-1/2 w-28 h-28 hidden md:block pointer-events-none">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+                className="w-full h-full rounded-full border border-dashed border-white/20 flex items-center justify-center"
+              >
+                <motion.div
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  className="w-18 h-18 rounded-full border border-dotted border-white/40 flex items-center justify-center"
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#DCCBFF] to-white/40 blur-[2px]"
+                  />
+                </motion.div>
+              </motion.div>
+              <div className="absolute inset-5 rounded-full bg-white/5 blur-md animate-pulse" />
+            </div>
+
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold">Welcome, {userName} </h2>
+              <p className="mt-2 text-sm opacity-90 max-w-xl leading-relaxed">
+                Monitor cloud spending, identify optimization opportunities, and reduce unnecessary costs.
+              </p>
+            </div>
+          </motion.div>
+
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-[#111844]">
+              Performance Metrics
+            </h2>
+            
+          </div>
+
+          {/* ENHANCED KPI CARDS (Removed sparklines, added custom trend indicators) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+            {[
+              { title: "Total Spend", value: 14892.45, prefix: "$", border: "border-t-[#982598]", trend: "+12.4%", trendType: "negative" },
+              { title: "Compute Spend", value: 8430.12, prefix: "$", border: "border-t-[#9A4DCC]", trend: "-2.4%", trendType: "positive" },
+              { title: "Storage Spend", value: 4120.30, prefix: "$", border: "border-t-[#792CA2]", trend: "+4.1%", trendType: "negative" },
+              { title: "Total Savings", value: 2342.03, prefix: "$", border: "border-t-[#1F215D]", trend: "+18.7%", trendType: "positive" },
+            ].map((card, index) => (
+              <motion.div
+                key={card.title}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 100, damping: 15, delay: index * 0.08 }}
+                whileHover={{
+                  y: -6,
+                  scale: 1.02,
+                  boxShadow: "0 15px 35px rgba(121, 44, 162, 0.1)",
+                }}
+                className={`bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 border-t-4 ${card.border} flex flex-col justify-between min-h-[140px]`}
+              >
+                <div>
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    {card.title}
+                  </h3>
+                  <p className="text-2xl font-black text-[#111844] mt-2 font-mono">
+                    {card.prefix}
+                    <CountUp
+                      end={card.value}
+                      decimals={2}
+                      duration={1.5}
+                      separator=","
+                    />
+                  </p>
+                </div>
+                
+               
+              </motion.div>
+            ))}
+          </div>
+
+          {/* ANALYTICS SECTION (Added Filter to Cost Distribution) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            
+            {/* Cost Trends Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-base font-bold text-[#111844]">Monthly Cost Trends</h3>
+                  <p className="text-[11px] text-gray-400">Variances calculated in real-time</p>
+                </div>
+                <div className="bg-gray-100 rounded-lg p-0.5 flex text-[10px]">
+                  {["Monthly", "Weekly", "Daily"].map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setChartTimeframe(p)}
+                      className={`px-2.5 py-1 rounded-md font-bold transition-all ${
+                        chartTimeframe === p ? "bg-white text-[#111844] shadow-sm" : "text-gray-400 hover:text-gray-600"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="h-64 relative border-b border-gray-100">
+                {[0.25, 0.5, 0.75, 1.0].map((ratio) => (
+                  <div
+                    key={ratio}
+                    className="absolute left-0 right-0 border-t border-dashed border-gray-100 pointer-events-none"
+                    style={{ bottom: `${ratio * 100}%` }}
+                  />
+                ))}
+
+                <div className="flex h-56 items-end justify-between px-2 pt-6">
+                  {currentChartData.map((item, index) => {
+                    const heightPercent = (item.value / maxChartValue) * 100;
+                    const isHovered = hoveredBar === index;
+                    
+                    return (
+                      <div
+                        key={item.label}
+                        className="flex flex-col items-center flex-1 relative group cursor-pointer"
+                        onMouseEnter={() => setHoveredBar(index)}
+                        onMouseLeave={() => setHoveredBar(null)}
+                      >
+                        <AnimatePresence>
+                          {isHovered && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              className="absolute -top-12 z-20 bg-[#111844] text-white px-3 py-1.5 rounded-xl shadow-lg text-[10px] font-bold whitespace-nowrap"
+                            >
+                              ${item.value.toLocaleString()}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <motion.div
+                          className={`w-7 sm:w-9 rounded-t-lg bg-gradient-to-t from-[#792CA2] to-[#9A4DCC] relative transition-all duration-300 ${
+                            isHovered ? "brightness-110 shadow-md scale-x-[1.03]" : "opacity-85"
+                          }`}
+                          initial={{ height: 0 }}
+                          animate={{ height: `${heightPercent}%` }}
+                          transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                        />
+                        <span className="text-[10px] text-gray-400 font-semibold mt-2">{item.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Cost Distribution (Added dropdown resource filter) */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 flex flex-col justify-between"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-base font-bold text-[#111844]">Cost Distribution</h3>
+                  <p className="text-[11px] text-gray-400">Spending splits by component</p>
+                </div>
+                
+                {/* Resource groups filter dropdown */}
+                <div className="bg-gray-100 rounded-xl px-2.5 py-1.5 flex items-center border border-gray-200/30 text-[10px]">
+                  <span className="text-gray-400 mr-1.5 font-semibold">Filter:</span>
+                  <select
+                    value={donutFilter}
+                    onChange={(e) => setDonutFilter(e.target.value)}
+                    className="bg-transparent outline-none text-[#111844] font-bold cursor-pointer"
+                  >
+                    <option value="All">All Clusters</option>
+                    <option value="Production">Production</option>
+                    <option value="Staging">Staging</option>
+                    <option value="Development">Development</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-4">
+                
+                <div className="relative w-36 h-36 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    {/* Concentric Double Outline Rings to make it visually impressive */}
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r={donutRadius + 7}
+                      fill="transparent"
+                      stroke="rgba(121, 44, 162, 0.18)"
+                      strokeWidth="0.75"
+                      strokeDasharray="2 2"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r={donutRadius - 7}
+                      fill="transparent"
+                      stroke="rgba(121, 44, 162, 0.18)"
+                      strokeWidth="0.75"
+                      strokeDasharray="2 2"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r={donutRadius}
+                      fill="transparent"
+                      stroke="rgba(255, 255, 255, 0.25)"
+                      strokeWidth={10}
+                      className="pointer-events-none"
+                    />
+
+                    {(() => {
+                      let accumPercent = 0;
+                      return donutData.map((item, idx) => {
+                        const percentage = (item.value / donutTotal) * 100;
+                        const strokeLength = (item.value / 100) * donutCircumference;
+                        const strokeOffset = donutCircumference - strokeLength;
+                        const rotation = (accumPercent / 100) * 360;
+                        accumPercent += percentage;
+
+                        const isHovered = donutHoveredSegment === idx;
+                        const isSelected = donutSelectedSegment === idx;
+
+                        return (
+                          <motion.circle
+                            key={item.name}
+                            cx="50"
+                            cy="50"
+                            r={donutRadius}
+                            fill="transparent"
+                            stroke={item.colorHex}
+                            strokeWidth={isHovered || isSelected ? 11 : 8}
+                            strokeDasharray={`${strokeLength} ${donutCircumference}`}
+                            strokeDashoffset={strokeOffset}
+                            transform={`rotate(${rotation} 50 50)`}
+                            style={{ transformOrigin: "50px 50px" }}
+                            className="cursor-pointer transition-all"
+                            onMouseEnter={() => setDonutHoveredSegment(idx)}
+                            onMouseLeave={() => setDonutHoveredSegment(null)}
+                            onClick={() => setDonutSelectedSegment(isSelected ? null : idx)}
+                            initial={{ strokeDashoffset: donutCircumference }}
+                            animate={{ strokeDashoffset: strokeOffset }}
+                            transition={{ duration: 1.2, ease: "easeOut" }}
+                          />
+                        );
+                      });
+                    })()}
+                  </svg>
+
+                  <div className="absolute flex flex-col items-center text-center">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">
+                      {donutSelectedSegment !== null ? donutData[donutSelectedSegment].name.split(" ")[0] : "Total"}
+                    </span>
+                    <span className="text-base font-black text-[#111844] font-mono mt-0.5">
+                      {donutSelectedSegment !== null ? `${donutData[donutSelectedSegment].value}%` : `$14,892`}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 flex-1 w-full max-w-[200px]">
+                  {donutData.map((item, idx) => {
+                    const isHovered = donutHoveredSegment === idx;
+                    const isSelected = donutSelectedSegment === idx;
+                    return (
+                      <div
+                        key={item.name}
+                        onMouseEnter={() => setDonutHoveredSegment(idx)}
+                        onMouseLeave={() => setDonutHoveredSegment(null)}
+                        onClick={() => setDonutSelectedSegment(isSelected ? null : idx)}
+                        className={`flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                          isHovered || isSelected ? "bg-white shadow-md border border-gray-100" : "hover:bg-white/40"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 rounded-full h-2" style={{ backgroundColor: item.colorHex }} />
+                          <span className="text-[10px] text-gray-600 font-semibold truncate max-w-[120px]">{item.name}</span>
+                        </div>
+                        <span className="text-xs font-extrabold text-[#111844]">{item.value}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* LOWER GRIDS: TABLES & ALERTS (Added view all and severity color tracks) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            {/* Top Cost Resources Table */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-base font-bold text-[#111844]">Top Cost Resources</h3>
+                <a href="#" className="text-xs text-[#792CA2] hover:underline font-bold flex items-center gap-0.5">
+                  View All
+                  <ArrowUpRightIcon className="w-3.5 h-3.5" />
+                </a>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-[10px] text-gray-400 uppercase font-black">
+                      <th className="pb-3">Resource ID</th>
+                      <th className="pb-3">Region</th>
+                      <th className="pb-3">Service</th>
+                      <th className="pb-3 text-right">Cost/mo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {resources.map((r) => (
+                      <tr key={r.id} className="border-b border-gray-50/50 hover:bg-gray-50/20 transition-all text-xs">
+                        <td className="py-3 font-semibold text-gray-800">
+                          <div className="flex items-center gap-1.5">
+                            <span>{r.name}</span>
+                            <button
+                              onClick={() => handleCopy(r.name)}
+                              className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                              title="Copy ID"
+                            >
+                              {copiedId === r.name ? (
+                                <CheckIcon className="w-3.5 h-3.5 text-green-500" />
+                              ) : (
+                                <DocumentDuplicateIcon className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                        </td>
+                        <td className="py-3 text-gray-500">{r.region}</td>
+                        <td className="py-3">
+                          <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-purple-50 text-purple-600 border border-purple-100/50">
+                            {r.service}
+                          </span>
+                        </td>
+                        <td className="py-3 text-right font-bold text-gray-700">${r.cost.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+
+            {/* Optimization Alerts panel (Color Coding & Left Tracks) */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60"
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className="text-base font-bold text-[#111844]">Optimization Alerts</h3>
+                  {/* Naming Convention Subtitle */}
+                  <p className="text-[10px] text-gray-400 font-medium">
+                    Naming Convention: <span className="font-semibold text-gray-500">[Severity] - [Resource ID] - [Optimization Issue]</span>
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                  <a href="#" className="text-xs text-[#792CA2] hover:underline font-bold flex items-center gap-0.5">
+                    View All
+                    <ArrowUpRightIcon className="w-3.5 h-3.5" />
+                  </a>
+                  {/* Color Symbols Legend for Alerts Category */}
+                  <div className="flex items-center gap-2 text-[8px] font-black text-gray-400 uppercase tracking-wider">
+                    <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Critical</span>
+                    <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> High</span>
+                    <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> Medium</span>
+                    <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Low</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 mt-4">
+                {alerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className="bg-gray-50 border border-gray-100/80 rounded-2xl flex items-stretch overflow-hidden shadow-sm"
+                  >
+                    {/* Left severity indicator bar track */}
+                    <div className={`w-1.5 flex-shrink-0 ${
+                      alert.severity === "Critical" ? "bg-red-500" :
+                      alert.severity === "High" ? "bg-orange-500" :
+                      alert.severity === "Medium" ? "bg-yellow-500" :
+                      "bg-green-500"
+                    }`} />
+
+                    <div className="p-3 flex justify-between items-center flex-grow">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          {/* Alert pill */}
+                          <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded border ${
+                            alert.severity === "Critical" ? "bg-red-50 text-red-700 border-red-200" :
+                            alert.severity === "High" ? "bg-orange-50 text-orange-700 border-orange-200" :
+                            alert.severity === "Medium" ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                            "bg-green-50 text-green-700 border-green-200"
+                          }`}>
+                            {alert.severity}
+                          </span>
+                          <h4 className="text-xs font-extrabold text-gray-800">{alert.title}</h4>
+                        </div>
+                        <p className="text-[10px] text-gray-400 leading-normal">{alert.desc}</p>
+                      </div>
+                      <span className="text-[11px] font-bold text-green-600 whitespace-nowrap pl-2">
+                        Save ${alert.savings}/mo
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+          </div>
+
+        </main>
+      </div>
+
     </div>
   );
 }
