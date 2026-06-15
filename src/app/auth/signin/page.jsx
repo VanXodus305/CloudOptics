@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Navbar, NavbarBrand, Image, Link, Button } from "@heroui/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Image, Link, Button } from "@heroui/react";
 
 function ParticleBackground() {
   const canvasRef = useRef(null);
@@ -182,40 +182,63 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F9F7F7] via-[#EEEEEE] to-[#DCCBFF] overflow-hidden flex flex-col">
       <Navbar
-        isBlurred
+        isBlurred={false}
         position="sticky"
-        maxWidth="full"
         className="
-        bg-[#F9F7F7]/95
-        backdrop-blur-md
-        border-b
-        border-[#EEEEEE]
+          fixed
+          top-4
+          left-1/2
+          -translate-x-1/2
+          w-[calc(100%-2rem)]
+          max-w-4xl
+          z-50
+          bg-white/60
+          backdrop-blur-xl
+          border
+          border-white/30
+          shadow-[0_8px_30px_rgba(0,0,0,0.03)]
+          rounded-full
+          h-16
+          px-4
         "
+        classNames={{
+          wrapper: "max-w-full px-2 h-full justify-between gap-4",
+        }}
       >
         <NavbarBrand>
           <div className="relative flex items-center">
             <motion.div
-              initial={{
-                x: -150,
-                y: -20,
-                opacity: 0,
-              }}
-              animate={{
-                x: 0,
-                y: 0,
-                opacity: 1,
-              }}
-              transition={{
-                duration: 1.4,
-              }}
-              className="-left-5 z-10"
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 80, delay: 0.1 }}
+              className="z-10 flex items-center pl-2"
             >
               <Link href={"/"}>
-                <Image src="/logo.png" alt="Logo" width={160} />
+                <Image src="/logo.png" alt="Logo" width={130} className="object-contain" />
               </Link>
             </motion.div>
           </div>
         </NavbarBrand>
+
+        {/* Back to Home Button */}
+        <NavbarContent justify="end">
+          <NavbarItem className="pr-2">
+            <motion.div
+              initial={{ x: 100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 80, delay: 0.2 }}
+            >
+              <Link href="/">
+                <Button
+                  size="sm"
+                  className="bg-[#792CA2]/10 hover:bg-[#792CA2]/20 text-[#792CA2] font-bold rounded-full transition-all duration-300 hover:scale-[1.03]"
+                >
+                  ← Back to Home
+                </Button>
+              </Link>
+            </motion.div>
+          </NavbarItem>
+        </NavbarContent>
       </Navbar>
 
       <div className="flex-grow flex items-center justify-center p-6 relative">
