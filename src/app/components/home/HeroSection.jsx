@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@heroui/react";
+import { useSession } from "next-auth/react";
 
 export default function HeroSection() {
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
   return (
     <section
       className="
@@ -155,7 +158,7 @@ export default function HeroSection() {
             }}
             className="mt-10"
           >
-            <a href="/auth/signin">
+            <a href={isLoggedIn ? "/dashboard" : "/auth/signin"}>
             <Button
               size="lg"
               className="
@@ -165,7 +168,7 @@ export default function HeroSection() {
               px-8
               "
             >
-              Explore Dashboard
+              {isLoggedIn ? "Dashboard" : "Explore Dashboard"}
             </Button>
             </a>
           </motion.div>

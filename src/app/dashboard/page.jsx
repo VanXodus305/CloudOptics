@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@heroui/react';
+import { Button, Avatar } from '@heroui/react';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -52,13 +52,11 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {session.user?.image && (
-              <img
-                src={session.user.image}
-                alt={session.user.name}
-                className="h-10 w-10 rounded-full"
-              />
-            )}
+            <Avatar
+              showFallback
+              src={session.user?.image || undefined}
+              className="h-10 w-10"
+            />
 
             <Button
               auto

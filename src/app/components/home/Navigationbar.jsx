@@ -10,8 +10,11 @@ import {
 
 import { CloudIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 export default function Navigationbar() {
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({
       behavior: "smooth",
@@ -142,13 +145,13 @@ export default function Navigationbar() {
             animate={{ opacity: 1 }}
             transition={{ delay: 3 }}
           >
-            <a href="/auth/signin">
+            <a href={isLoggedIn ? "/dashboard" : "/auth/signin"}>
               <Button
                 size="md"
                 className="bg-[#792CA2] hover:bg-[#5E1A86] text-white font-semibold py-2 px-4"
                 radius="lg"
               >
-                Sign In
+                {isLoggedIn ? "Go To Dashboard" : "Sign In"}
               </Button>
             </a>
           </motion.div>
