@@ -99,7 +99,9 @@ export default function SignInPage() {
         >
           <div>
             <h1 className="text-4xl font-black tracking-wide">
-              <span className="text-6xl">{">"}</span> Accenture
+               <span className="text-6xl">{">" }</span>
+               <br/>
+               CloudOptics
             </h1>
           </div>
 
