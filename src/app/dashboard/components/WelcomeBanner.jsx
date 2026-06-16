@@ -8,7 +8,7 @@ export default function WelcomeBanner({ userName }) {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="rounded-3xl p-8 mb-8 bg-gradient-to-r from-[#792CA2] via-[#9A4DCC] to-[#1F215D] text-white shadow-xl relative overflow-hidden"
+      className="rounded-3xl p-6 md:p-8 mb-6 md:mb-8 bg-gradient-to-r from-[#792CA2] via-[#9A4DCC] to-[#1F215D] text-white shadow-xl relative overflow-hidden"
     >
       {/* Custom Interactive SVG Background Pattern */}
       <div className="absolute inset-0 opacity-15 pointer-events-none">

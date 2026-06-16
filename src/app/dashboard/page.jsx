@@ -479,12 +479,14 @@ export default function DashboardPage() {
           isLiveSimulation={isLiveSimulation}
           setIsLiveSimulation={setIsLiveSimulation}
           handleSignOut={handleSignOut}
+          setIsResourcesModalOpen={setIsResourcesModalOpen}
+          setIsAlertsModalOpen={setIsAlertsModalOpen}
         />
 
         {/* MAIN CONTENT AREA */}
         <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative">
           {/* MAIN DASHBOARD CONTENT */}
-          <main className="flex-grow p-8 relative">
+          <main className="flex-grow p-4 md:p-8 pb-24 md:pb-8 relative">
             {/* WELCOME BANNER */}
             <WelcomeBanner userName={userName} />
 
@@ -539,7 +541,9 @@ export default function DashboardPage() {
             </div>
           </main>
 
-          <Footer reduced={true} />
+          <div className="hidden md:block">
+            <Footer reduced={true} />
+          </div>
 
           {/* VIEW ALL MODALS */}
           <Modals

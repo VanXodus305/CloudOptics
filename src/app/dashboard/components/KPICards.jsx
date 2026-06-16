@@ -40,7 +40,7 @@ export default function KPICards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mb-6 md:mb-10">
       {cards.map((card, index) => (
         <motion.div
           key={card.title}
@@ -57,13 +57,13 @@ export default function KPICards() {
             scale: 1.02,
             boxShadow: "0 15px 35px rgba(121, 44, 162, 0.1)",
           }}
-          className={`bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 border-t-4 ${card.border} flex flex-col justify-between min-h-[140px]`}
+          className={`bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-3xl p-3 md:p-6 shadow-lg border border-white/60 border-t-4 ${card.border} flex flex-col justify-between min-h-[75px] md:min-h-[140px]`}
         >
           <div>
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <h3 className="text-[9px] md:text-xs font-bold text-gray-400 uppercase tracking-wider">
               {card.title}
             </h3>
-            <p className="text-2xl font-black text-[#111844] mt-2 font-mono">
+            <p className="text-sm sm:text-lg md:text-2xl font-black text-[#111844] mt-0.5 md:mt-2 font-mono">
               {card.prefix}
               <CountUp
                 end={card.value}
