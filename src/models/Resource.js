@@ -42,6 +42,11 @@ const ResourceSchema = new mongoose.Schema(
       enum: ["Engineering", "Marketing", "Data Science"],
       default: "Engineering",
     },
+    anomalyType: {
+      type: String,
+      enum: ["none", "idle", "oversized", "unattached"],
+      default: "none",
+    },
   },
   { timestamps: true },
 );

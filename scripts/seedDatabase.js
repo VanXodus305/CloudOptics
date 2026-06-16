@@ -68,30 +68,63 @@ function generateS3BucketName() {
   )}`.toLowerCase();
 }
 
-function generateResourceMetrics(serviceType) {
+function generateResourceMetrics(resource) {
+  const serviceType = resource.serviceType;
+  const anomalyType = resource.anomalyType || "none";
+
   if (serviceType === "EC2") {
+    let cpu = faker.number.int({ min: 10, max: 80 });
+    let mem = faker.number.int({ min: 15, max: 75 });
+    
+    if (anomalyType === "idle") {
+      cpu = faker.number.int({ min: 1, max: 4 });
+      mem = faker.number.int({ min: 5, max: 20 });
+    } else if (anomalyType === "oversized") {
+      cpu = faker.number.int({ min: 4, max: 12 });
+      mem = faker.number.int({ min: 5, max: 17 });
+    }
+
     return {
-      cpuUtilization: faker.number.int({ min: 5, max: 85 }),
-      memoryUtilization: faker.number.int({ min: 10, max: 80 }),
+      cpuUtilization: cpu,
+      memoryUtilization: mem,
       storageSizeGB: 0,
       readOperations: faker.number.int({ min: 100, max: 5000 }),
       writeOperations: faker.number.int({ min: 50, max: 3000 }),
     };
   } else if (serviceType === "RDS") {
+    let cpu = faker.number.int({ min: 15, max: 70 });
+    let mem = faker.number.int({ min: 20, max: 70 });
+
+    if (anomalyType === "idle") {
+      cpu = faker.number.int({ min: 1, max: 4 });
+      mem = faker.number.int({ min: 10, max: 30 });
+    } else if (anomalyType === "oversized") {
+      cpu = faker.number.int({ min: 4, max: 12 });
+      mem = faker.number.int({ min: 10, max: 18 });
+    }
+
     return {
-      cpuUtilization: faker.number.int({ min: 10, max: 70 }),
-      memoryUtilization: faker.number.int({ min: 20, max: 75 }),
+      cpuUtilization: cpu,
+      memoryUtilization: mem,
       storageSizeGB: faker.number.int({ min: 10, max: 500 }),
       readOperations: faker.number.int({ min: 500, max: 10000 }),
       writeOperations: faker.number.int({ min: 200, max: 5000 }),
     };
   } else if (serviceType === "S3") {
+    let readOps = faker.number.int({ min: 100, max: 50000 });
+    let writeOps = faker.number.int({ min: 50, max: 10000 });
+
+    if (anomalyType === "unattached") {
+      readOps = 0;
+      writeOps = 0;
+    }
+
     return {
       cpuUtilization: 0,
       memoryUtilization: 0,
       storageSizeGB: faker.number.int({ min: 100, max: 5000 }),
-      readOperations: faker.number.int({ min: 0, max: 50000 }),
-      writeOperations: faker.number.int({ min: 0, max: 10000 }),
+      readOperations: readOps,
+      writeOperations: writeOps,
     };
   }
 }
@@ -126,23 +159,23 @@ async function seedDatabase() {
         resourceId = generateEC2ResourceId();
         instanceType = faker.helpers.arrayElement(EC2_INSTANCES);
         costPerHour = faker.number.float({
-          min: 0.1,
-          max: 2.5,
+          min: 0.05,
+          max: 0.20,
           fractionDigits: 3,
         });
       } else if (serviceType === "S3") {
         resourceId = generateS3BucketName();
         costPerHour = faker.number.float({
           min: 0.01,
-          max: 0.5,
+          max: 0.08,
           fractionDigits: 3,
         });
       } else {
         resourceId = generateRDSResourceId();
         instanceType = faker.helpers.arrayElement(RDS_INSTANCES);
         costPerHour = faker.number.float({
-          min: 0.2,
-          max: 3.0,
+          min: 0.08,
+          max: 0.25,
           fractionDigits: 3,
         });
       }
@@ -157,6 +190,7 @@ async function seedDatabase() {
         costPerHour,
         environment: faker.helpers.arrayElement(ENVIRONMENTS),
         department: faker.helpers.arrayElement(DEPARTMENTS),
+        anomalyType: "none",
       });
     }
 
@@ -181,12 +215,13 @@ async function seedDatabase() {
         launchTimestamp: faker.date.past({ years: 1 }),
         status: "running",
         costPerHour: faker.number.float({
-          min: 0.2,
-          max: 1.0,
+          min: 0.05,
+          max: 0.15,
           fractionDigits: 3,
         }),
         environment: faker.helpers.arrayElement(ENVIRONMENTS),
         department: faker.helpers.arrayElement(DEPARTMENTS),
+        anomalyType: "idle",
       });
     }
 
@@ -200,13 +235,14 @@ async function seedDatabase() {
         instanceType: "t3.2xlarge",
         launchTimestamp: faker.date.past({ years: 1 }),
         status: "running",
-        costPerHour: 1.2, // High cost but low utilization
+        costPerHour: 0.35, // Projected cost over $100/mo (0.35 * 720 = $252)
         environment: faker.helpers.arrayElement(ENVIRONMENTS),
         department: faker.helpers.arrayElement(DEPARTMENTS),
+        anomalyType: "oversized",
       });
     }
 
-    // Create 2 unattached storage
+    // Create 2 unattached S3 storage buckets
     console.log("📝 Creating 2 unattached S3 storage buckets...");
     for (let i = 0; i < 2; i++) {
       resources.push({
@@ -215,9 +251,10 @@ async function seedDatabase() {
         region: faker.helpers.arrayElement(AWS_REGIONS),
         launchTimestamp: faker.date.past({ years: 1 }),
         status: "running",
-        costPerHour: 0.1,
+        costPerHour: 0.03, // Projected cost (0.03 * 720 = $21.60/mo)
         environment: faker.helpers.arrayElement(ENVIRONMENTS),
         department: faker.helpers.arrayElement(DEPARTMENTS),
+        anomalyType: "unattached",
       });
     }
 
@@ -242,7 +279,7 @@ async function seedDatabase() {
       const metricsForThisHour = [];
 
       for (const resource of resources) {
-        const metrics = generateResourceMetrics(resource.serviceType);
+        const metrics = generateResourceMetrics(resource);
         metricsForThisHour.push({
           resourceId: resource.resourceId,
           timestamp: new Date(timestamp),

@@ -1,11 +1,12 @@
-import { auth } from "../../../../app/api/auth/[...nextauth]/route";
 import { connectDB } from "../../../../lib/mongodb";
 import { Resource } from "../../../../models/Resource";
 import { Metric } from "../../../../models/Metric";
+import { verifySession } from "../../../../lib/auth-helper";
+import { calculateAlerts } from "../../../../lib/alerts-helper";
 
 export async function GET(request) {
   try {
-    const session = await auth();
+    const session = await verifySession(request);
 
     if (!session || !session.user) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -13,44 +14,102 @@ export async function GET(request) {
 
     await connectDB();
 
-    // Get last 30 days of data
+    const url = new URL(request.url);
+    const environment = url.searchParams.get("environment");
+
+    let resourceFilter = {};
+    if (environment && ["Production", "Development", "Testing"].includes(environment)) {
+      resourceFilter.environment = environment;
+    }
+
+    // Fetch resources based on environment
+    const resources = await Resource.find(resourceFilter).lean();
+    const resourceIds = resources.map((r) => r.resourceId);
+
+    // Get budget limit from environment or default
+    const budget = parseFloat(process.env.BUDGET_LIMIT || "5000");
+
+    // Fetch alerts to calculate activeAlerts and totalSavings
+    const activeAlertsList = await calculateAlerts(environment);
+    const activeAlerts = activeAlertsList.length;
+    const totalSavings = activeAlertsList.reduce((sum, a) => sum + a.potentialSavings, 0);
+
+    if (resources.length === 0) {
+      return Response.json({
+        totalSpend: 0,
+        budget,
+        remainingBudget: budget,
+        activeResources: 0,
+        totalResources: 0,
+        computeSpend: 0,
+        storageSpend: 0,
+        rdsSpend: 0,
+        totalSavings: 0,
+        activeAlerts: 0,
+      });
+    }
+
+    // Get last 30 days of metrics
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Calculate total spend
-    const totalSpend = await Metric.aggregate([
+    const ec2Ids = resources.filter((r) => r.serviceType === "EC2").map((r) => r.resourceId);
+    const s3Ids = resources.filter((r) => r.serviceType === "S3").map((r) => r.resourceId);
+    const rdsIds = resources.filter((r) => r.serviceType === "RDS").map((r) => r.resourceId);
+
+    const spendStats = await Metric.aggregate([
       {
         $match: {
           timestamp: { $gte: thirtyDaysAgo },
+          resourceId: { $in: resourceIds },
         },
       },
       {
         $group: {
           _id: null,
-          total: { $sum: "$costIncurred" },
+          totalSpend: { $sum: "$costIncurred" },
+          computeSpend: {
+            $sum: {
+              $cond: [{ $in: ["$resourceId", ec2Ids] }, "$costIncurred", 0],
+            },
+          },
+          storageSpend: {
+            $sum: {
+              $cond: [{ $in: ["$resourceId", s3Ids] }, "$costIncurred", 0],
+            },
+          },
+          rdsSpend: {
+            $sum: {
+              $cond: [{ $in: ["$resourceId", rdsIds] }, "$costIncurred", 0],
+            },
+          },
         },
       },
     ]);
 
-    // Count active resources
-    const activeResources = await Resource.countDocuments({
-      status: "running",
-    });
+    const stats = spendStats[0] || {
+      totalSpend: 0,
+      computeSpend: 0,
+      storageSpend: 0,
+      rdsSpend: 0,
+    };
 
-    // Count total resources
-    const totalResources = await Resource.countDocuments();
-
-    // Get budget (hardcoded for now, can be made configurable)
-    const budget = 5000;
-    const remainingBudget = budget - (totalSpend[0]?.total || 0);
+    const totalSpend = stats.totalSpend;
+    const remainingBudget = Math.max(0, budget - totalSpend);
+    const totalResources = resources.length;
+    const activeResources = resources.filter((r) => r.status === "running").length;
 
     return Response.json({
-      totalSpend: totalSpend[0]?.total || 0,
+      totalSpend,
       budget,
       remainingBudget,
       activeResources,
       totalResources,
-      activeAlerts: 0, // Will be calculated from optimization rules
+      computeSpend: stats.computeSpend,
+      storageSpend: stats.storageSpend,
+      rdsSpend: stats.rdsSpend,
+      totalSavings,
+      activeAlerts,
     });
   } catch (error) {
     console.error("Error fetching dashboard summary:", error);
