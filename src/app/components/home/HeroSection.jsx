@@ -360,6 +360,7 @@ export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -367,6 +368,7 @@ export default function HeroSection() {
     };
     handleResize();
     window.addEventListener("resize", handleResize);
+    setMounted(true);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -461,6 +463,8 @@ export default function HeroSection() {
             md:mt-24
             text-transparent
             leading-none
+            overflow-visible
+            pb-3
             "
           >
             Cloud
@@ -481,7 +485,7 @@ export default function HeroSection() {
             from-[#792CA2]
             to-[#B770FF]
             rounded-full
-            mt-5
+            mt-4
             "
           />
 
@@ -512,7 +516,7 @@ export default function HeroSection() {
           </motion.p>
 
           {/* Floating Widgets Cluster */}
-          <div className="mt-12 relative h-[320px] w-full hidden md:block">
+          <div className="mt-8 relative h-[320px] w-full hidden md:block">
             {/* Widget 1: Savings */}
             <motion.div
               onMouseEnter={() => setHoveredWidget("savings")}
@@ -678,62 +682,64 @@ export default function HeroSection() {
             className="min-h-[340px] flex flex-col justify-center relative z-10"
             style={{ perspective: "1200px", transformStyle: "preserve-3d" }}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSlide}
-                variants={isMobile ? mobileContainerVariants : containerVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                style={isMobile ? {} : { transformStyle: "preserve-3d" }}
-                className="flex flex-col items-start"
-              >
-                {/* Badge Tag with 3D Flip */}
+            {mounted && (
+              <AnimatePresence mode="wait">
                 <motion.div
-                  variants={isMobile ? {} : tagVariants}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${slides[currentSlide].tagColor} shadow-md mb-6`}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  {slides[currentSlide].tag}
-                </motion.div>
-
-                <motion.h2
-                  className="
-                  text-4xl
-                  md:text-5xl
-                  font-black
-                  text-[#111844]
-                  leading-tight
-                  overflow-visible
-                  "
+                  key={currentSlide}
+                  variants={isMobile ? mobileContainerVariants : containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
                   style={isMobile ? {} : { transformStyle: "preserve-3d" }}
+                  className="flex flex-col items-start"
                 >
-                  <WordWrapper text={slides[currentSlide].title} delayOffset={0.05} variantType="title" isMobile={isMobile} />
-                  <br />
-                  <WordWrapper 
-                    text={slides[currentSlide].highlight} 
-                    delayOffset={0.25} 
-                    variantType="highlight" 
-                    className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] bg-clip-text text-transparent font-black pb-2 -mb-2"
-                    isMobile={isMobile}
-                  />
-                </motion.h2>
+                  {/* Badge Tag with 3D Flip */}
+                  <motion.div
+                    variants={isMobile ? {} : tagVariants}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${slides[currentSlide].tagColor} shadow-md mb-6`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    {slides[currentSlide].tag}
+                  </motion.div>
 
-                <motion.p
-                  variants={isMobile ? {} : descVariants}
-                  className="
-                  mt-8
-                  text-lg
-                  md:text-xl
-                  text-gray-600
-                  leading-relaxed
-                  max-w-xl
-                  "
-                >
-                  {slides[currentSlide].desc}
-                </motion.p>
-              </motion.div>
-            </AnimatePresence>
+                  <motion.h2
+                    className="
+                    text-4xl
+                    md:text-5xl
+                    font-black
+                    text-[#111844]
+                    leading-tight
+                    overflow-visible
+                    "
+                    style={isMobile ? {} : { transformStyle: "preserve-3d" }}
+                  >
+                    <WordWrapper text={slides[currentSlide].title} delayOffset={0.05} variantType="title" isMobile={isMobile} />
+                    <br />
+                    <WordWrapper 
+                      text={slides[currentSlide].highlight} 
+                      delayOffset={0.25} 
+                      variantType="highlight" 
+                      className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] bg-clip-text text-transparent font-black pb-2 -mb-2"
+                      isMobile={isMobile}
+                    />
+                  </motion.h2>
+
+                  <motion.p
+                    variants={isMobile ? {} : descVariants}
+                    className="
+                    mt-8
+                    text-lg
+                    md:text-xl
+                    text-gray-600
+                    leading-relaxed
+                    max-w-xl
+                    "
+                  >
+                    {slides[currentSlide].desc}
+                  </motion.p>
+                </motion.div>
+              </AnimatePresence>
+            )}
           </div>
 
           <motion.div
