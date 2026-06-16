@@ -4,160 +4,49 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@heroui/react";
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import CountUp from "react-countup";
-import { useRouter } from "next/navigation";
-import {
-  CalendarIcon,
-  ArrowDownTrayIcon,
-  ArrowRightOnRectangleIcon,
-  CheckIcon,
-  DocumentDuplicateIcon,
-  XMarkIcon,
-  UserIcon,
-  Squares2X2Icon,
-  CpuChipIcon,
-  LightBulbIcon,
-  BellAlertIcon,
-  Cog6ToothIcon,
-} from "@heroicons/react/24/outline";
 
 export default function DashboardPreview() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const router = useRouter();
-  const [isLockedShow, setIsLockedShow] = useState(false);
-
-  // Local States for Sandbox
-  const [isLiveSimulation, setIsLiveSimulation] = useState(true);
-  const [chartTimeframe, setChartTimeframe] = useState("Monthly");
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isResourcesModalOpen, setIsResourcesModalOpen] = useState(false);
-  const [isAlertsModalOpen, setIsAlertsModalOpen] = useState(false);
-  const [copiedId, setCopiedId] = useState(null);
-
-  const handleScroll = (e) => {
-    if (e.currentTarget.scrollTop > 15) {
-      setIsLockedShow(true);
-    }
-  };
-
-  const [liveChartData, setLiveChartData] = useState(null);
-
-  const profileRef = useRef(null);
-
-  // Close dropdowns on click-away
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setIsProfileOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleCopy = (idText) => {
-    navigator.clipboard.writeText(idText);
-    setCopiedId(idText);
-    setTimeout(() => setCopiedId(null), 1000);
-  };
-
-  // Hardcoded chart datasets
-  const chartDatasets = {
-    Monthly: [
-      { label: "Jan", value: 12500 },
-      { label: "Feb", value: 14200 },
-      { label: "Mar", value: 13800 },
-      { label: "Apr", value: 15100 },
-      { label: "May", value: 16400 },
-      { label: "Jun", value: 14800 },
-    ],
-    Weekly: [
-      { label: "Week 1", value: 3200 },
-      { label: "Week 2", value: 3800 },
-      { label: "Week 3", value: 3500 },
-      { label: "Week 4", value: 4392 },
-    ],
-    Daily: [
-      { label: "Mon", value: 510 },
-      { label: "Tue", value: 480 },
-      { label: "Wed", value: 620 },
-      { label: "Thu", value: 580 },
-      { label: "Fri", value: 650 },
-      { label: "Sat", value: 420 },
-      { label: "Sun", value: 390 },
-    ],
-  };
-
-  // Local live simulation loop
-  useEffect(() => {
-    if (!isLiveSimulation) {
-      setLiveChartData(null);
-      return;
-    }
-
-    setLiveChartData(JSON.parse(JSON.stringify(chartDatasets)));
-
-    const interval = setInterval(() => {
-      setLiveChartData((prev) => {
-        if (!prev) return prev;
-        const copy = JSON.parse(JSON.stringify(prev));
-        Object.keys(copy).forEach((key) => {
-          copy[key] = copy[key].map((item) => {
-            const changePercent = 1 + (Math.random() * 0.1 - 0.05); // +/- 5%
-            return {
-              ...item,
-              value: Math.max(10, Math.round(item.value * changePercent)),
-            };
-          });
-        });
-        return copy;
-      });
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [isLiveSimulation]);
-
-
-
-  const currentChartData = useMemo(() => {
-    if (isLiveSimulation && liveChartData) {
-      return liveChartData[chartTimeframe];
-    }
-    return chartDatasets[chartTimeframe];
-  }, [isLiveSimulation, liveChartData, chartTimeframe]);
-
-  const maxChartValue = useMemo(() => {
-    return Math.max(...currentChartData.map((d) => d.value)) * 1.1;
-  }, [currentChartData]);
-
-  const expandedResources = [
-    { id: "1", name: "i-09f482d8c3", service: "EC2", cost: 1420.5, status: "Running", region: "us-east-1", environment: "Production" },
-    { id: "2", name: "s3-archive-media", service: "S3", cost: 980.2, status: "Active", region: "us-west-2", environment: "Production" },
-    { id: "3", name: "db-prod-replica", service: "RDS", cost: 850.0, status: "Running", region: "eu-west-1", environment: "Staging" },
-    { id: "4", name: "i-04f811a2d4", service: "EC2", cost: 620.0, status: "Stopped", region: "us-east-1", environment: "Development" },
-  ];
-
-  const expandedAlerts = [
-    { id: "a1", title: "Underutilized EC2 Instance", desc: "Instance CPU average < 5%", savings: 180, severity: "Critical", category: "Compute", status: "Active" },
-    { id: "a2", title: "Unattached EBS Volume", desc: "EBS unattached for 15 days", savings: 45, severity: "High", category: "Storage", status: "Active" },
-    { id: "a3", title: "Idle Elastic IP", desc: "EIP is unassociated", savings: 15, severity: "Low", category: "Networking", status: "Acknowledged" },
-    { id: "a4", title: "Unused Redshift Cluster", desc: "Cluster dw-staging has no connections", savings: 350, severity: "Critical", category: "Database", status: "Active" },
-  ];
-
   return (
     <section
       id="dashboard"
-      className="py-28 bg-[#F9F7F7] dark:bg-[#080A1A] rounded-t-[50px] border-t border-[#EEEEEE] dark:border-slate-800/40 relative overflow-hidden transition-colors duration-500"
+      className="
+      py-28
+      bg-[#F9F7F7]
+      dark:bg-[#080A1A]
+      rounded-t-[50px]
+      border-t
+      border-[#EEEEEE]
+      dark:border-slate-800/40
+      relative
+      overflow-hidden
+      transition-colors
+      duration-500
+      "
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
-          transition={{ duration: 0.8 }}
-          className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center w-full"
+          initial={{
+            opacity: 0,
+            y: 60,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: false,
+          }}
+          transition={{
+            duration: 0.8,
+          }}
+          className="
+          grid
+          lg:grid-cols-2
+          gap-12
+          lg:gap-20
+          items-center
+          "
         >
           {/* SaaS Dashboard Mockup Panel */}
           <div
@@ -199,61 +88,6 @@ export default function DashboardPreview() {
                   <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-[8px] font-black text-[#792CA2]">
                     U
                   </div>
-                </div>
-          {/* Left Column: LIVE Sandbox Dashboard Mockup Panel */}
-          <div className="h-[300px] rounded-3xl bg-[#F9F7F7] border border-slate-200 flex flex-col shadow-2xl overflow-hidden relative text-[#111844] w-full">
-            
-            {/* 1. Header (Topbar Mockup) */}
-            <div className="bg-white/80 border-b border-gray-200/50 px-4 py-2 flex items-center justify-between shadow-sm z-10 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500/80" />
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500/80" />
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
-                </div>
-                <img src="/logo.png" alt="Logo" className="h-4 object-contain" />
-              </div>
-              <div className="flex items-center gap-1.5 text-[7px] font-bold text-gray-500">
-                <div className="px-1.5 py-0.5 rounded bg-gray-50 border border-gray-100 flex items-center gap-0.5">
-                  <CalendarIcon className="w-2.5 h-2.5 text-[#792CA2]" />
-                  <span>Jun 16, 2026</span>
-                </div>
-                <button className="px-1.5 py-0.5 rounded bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white flex items-center gap-0.5">
-                  <span>Report</span>
-                  <ArrowDownTrayIcon className="w-2 h-2 text-white" />
-                </button>
-                <div className="relative" ref={profileRef}>
-                  <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="w-4 h-4 rounded-full bg-gradient-to-r from-[#792CA2] to-[#DCCBFF] p-0.5 focus:outline-none flex items-center justify-center"
-                  >
-                    <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-                      <UserIcon className="w-2.5 h-2.5 text-[#792CA2]" />
-                    </div>
-                  </button>
-
-                  <AnimatePresence>
-                    {isProfileOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                        className="absolute right-0 mt-1 w-28 bg-white border border-gray-150 rounded-lg shadow-md p-1.5 z-20 text-left text-[6px]"
-                      >
-                        <p className="font-bold text-[#111844] truncate">Admin User</p>
-                        <p className="text-gray-400 truncate">admin@cloudoptics.io</p>
-                        <div className="border-t border-gray-100 mt-1 pt-1">
-                          <button
-                            onClick={() => setIsProfileOpen(false)}
-                            className="w-full text-left text-red-600 font-semibold flex items-center gap-0.5"
-                          >
-                            <ArrowRightOnRectangleIcon className="w-2 h-2" />
-                            Sign Out
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               </div>
             </div>
@@ -429,40 +263,6 @@ export default function DashboardPreview() {
                       Sign Out
                     </span>
                   </div>
-            {/* 2. Main Body Container (Sidebar + Content) */}
-            <div className="flex flex-grow w-full overflow-hidden relative">
-              {/* Sidebar Mockup (Tactile Keycaps) */}
-              <div className="w-10 bg-[#111844] text-white flex flex-col justify-between p-1.5 flex-shrink-0 border-r border-[#1F215D]/20 rounded-tr-xl">
-                <div className="space-y-2">
-                  <div className="w-7 h-7 rounded bg-[#792CA2] flex items-center justify-center shadow-[0_2px_0_#5c1f7e] cursor-pointer">
-                    <Squares2X2Icon className="w-3.5 h-3.5 text-white" />
-                  </div>
-                  <div className="w-7 h-7 rounded bg-white/5 border border-gray-700/40 flex items-center justify-center shadow-[0_2px_0_#0d1235] cursor-pointer hover:bg-[#792CA2]/10">
-                    <CpuChipIcon className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                  </div>
-                  <div className="w-7 h-7 rounded bg-white/5 border border-gray-700/40 flex items-center justify-center shadow-[0_2px_0_#0d1235] cursor-pointer hover:bg-[#792CA2]/10">
-                    <LightBulbIcon className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                  </div>
-                  <div className="w-7 h-7 rounded bg-white/5 border border-gray-700/40 flex items-center justify-center shadow-[0_2px_0_#0d1235] cursor-pointer hover:bg-[#792CA2]/10">
-                    <BellAlertIcon className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  {/* Live Simulation switch mockup */}
-                  <button
-                    onClick={() => setIsLiveSimulation(!isLiveSimulation)}
-                    className={`w-7 py-1 rounded-full flex flex-col items-center justify-center transition-colors ${
-                      isLiveSimulation ? "bg-green-500" : "bg-gray-600"
-                    }`}
-                    title="Toggle Local Simulation"
-                  >
-                    <div className="w-2.5 h-2.5 bg-white rounded-full shadow-sm" />
-                  </button>
-
-                  <div className="w-7 h-7 rounded bg-white/5 border border-gray-700/40 flex items-center justify-center shadow-[0_2px_0_#0d1235] cursor-pointer hover:bg-[#792CA2]/10">
-                    <Cog6ToothIcon className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                  </div>
                 </div>
               </div>
 
@@ -566,15 +366,6 @@ export default function DashboardPreview() {
                         className="h-full bg-[#9A4DCC]"
                       />
                     </div>
-              {/* Dashboard Content Mockup */}
-              <div onScroll={handleScroll} className="flex-grow p-2.5 overflow-y-auto flex flex-col gap-2.5 bg-[#F9F7F7]/60">
-                {/* 1. Welcome Banner */}
-                <div className="bg-gradient-to-r from-[#792CA2] via-[#9A4DCC] to-[#1F215D] text-white rounded-xl p-2.5 shadow-md relative overflow-hidden flex items-center justify-between">
-                  <div className="z-10 text-left">
-                    <h4 className="text-[8px] font-black leading-none">Welcome, Admin User</h4>
-                    <p className="text-[6px] opacity-85 mt-0.5 max-w-[130px] leading-tight">
-                      Monitor cloud spending, identify optimization opportunities.
-                    </p>
                   </div>
 
                   {/* Storage Spend */}
@@ -593,8 +384,6 @@ export default function DashboardPreview() {
                         className="h-full bg-[#792CA2]"
                       />
                     </div>
-                  <div className="w-7 h-7 rounded-full border border-dashed border-white/20 flex items-center justify-center mr-1 flex-shrink-0">
-                    <div className="w-4 h-4 rounded-full border border-dotted border-white/40" />
                   </div>
 
                   {/* Total Savings */}
@@ -612,19 +401,6 @@ export default function DashboardPreview() {
                         transition={{ duration: 1.5 }}
                         className="h-full bg-emerald-500"
                       />
-                </div>
-
-                {/* 2. Performance Metrics Heading */}
-                <div className="bg-white/80 border border-white/60 rounded-lg p-2 flex items-center justify-between shadow-sm">
-                  <div className="flex items-center text-left">
-                    <div className="w-0.5 h-4 bg-gradient-to-b from-[#792CA2] to-[#1F215D] rounded-full mr-1.5 shadow-sm shadow-[#792CA2]/20" />
-                    <div className="flex flex-col">
-                      <h4 className="text-[7px] font-black text-[#111844] tracking-tight leading-none">
-                        Performance&nbsp;&nbsp;&nbsp;Metrics
-                      </h4>
-                      <p className="text-[5px] text-gray-400 font-bold tracking-wider mt-0.5">
-                        Real-time Cloud Operations
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -641,52 +417,6 @@ export default function DashboardPreview() {
                         <div className="w-5 h-1.5 bg-gray-100 dark:bg-slate-950 rounded" />
                         <div className="w-7 h-1.5 bg-[#792CA2]/15 dark:bg-[#B770FF]/20 rounded" />
                       </div>
-                {/* 3. KPI Cards Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
-                  {[
-                    { title: "Total Spend", value: 14892.45, border: "border-t-[#982598]" },
-                    { title: "Compute Spend", value: 8430.12, border: "border-t-[#9A4DCC]" },
-                    { title: "Storage Spend", value: 4120.3, border: "border-t-[#792CA2]" },
-                    { title: "Total Savings", value: 2342.03, border: "border-t-[#1F215D]" },
-                  ].map((card, index) => (
-                    <div
-                      key={index}
-                      className={`bg-white border border-gray-150 border-t-2 ${card.border} rounded-lg p-1.5 shadow-sm flex flex-col justify-center text-left`}
-                    >
-                      <span className="text-[5px] font-bold text-gray-400 uppercase tracking-wider leading-none">
-                        {card.title}
-                      </span>
-                      <span className="text-[8px] font-black text-[#111844] mt-0.5 font-mono leading-none">
-                        $
-                        {isLiveSimulation ? (
-                          <CountUp end={card.value} decimals={2} duration={2} separator="," />
-                        ) : (
-                          card.value.toLocaleString(undefined, { minimumFractionDigits: 2 })
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* 4. Chart Mockup (Cost Trends Bar Chart) */}
-                <div className="bg-white border border-gray-150 rounded-lg p-2 flex flex-col justify-between text-left w-full shadow-sm">
-                  <div className="flex justify-between items-center text-[5px] font-bold text-[#111844] leading-none mb-1.5">
-                    <span>{chartTimeframe} Trends</span>
-                    <div className="flex gap-0.5 scale-[0.8] origin-right">
-                      {["M", "W", "D"].map((tab, idx) => {
-                        const valMap = { M: "Monthly", W: "Weekly", D: "Daily" };
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => setChartTimeframe(valMap[tab])}
-                            className={`px-1 py-0.5 rounded text-[5px] font-bold ${
-                              chartTimeframe === valMap[tab] ? "bg-gray-100" : "text-gray-400"
-                            }`}
-                          >
-                            {tab}
-                          </button>
-                        );
-                      })}
                     </div>
 
                     {/* Graph bars container with Y-Axis and Grid Lines */}
@@ -866,19 +596,6 @@ export default function DashboardPreview() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-end justify-between h-14 px-1 pb-0.5 border-b border-gray-50">
-                    {currentChartData.map((item, idx) => {
-                      const heightPercent = (item.value / maxChartValue) * 100;
-                      return (
-                        <motion.div
-                          key={idx}
-                          className="w-2.5 bg-gradient-to-t from-[#792CA2] to-[#9A4DCC] rounded-t-sm"
-                          animate={{ height: `${heightPercent}%` }}
-                          transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                        />
-                      );
-                    })}
-                  </div>
 
                   {/* Blurred Overlay when Resources, Recommendations, or Alerts are active */}
                   <AnimatePresence>
@@ -936,31 +653,6 @@ export default function DashboardPreview() {
               </div>
             </div>
 
-            <AnimatePresence>
-              {isLockedShow && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 30 }}
-                  className="absolute inset-x-0 bottom-0 top-[37px] bg-gradient-to-t from-[#F9F7F7] via-[#F9F7F7]/95 to-[#F9F7F7]/60 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center"
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#792CA2]/15 border border-[#792CA2]/30 flex items-center justify-center mb-3 shadow-md animate-bounce">
-                    <span className="text-sm">🔒</span>
-                  </div>
-                  <h4 className="text-[10px] font-black text-[#111844] tracking-tight uppercase">Dashboard Locked</h4>
-                  <p className="text-[7px] text-gray-500 max-w-[150px] mt-1.5 font-bold leading-normal">
-                    Sign in to unlock interactive cost trends, resources telemetry, and custom savings recommendations.
-                  </p>
-                  <button
-                    onClick={() => router.push("/auth/signin")}
-                    className="mt-3.5 bg-[#792CA2] text-white font-bold text-[7px] px-3.5 py-1.5 rounded-full shadow-md hover:bg-[#9A4DCC] transition-colors"
-                  >
-                    Sign In to Unlock
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             {/* Glowing background inside card */}
             <div className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-64 h-64 rounded-full bg-[#792CA2]/5 dark:bg-[#792CA2]/10 blur-[100px] pointer-events-none" />
           </div>
@@ -970,22 +662,12 @@ export default function DashboardPreview() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111844] dark:text-white mb-6 transition-colors duration-500">
                 Unlock Full Insights
               </h2>
-          {/* Right Column: Content (Title, Description & Bullet points) */}
-          <div className="text-left w-full">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111844] dark:text-white mb-6 transition-colors duration-500">
-              Unlock Full Insights
-            </h2>
 
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed transition-colors duration-500">
                 Access comprehensive analytics and cloud cost optimization
                 recommendations. CloudOptics continuously checks your
                 environments to build custom savings profiles.
               </p>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed transition-colors duration-500">
-              Access comprehensive analytics and cloud cost optimization recommendations.
-              CloudOptics continuously checks your environments to build custom savings
-              profiles.
-            </p>
 
               <ul className="space-y-4 text-base text-[#111844] dark:text-gray-200 font-medium transition-colors duration-500">
                 <li className="flex items-center gap-2">
@@ -1028,113 +710,6 @@ export default function DashboardPreview() {
             </div>
           </motion.div>
         </div>
-            <ul className="space-y-4 text-base text-[#111844] dark:text-gray-200 font-semibold transition-colors duration-500">
-              <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
-                Live cloud spending visibility
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
-                Advanced cost breakdowns
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
-                Historical trend tracking
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
-                Automated resource detection
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
-                Intelligent recommendations
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
-                Real-time anomaly alerts
-              </li>
-            </ul>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Sandbox Modals rendered inside the absolute container */}
-      <AnimatePresence>
-        {isResourcesModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 text-[#111844] text-[8px]"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-white rounded-2xl p-4 shadow-2xl max-w-sm w-full border border-gray-100"
-            >
-              <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-                <h3 className="font-bold text-[#111844] text-[10px]">All Cost Resources</h3>
-                <button onClick={() => setIsResourcesModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                  <XMarkIcon className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              <div className="space-y-1.5">
-                {expandedResources.map((r) => (
-                  <div key={r.id} className="flex justify-between items-center border-b border-gray-50 pb-1">
-                    <div className="flex items-center gap-1">
-                      <span className="font-semibold text-gray-800">{r.name}</span>
-                      <button onClick={() => handleCopy(r.name)}>
-                        {copiedId === r.name ? <CheckIcon className="w-2.5 h-2.5 text-green-500" /> : <DocumentDuplicateIcon className="w-2.5 h-2.5 text-gray-400" />}
-                      </button>
-                    </div>
-                    <span className="font-bold text-gray-700">${r.cost.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isAlertsModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 text-[#111844] text-[8px]"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-white rounded-2xl p-4 shadow-2xl max-w-sm w-full border border-gray-100"
-            >
-              <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-                <h3 className="font-bold text-[#111844] text-[10px]">All Optimization Alerts</h3>
-                <button onClick={() => setIsAlertsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                  <XMarkIcon className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              <div className="space-y-1.5">
-                {expandedAlerts.map((a) => (
-                  <div key={a.id} className="flex justify-between items-start border-b border-gray-50 pb-1">
-                    <div>
-                      <h4 className="font-extrabold text-gray-800 leading-none">{a.title}</h4>
-                      <p className="text-[6px] text-gray-400 mt-0.5">{a.desc}</p>
-                    </div>
-                    <span className={`text-[6px] font-bold px-1 rounded ${a.severity === "Critical" ? "bg-red-50 text-red-700" : "bg-orange-50 text-orange-700"}`}>
-                      {a.severity}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Floating design elements */}
       <div className="absolute bottom-[-20%] left-[-10%] w-[35vw] h-[35vw] rounded-full bg-[#792CA2]/5 blur-[120px] pointer-events-none z-0" />
     </section>

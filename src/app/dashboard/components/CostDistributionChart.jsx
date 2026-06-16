@@ -1,6 +1,16 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
+
+const filterMap = {
+  All: "All Clusters",
+  Production: "Production",
+  Staging: "Staging",
+  Development: "Development",
+  Management: "Management",
+  Finance: "Finance",
+};
 
 export default function CostDistributionChart({
   donutFilter,
@@ -30,21 +40,38 @@ export default function CostDistributionChart({
         </div>
 
         {/* Resource filter*/}
-        <div className="bg-gray-100 rounded-xl px-2.5 py-1.5 flex items-center border border-gray-200/30 text-[10px]">
-          <span className="text-gray-400 mr-1.5 font-semibold">Filter:</span>
-          <select
-            value={donutFilter}
-            onChange={(e) => setDonutFilter(e.target.value)}
-            className="bg-transparent outline-none text-[#111844] font-bold cursor-pointer"
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger>
+            <Button
+              size="sm"
+              variant="flat"
+              className="bg-gray-100 hover:bg-gray-200/60 border border-gray-200/30 text-[10px] font-bold text-[#111844] rounded-xl px-3 h-8 min-w-0"
+            >
+              <span className="text-gray-400 font-semibold mr-1">Filter:</span>
+              {filterMap[donutFilter]}
+              <span className="text-[8px] ml-1 text-gray-500">▼</span>
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Filter Clusters"
+            variant="flat"
+            disallowEmptySelection
+            selectionMode="single"
+            selectedKeys={new Set([donutFilter])}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0];
+              setDonutFilter(selected);
+            }}
+            className="text-xs text-[#111844]"
           >
-            <option value="All">All Clusters</option>
-            <option value="Production">Production</option>
-            <option value="Staging">Staging</option>
-            <option value="Development">Development</option>
-            <option value="Management">Management</option>
-            <option value="Finance">Finance</option>
-          </select>
-        </div>
+            <DropdownItem key="All">All Clusters</DropdownItem>
+            <DropdownItem key="Production">Production</DropdownItem>
+            <DropdownItem key="Staging">Staging</DropdownItem>
+            <DropdownItem key="Development">Development</DropdownItem>
+            <DropdownItem key="Management">Management</DropdownItem>
+            <DropdownItem key="Finance">Finance</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-4">

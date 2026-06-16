@@ -31,15 +31,17 @@ export default function DashboardPage() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
-  // Current Date 
+  // Current Date
   const [currentDate, setCurrentDate] = useState("");
   useEffect(() => {
-    setCurrentDate(new Date().toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    }));
+    setCurrentDate(
+      new Date().toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+    );
   }, []);
 
   const [isResourcesModalOpen, setIsResourcesModalOpen] = useState(false);
@@ -128,7 +130,7 @@ export default function DashboardPage() {
   }, [isLiveSimulation, liveChartData, chartTimeframe]);
 
   const maxChartValue = useMemo(() => {
-    return Math.max(...currentChartData.map(d => d.value)) * 1.1;
+    return Math.max(...currentChartData.map((d) => d.value)) * 1.1;
   }, [currentChartData]);
 
   // Donut data changes according to dropdown filter
@@ -239,34 +241,178 @@ export default function DashboardPage() {
 
   // Alerts array with criteria-severity levels (Only 3 items shown in dashboard)
   const alerts = [
-    { id: "a1", title: "Underutilized EC2 Instance", desc: "Instance i-09f482d8c3 has average CPU < 5%", savings: 180, severity: "Critical", category: "Compute", status: "Active" },
-    { id: "a2", title: "Unattached EBS Volume found", desc: "Volume vol-028a49c has been unattached for 15 days", savings: 45, severity: "High", category: "Storage", status: "Active" },
-    { id: "a3", title: "Idle Elastic IP detected", desc: "EIP 54.210.12.89 is unassociated with any instance", savings: 15, severity: "Low", category: "Networking", status: "Acknowledged" }
+    {
+      id: "a1",
+      title: "Underutilized EC2 Instance",
+      desc: "Instance i-09f482d8c3 has average CPU < 5%",
+      savings: 180,
+      severity: "Critical",
+      category: "Compute",
+      status: "Active",
+    },
+    {
+      id: "a2",
+      title: "Unattached EBS Volume found",
+      desc: "Volume vol-028a49c has been unattached for 15 days",
+      savings: 45,
+      severity: "High",
+      category: "Storage",
+      status: "Active",
+    },
+    {
+      id: "a3",
+      title: "Idle Elastic IP detected",
+      desc: "EIP 54.210.12.89 is unassociated with any instance",
+      savings: 15,
+      severity: "Low",
+      category: "Networking",
+      status: "Acknowledged",
+    },
   ];
 
   const expandedAlerts = [
-    { id: "a1", title: "Underutilized EC2 Instance", desc: "Instance i-09f482d8c3 has average CPU < 5%", savings: 180, severity: "Critical", category: "Compute", status: "Active" },
-    { id: "a2", title: "Unattached EBS Volume found", desc: "Volume vol-028a49c has been unattached for 15 days", savings: 45, severity: "High", category: "Storage", status: "Active" },
-    { id: "a3", title: "Idle Elastic IP detected", desc: "EIP 54.210.12.89 is unassociated with any instance", savings: 15, severity: "Low", category: "Networking", status: "Acknowledged" },
-    { id: "a4", title: "Unused Redshift Cluster", desc: "Cluster dw-staging has had no connections for 30 days", savings: 350, severity: "Critical", category: "Database", status: "Active" },
-    { id: "a5", title: "Unused Route53 Hosted Zone", desc: "Hosted zone sandbox.dev has had no queries for 3 months", savings: 10, severity: "Low", category: "Networking", status: "Resolved" },
-    { id: "a6", title: "Idle Load Balancer", desc: "ELB app-lb-dev has had no traffic for 10 days", savings: 25, severity: "Medium", category: "Networking", status: "Active" },
+    {
+      id: "a1",
+      title: "Underutilized EC2 Instance",
+      desc: "Instance i-09f482d8c3 has average CPU < 5%",
+      savings: 180,
+      severity: "Critical",
+      category: "Compute",
+      status: "Active",
+    },
+    {
+      id: "a2",
+      title: "Unattached EBS Volume found",
+      desc: "Volume vol-028a49c has been unattached for 15 days",
+      savings: 45,
+      severity: "High",
+      category: "Storage",
+      status: "Active",
+    },
+    {
+      id: "a3",
+      title: "Idle Elastic IP detected",
+      desc: "EIP 54.210.12.89 is unassociated with any instance",
+      savings: 15,
+      severity: "Low",
+      category: "Networking",
+      status: "Acknowledged",
+    },
+    {
+      id: "a4",
+      title: "Unused Redshift Cluster",
+      desc: "Cluster dw-staging has had no connections for 30 days",
+      savings: 350,
+      severity: "Critical",
+      category: "Database",
+      status: "Active",
+    },
+    {
+      id: "a5",
+      title: "Unused Route53 Hosted Zone",
+      desc: "Hosted zone sandbox.dev has had no queries for 3 months",
+      savings: 10,
+      severity: "Low",
+      category: "Networking",
+      status: "Resolved",
+    },
+    {
+      id: "a6",
+      title: "Idle Load Balancer",
+      desc: "ELB app-lb-dev has had no traffic for 10 days",
+      savings: 25,
+      severity: "Medium",
+      category: "Networking",
+      status: "Active",
+    },
   ];
 
   // Resources list with regions (Only 3 items shown in dashboard)
   const resources = [
-    { id: "1", name: "i-09f482d8c3", service: "EC2", cost: 1420.50, status: "Running", region: "us-east-1", environment: "Production" },
-    { id: "2", name: "s3-archive-media", service: "S3", cost: 980.20, status: "Active", region: "us-west-2", environment: "Production" },
-    { id: "3", name: "db-prod-replica", service: "RDS", cost: 850.00, status: "Running", region: "eu-west-1", environment: "Staging" }
+    {
+      id: "1",
+      name: "i-09f482d8c3",
+      service: "EC2",
+      cost: 1420.5,
+      status: "Running",
+      region: "us-east-1",
+      environment: "Production",
+    },
+    {
+      id: "2",
+      name: "s3-archive-media",
+      service: "S3",
+      cost: 980.2,
+      status: "Active",
+      region: "us-west-2",
+      environment: "Production",
+    },
+    {
+      id: "3",
+      name: "db-prod-replica",
+      service: "RDS",
+      cost: 850.0,
+      status: "Running",
+      region: "eu-west-1",
+      environment: "Staging",
+    },
   ];
 
   const expandedResources = [
-    { id: "1", name: "i-09f482d8c3", service: "EC2", cost: 1420.50, status: "Running", region: "us-east-1", environment: "Production" },
-    { id: "2", name: "s3-archive-media", service: "S3", cost: 980.20, status: "Active", region: "us-west-2", environment: "Production" },
-    { id: "3", name: "i-04f811a2d4", service: "EC2", cost: 620.00, status: "Stopped", region: "us-east-1", environment: "Development" },
-    { id: "4", name: "s3-backup-logs", service: "S3", cost: 95.10, status: "Active", region: "ap-southeast-1", environment: "Staging" },
-    { id: "5", name: "i-09ab723cd8", service: "EC2", cost: 310.00, status: "Running", region: "us-east-1", environment: "Development" },
-    { id: "6", name: "s3-billing-exports", service: "S3", cost: 45.00, status: "Active", region: "us-east-1", environment: "Management" },
+    {
+      id: "1",
+      name: "i-09f482d8c3",
+      service: "EC2",
+      cost: 1420.5,
+      status: "Running",
+      region: "us-east-1",
+      environment: "Production",
+    },
+    {
+      id: "2",
+      name: "s3-archive-media",
+      service: "S3",
+      cost: 980.2,
+      status: "Active",
+      region: "us-west-2",
+      environment: "Production",
+    },
+    {
+      id: "3",
+      name: "i-04f811a2d4",
+      service: "EC2",
+      cost: 620.0,
+      status: "Stopped",
+      region: "us-east-1",
+      environment: "Development",
+    },
+    {
+      id: "4",
+      name: "s3-backup-logs",
+      service: "S3",
+      cost: 95.1,
+      status: "Active",
+      region: "ap-southeast-1",
+      environment: "Staging",
+    },
+    {
+      id: "5",
+      name: "i-09ab723cd8",
+      service: "EC2",
+      cost: 310.0,
+      status: "Running",
+      region: "us-east-1",
+      environment: "Development",
+    },
+    {
+      id: "6",
+      name: "s3-billing-exports",
+      service: "S3",
+      cost: 45.0,
+      status: "Active",
+      region: "us-east-1",
+      environment: "Management",
+    },
   ];
 
   if (status === "loading" || (status === "unauthenticated" && !isSigningOut)) {
