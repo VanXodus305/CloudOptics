@@ -179,21 +179,21 @@ function ParticleBackground() {
 
 const slides = [
   {
-    tag: "COST CONTROL",
+    // tag: "COST CONTROL",
     tagColor: "from-purple-600 to-indigo-600",
     title: "See Every Dollar.",
     highlight: "Optimize Every Resource.",
     desc: "CloudOptics combines real-time monitoring, cost analytics, automated optimization, savings recommendations, and risk detection into a single platform, helping organizations achieve greater efficiency and financial control across their cloud environments.",
   },
   {
-    tag: "INSTANT ALERTS",
+    // tag: "INSTANT ALERTS",
     tagColor: "from-sky-500 to-blue-500",
     title: "Real-time Cost Visibility.",
     highlight: "Never Miss An Anomaly.",
     desc: "Get notified instantly of any abnormal spikes in your cloud resources. Keep your cloud engineering teams accountable with precise resource ownership mapping and automated alert routing.",
   },
   {
-    tag: "AUTOMATED SAVINGS",
+    // tag: "AUTOMATED SAVINGS",
     tagColor: "from-emerald-500 to-teal-500",
     title: "Actionable Savings Insights.",
     highlight: "Cut Cloud Waste by 30%.",
@@ -707,14 +707,7 @@ export default function HeroSection() {
                       style={isMobile ? {} : { transformStyle: "preserve-3d" }}
                       className="flex flex-col items-start"
                     >
-                      {/* Badge Tag with 3D Flip */}
-                      <motion.div
-                        variants={isMobile ? {} : tagVariants}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${slides[currentSlide].tagColor} shadow-md mb-6`}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        {slides[currentSlide].tag}
-                      </motion.div>
+                     
 
                       <motion.h2
                         className="
