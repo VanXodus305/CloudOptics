@@ -10,11 +10,15 @@ export default function DashboardPreview() {
       className="
       py-28
       bg-[#F9F7F7]
+      dark:bg-[#080A1A]
       rounded-t-[50px]
       border-t
       border-[#EEEEEE]
+      dark:border-slate-800/40
       relative
       overflow-hidden
+      transition-colors
+      duration-500
       "
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -151,37 +155,37 @@ export default function DashboardPreview() {
 
           <div>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111844] mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111844] dark:text-white mb-6 transition-colors duration-500">
               Unlock Full Insights
             </h2>
 
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed transition-colors duration-500">
               Access comprehensive analytics and cloud cost optimization recommendations. CloudOptics continuously checks your environments to build custom savings profiles.
             </p>
 
-            <ul className="space-y-4 text-base text-[#111844] font-medium">
+            <ul className="space-y-4 text-base text-[#111844] dark:text-gray-200 font-medium transition-colors duration-500">
               <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] text-xl font-bold">&bull;</span>
+                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
                 Live cloud spending visibility across all services
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] text-xl font-bold">&bull;</span>
+                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
                 Advanced cost breakdowns and analytics dashboards
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] text-xl font-bold">&bull;</span>
+                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
                 Historical trend tracking and forecasting insights
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] text-xl font-bold">&bull;</span>
+                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
                 Automated detection of idle and oversized resources
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] text-xl font-bold">&bull;</span>
+                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
                 Intelligent cost-saving recommendations
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-[#792CA2] text-xl font-bold">&bull;</span>
+                <span className="text-[#792CA2] dark:text-[#B770FF] text-xl font-bold">&bull;</span>
                 Real-time alerts for risks and anomalies
               </li>
             </ul>

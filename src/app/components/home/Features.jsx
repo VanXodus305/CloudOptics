@@ -295,24 +295,26 @@ function FeatureCard({ feature, index, activeIndexVal, isMobile, startIndex, set
           cursor-pointer
           rounded-3xl
           ${index === startIndex
-            ? "border-[#792CA2] bg-white shadow-[0_30px_70px_rgba(121,44,162,0.15)] scale-[1.02]"
-            : "border-gray-200 bg-white/70 backdrop-blur-md opacity-60 shadow-md hover:opacity-85 hover:border-[#792CA2]/50 hover:shadow-lg"
+            ? "border-[#792CA2] dark:border-[#9A4DCC] bg-white dark:bg-[#111430] shadow-[0_30px_70px_rgba(121,44,162,0.15)] dark:shadow-[0_30px_70px_rgba(154,77,204,0.25)] scale-[1.02]"
+            : "border-gray-200 dark:border-neutral-800 bg-white/70 dark:bg-[#111430]/70 backdrop-blur-md opacity-60 shadow-md hover:opacity-85 hover:border-[#792CA2]/50 dark:hover:border-[#9A4DCC]/50 hover:shadow-lg"
           }
         `}
       >
         <CardBody className="p-8 flex flex-col justify-between">
           <div>
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-sm transition-all ${
-              index === startIndex ? "bg-[#792CA2] text-white" : "bg-[#792CA2]/10 text-[#792CA2]"
+              index === startIndex 
+                ? "bg-[#792CA2] dark:bg-[#9A4DCC] text-white" 
+                : "bg-[#792CA2]/10 dark:bg-[#9A4DCC]/20 text-[#792CA2] dark:text-[#B770FF]"
             }`}>
               {feature.icon}
             </div>
 
-            <h3 className="text-2xl font-bold text-[#111844] mb-3">
+            <h3 className="text-2xl font-bold text-[#111844] dark:text-white mb-3 transition-colors duration-500">
               {feature.title}
             </h3>
 
-            <p className="text-gray-500 leading-relaxed text-xs mb-6">
+            <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-xs mb-6 transition-colors duration-500">
               {feature.desc}
             </p>
           </div>
@@ -425,7 +427,7 @@ export default function FeaturesCarousel() {
   return (
     <section
       id="features"
-      className="py-28 bg-[#FFFFFF] rounded-t-[50px] relative overflow-hidden"
+      className="py-28 bg-[#FFFFFF] dark:bg-[#070919] rounded-t-[50px] relative overflow-hidden transition-colors duration-500"
     >
       {/* Background Decorative patterns */}
       <div className="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-[#792CA2]/5 blur-[120px] pointer-events-none" />
@@ -437,11 +439,11 @@ export default function FeaturesCarousel() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
 
         <div className="text-center mb-4 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111844] mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111844] dark:text-white mb-4 transition-colors duration-500">
             Core Features
           </h2>
 
-          <p className="text-lg text-gray-500">
+          <p className="text-lg text-gray-500 dark:text-gray-400 transition-colors duration-500">
             Drag the entire stack of cards left or right or use trackpad two-finger swipe.
           </p>
         </div>
@@ -454,9 +456,10 @@ export default function FeaturesCarousel() {
             className={`
               hidden md:flex
               w-12 h-12 rounded-full
-              bg-white
+              bg-white dark:bg-slate-900
+              border dark:border-slate-800
               shadow-lg
-              text-[#792CA2]
+              text-[#792CA2] dark:text-[#B770FF]
               items-center justify-center
               font-bold
               transition-all
@@ -536,9 +539,10 @@ export default function FeaturesCarousel() {
             className={`
               hidden md:flex
               w-12 h-12 rounded-full
-              bg-white
+              bg-white dark:bg-slate-900
+              border dark:border-slate-800
               shadow-lg
-              text-[#792CA2]
+              text-[#792CA2] dark:text-[#B770FF]
               items-center justify-center
               font-bold
               transition-all
@@ -559,8 +563,8 @@ export default function FeaturesCarousel() {
               onClick={() => setStartIndex(index)}
               className={`h-2.5 rounded-full transition-all duration-300 ${
                 startIndex === index
-                  ? "w-8 bg-[#792CA2]"
-                  : "w-2.5 bg-gray-300 hover:bg-gray-400"
+                  ? "w-8 bg-[#792CA2] dark:bg-[#B770FF]"
+                  : "w-2.5 bg-gray-300 dark:bg-neutral-700 hover:bg-gray-400 dark:hover:bg-neutral-600"
               }`}
               aria-label={`Go to feature slide ${index + 1}`}
             />

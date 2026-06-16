@@ -457,7 +457,7 @@ export default function DashboardPage() {
               <img
                 src="/logo.png"
                 alt="Logo"
-                className="h-8 object-contain cursor-pointer"
+                className="h-1 object-contain cursor-pointer"
                 onClick={() => router.push("/dashboard")}
               />
             </div>

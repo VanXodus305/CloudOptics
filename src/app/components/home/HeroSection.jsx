@@ -388,6 +388,9 @@ export default function HeroSection() {
       from-[#F9F7F7]
       via-[#EEEEEE]
       to-[#DCCBFF]
+      dark:from-[#080A1A]
+      dark:via-[#0F122B]
+      dark:to-[#22163A]
       flex
       items-center
       px-8
@@ -409,16 +412,16 @@ export default function HeroSection() {
       <div className="absolute bottom-[10%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-[#B770FF]/6 blur-[110px] animate-[pulse_8s_infinite_alternate_2s] pointer-events-none z-0" />
 
       {/* Cybernetic concentric circles in the background */}
-      <div className="absolute top-1/2 left-[5%] w-[450px] h-[450px] opacity-[0.05] pointer-events-none z-0">
+      <div className="absolute top-1/2 left-[5%] w-[450px] h-[450px] opacity-[0.05] dark:opacity-[0.1] pointer-events-none z-0">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-          className="w-full h-full rounded-full border border-dashed border-[#111844]"
+          className="w-full h-full rounded-full border border-dashed border-[#111844] dark:border-white"
         />
         <motion.div
           animate={{ rotate: -360 }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-10 rounded-full border border-dotted border-[#111844]"
+          className="absolute inset-10 rounded-full border border-dotted border-[#111844] dark:border-white"
         />
       </div>
 
@@ -461,7 +464,8 @@ export default function HeroSection() {
             bg-clip-text
             mt-2
             md:mt-24
-            text-transparent
+            text-[#111844]
+            dark:text-white
             leading-none
             overflow-visible
             pb-3
@@ -484,6 +488,8 @@ export default function HeroSection() {
             bg-gradient-to-r
             from-[#792CA2]
             to-[#B770FF]
+            dark:from-[#9A4DCC]
+            dark:to-[#C084FC]
             rounded-full
             mt-4
             "
@@ -506,6 +512,7 @@ export default function HeroSection() {
             uppercase
             tracking-[4px]
             text-[#792CA2]
+            dark:text-[#B770FF]
             font-bold
             text-sm
             md:text-base
@@ -533,36 +540,36 @@ export default function HeroSection() {
                 stiffness: 220,
                 damping: 24,
               }}
-              className="absolute top-0 left-0 p-5 bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-60 overflow-hidden cursor-pointer"
+              className="absolute top-0 left-0 p-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-white/40 dark:border-slate-800/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-60 overflow-hidden cursor-pointer"
             >
               <div className="flex justify-between items-center mb-2">
-                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Potential Savings</span>
-                <span className="px-2 py-0.5 text-[9px] bg-emerald-100 text-emerald-800 rounded-full font-bold">+24.5%</span>
+                <span className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">Potential Savings</span>
+                <span className="px-2 py-0.5 text-[9px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 rounded-full font-bold">+24.5%</span>
               </div>
-              <p className="text-3xl font-black text-[#111844]">$8,450<span className="text-sm font-medium text-gray-500">/mo</span></p>
+              <p className="text-3xl font-black text-[#111844] dark:text-white">$8,450<span className="text-sm font-medium text-gray-500 dark:text-slate-400">/mo</span></p>
               
               {hoveredWidget === "savings" ? (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="mt-3 pt-3 border-t border-gray-150/50 space-y-1 text-[10px] text-gray-600"
+                  className="mt-3 pt-3 border-t border-gray-150/50 dark:border-slate-800 space-y-1 text-[10px] text-gray-600 dark:text-slate-300"
                 >
                   <div className="flex justify-between font-semibold">
                     <span>☁ Compute (EC2):</span>
-                    <span className="text-emerald-600">$3,200</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">$3,200</span>
                   </div>
                   <div className="flex justify-between font-semibold">
                     <span>💾 Storage (S3):</span>
-                    <span className="text-emerald-600">$2,850</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">$2,850</span>
                   </div>
                   <div className="flex justify-between font-semibold">
                     <span>🗄 Databases (RDS):</span>
-                    <span className="text-emerald-600">$2,400</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">$2,400</span>
                   </div>
                 </motion.div>
               ) : (
-                <p className="text-xs text-gray-400 mt-1">Hover to expand breakdown</p>
+                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Hover to expand breakdown</p>
               )}
             </motion.div>
 
@@ -582,28 +589,28 @@ export default function HeroSection() {
                 stiffness: 220,
                 damping: 24,
               }}
-              className="absolute top-12 right-2 md:right-6 p-5 bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-56 overflow-hidden cursor-pointer"
+              className="absolute top-12 right-2 md:right-6 p-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-white/40 dark:border-slate-800/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-56 overflow-hidden cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
                 <div className="w-2 h-2 rounded-full bg-amber-500 absolute" />
-                <span className="text-[9px] text-amber-800 font-bold uppercase tracking-wider">Active Alert</span>
+                <span className="text-[9px] text-amber-800 dark:text-amber-400 font-bold uppercase tracking-wider">Active Alert</span>
               </div>
-              <p className="text-sm font-bold text-[#111844] mt-2">Idle Database Instance</p>
+              <p className="text-sm font-bold text-[#111844] dark:text-white mt-2">Idle Database Instance</p>
               
               {hoveredWidget === "alert" ? (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="mt-2.5 pt-2.5 border-t border-gray-150/50 text-[10px] text-gray-600 space-y-0.5"
+                  className="mt-2.5 pt-2.5 border-t border-gray-150/50 dark:border-slate-800 text-[10px] text-gray-600 dark:text-slate-300 space-y-0.5"
                 >
                   <p className="font-semibold"><span className="text-gray-400">ID:</span> db-prod-replica</p>
                   <p className="font-semibold"><span className="text-gray-400">Action:</span> Terminate</p>
-                  <p className="text-amber-600 font-bold">Waste: $140/mo</p>
+                  <p className="text-amber-600 dark:text-amber-400 font-bold">Waste: $140/mo</p>
                 </motion.div>
               ) : (
-                <p className="text-xs text-gray-500">Saving potential: $140/mo</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">Saving potential: $140/mo</p>
               )}
             </motion.div>
 
@@ -623,7 +630,7 @@ export default function HeroSection() {
                 stiffness: 220,
                 damping: 24,
               }}
-              className="absolute bottom-16 left-10 md:left-14 p-4 bg-[#792CA2] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
+              className="absolute bottom-16 left-10 md:left-14 p-4 bg-[#792CA2] dark:bg-[#5E1A86] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/10 rounded-xl">
@@ -632,7 +639,7 @@ export default function HeroSection() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[10px] text-[#DCCBFF] font-bold uppercase tracking-wider">Active Monitoring</p>
+                  <p className="text-[10px] text-[#DCCBFF] dark:text-slate-300 font-bold uppercase tracking-wider">Active Monitoring</p>
                   <p className="text-sm font-black">Systems Optimized</p>
                 </div>
               </div>
@@ -642,7 +649,7 @@ export default function HeroSection() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="mt-3 pt-2.5 border-t border-white/10 text-[9px] text-[#DCCBFF] grid grid-cols-2 gap-1 font-semibold"
+                  className="mt-3 pt-2.5 border-t border-white/10 text-[9px] text-[#DCCBFF] dark:text-slate-300 grid grid-cols-2 gap-1 font-semibold"
                 >
                   <div>✔ Budgets: OK</div>
                   <div>✔ Anomalies: 0</div>
@@ -669,10 +676,10 @@ export default function HeroSection() {
               transition={{ duration: 1, ease: "easeInOut" }}
               className={`absolute -inset-16 -z-10 rounded-full pointer-events-none ${
                 currentSlide === 0
-                  ? "bg-gradient-to-tr from-[#792CA2]/15 via-[#B770FF]/15 to-transparent"
+                  ? "bg-gradient-to-tr from-[#792CA2]/15 via-[#B770FF]/15 dark:from-[#9A4DCC]/20 dark:via-[#C084FC]/10 to-transparent"
                   : currentSlide === 1
-                  ? "bg-gradient-to-br from-[#00F2FE]/15 via-[#4FACFE]/15 to-transparent"
-                  : "bg-gradient-to-tr from-[#FF0844]/15 via-[#FFB199]/15 to-transparent"
+                  ? "bg-gradient-to-br from-[#00F2FE]/15 via-[#4FACFE]/15 dark:from-[#00F2FE]/20 dark:via-[#4FACFE]/10 to-transparent"
+                  : "bg-gradient-to-tr from-[#FF0844]/15 via-[#FFB199]/15 dark:from-[#FF0844]/20 dark:via-[#FFB199]/10 to-transparent"
               }`}
             />
           </AnimatePresence>
@@ -708,6 +715,7 @@ export default function HeroSection() {
                     md:text-5xl
                     font-black
                     text-[#111844]
+                    dark:text-white
                     leading-tight
                     overflow-visible
                     "
@@ -719,7 +727,7 @@ export default function HeroSection() {
                       text={slides[currentSlide].highlight} 
                       delayOffset={0.25} 
                       variantType="highlight" 
-                      className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] bg-clip-text text-transparent font-black pb-2 -mb-2"
+                      className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2"
                       isMobile={isMobile}
                     />
                   </motion.h2>
@@ -731,6 +739,7 @@ export default function HeroSection() {
                     text-lg
                     md:text-xl
                     text-gray-600
+                    dark:text-gray-300
                     leading-relaxed
                     max-w-xl
                     "
@@ -758,8 +767,11 @@ export default function HeroSection() {
                 size="lg"
                 className="
                 bg-[#111844]
+                dark:bg-white
                 hover:bg-[#0c0e2b]
+                dark:hover:bg-gray-150
                 text-white
+                dark:text-[#111844]
                 font-bold
                 px-8
                 shadow-[0_4px_25px_rgba(17,24,68,0.25)]
@@ -782,7 +794,7 @@ export default function HeroSection() {
                       setCurrentSlide(idx);
                     }}
                     className={`h-2.5 rounded-full overflow-hidden relative transition-all duration-500 ease-out ${
-                      isActive ? "w-8 bg-gray-200" : "w-2.5 bg-gray-300 hover:bg-gray-400"
+                      isActive ? "w-8 bg-gray-200 dark:bg-neutral-800" : "w-2.5 bg-gray-300 dark:bg-neutral-700 hover:bg-gray-400 dark:hover:bg-neutral-600"
                     }`}
                     aria-label={`Go to slide ${idx + 1}`}
                   >
@@ -792,7 +804,7 @@ export default function HeroSection() {
                         initial={{ width: isPaused ? "100%" : "0%" }}
                         animate={{ width: "100%" }}
                         transition={{ duration: isPaused ? 0 : 3, ease: "linear" }}
-                        className="absolute inset-y-0 left-0 bg-[#792CA2]"
+                        className="absolute inset-y-0 left-0 bg-[#792CA2] dark:bg-[#B770FF]"
                       />
                     )}
                   </button>

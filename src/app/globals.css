@@ -10,6 +10,12 @@ body {
   overflow-x: hidden;
   background: #F9F7F7;
   color: #111844;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+html.dark body {
+  background: #080A1A;
+  color: #F9F7F7;
 }
 
 /* Hero Background */
