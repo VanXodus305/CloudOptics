@@ -2,8 +2,16 @@
 
 import { motion } from "framer-motion";
 
-export default function Footer() {
+export default function Footer({ reduced = false }) {
   const currentYear = new Date().getFullYear();
+
+  if (reduced) {
+    return (
+      <footer className="w-full py-6 text-center text-xs text-gray-400 bg-[#111844] border-t border-white/5 relative z-10">
+        <p>@2026 CloudOptics</p>
+      </footer>
+    );
+  }
 
   const handleScrollTo = (e, id) => {
     e.preventDefault();
@@ -88,7 +96,7 @@ export default function Footer() {
           <p>© {currentYear} CloudOptics. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <p className="font-medium text-gray-600">Built for high-efficiency infrastructure.</p>
-            
+
             {/* Scroll to Top */}
             <motion.button
               onClick={scrollToTop}

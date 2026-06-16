@@ -8,7 +8,7 @@ import {
   ArrowRightOnRectangleIcon,
   Squares2X2Icon,
   CpuChipIcon,
-  SparklesIcon,
+  LightBulbIcon,
   Cog6ToothIcon,
   ArrowUpRightIcon,
   CheckIcon,
@@ -18,6 +18,8 @@ import {
   DocumentDuplicateIcon,
   UserIcon,
   Bars3Icon,
+  CalendarIcon,
+  HomeIcon,
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import CountUp from "react-countup";
@@ -161,6 +163,17 @@ export default function DashboardPage() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isBellHovered, setIsBellHovered] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+
+  // Current Date State
+  const [currentDate, setCurrentDate] = useState("");
+  useEffect(() => {
+    setCurrentDate(new Date().toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    }));
+  }, []);
   const [isResourcesModalOpen, setIsResourcesModalOpen] = useState(false);
   const [isAlertsModalOpen, setIsAlertsModalOpen] = useState(false);
 
@@ -240,7 +253,17 @@ export default function DashboardPage() {
     ],
   };
 
-  const currentChartData = chartDatasets[chartTimeframe];
+  const [isLiveSimulation, setIsLiveSimulation] = useState(false);
+  const [liveChartData, setLiveChartData] = useState(null);
+  const [liveDonutData, setLiveDonutData] = useState(null);
+
+  const currentChartData = useMemo(() => {
+    if (isLiveSimulation && liveChartData) {
+      return liveChartData[chartTimeframe];
+    }
+    return chartDatasets[chartTimeframe];
+  }, [isLiveSimulation, liveChartData, chartTimeframe]);
+
   const maxChartValue = useMemo(() => {
     return Math.max(...currentChartData.map(d => d.value)) * 1.1;
   }, [currentChartData]);
@@ -291,12 +314,67 @@ export default function DashboardPage() {
     ],
   };
 
-  const donutData = donutDatasets[donutFilter];
-  const donutTotal = donutData.reduce((acc, curr) => acc + curr.value, 0);
+  // Live Simulation effect
+  useEffect(() => {
+    if (!isLiveSimulation) {
+      setLiveChartData(null);
+      setLiveDonutData(null);
+      return;
+    }
+
+    setLiveChartData(JSON.parse(JSON.stringify(chartDatasets)));
+    setLiveDonutData(JSON.parse(JSON.stringify(donutDatasets)));
+
+    const interval = setInterval(() => {
+      setLiveChartData((prev) => {
+        if (!prev) return prev;
+        const copy = JSON.parse(JSON.stringify(prev));
+        Object.keys(copy).forEach((key) => {
+          copy[key] = copy[key].map((item) => {
+            const changePercent = 1 + (Math.random() * 0.1 - 0.05); // +/- 5%
+            return {
+              ...item,
+              value: Math.max(10, Math.round(item.value * changePercent)),
+            };
+          });
+        });
+        return copy;
+      });
+
+      setLiveDonutData((prev) => {
+        if (!prev) return prev;
+        const copy = JSON.parse(JSON.stringify(prev));
+        Object.keys(copy).forEach((key) => {
+          copy[key] = copy[key].map((item) => {
+            const changePercent = 1 + (Math.random() * 0.08 - 0.04); // +/- 4%
+            return {
+              ...item,
+              value: Math.max(2, Math.round(item.value * changePercent)),
+            };
+          });
+        });
+        return copy;
+      });
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [isLiveSimulation]);
+
+  const donutData = useMemo(() => {
+    if (isLiveSimulation && liveDonutData) {
+      return liveDonutData[donutFilter];
+    }
+    return donutDatasets[donutFilter];
+  }, [isLiveSimulation, liveDonutData, donutFilter]);
+
+  const donutTotal = useMemo(() => {
+    return donutData.reduce((acc, curr) => acc + curr.value, 0);
+  }, [donutData]);
+
   const donutRadius = 38;
   const donutCircumference = 2 * Math.PI * donutRadius;
 
-  // Alerts array with criteria-severity levels
+  // Alerts array with criteria-severity levels (Only 3 items shown in dashboard)
   const alerts = [
     { id: "a1", title: "Underutilized EC2 Instance", desc: "Instance i-09f482d8c3 has average CPU < 5%", savings: 180, severity: "Critical", category: "Compute", status: "Active" },
     { id: "a2", title: "Unattached EBS Volume found", desc: "Volume vol-028a49c has been unattached for 15 days", savings: 45, severity: "High", category: "Storage", status: "Active" },
@@ -307,28 +385,26 @@ export default function DashboardPage() {
     { id: "a1", title: "Underutilized EC2 Instance", desc: "Instance i-09f482d8c3 has average CPU < 5%", savings: 180, severity: "Critical", category: "Compute", status: "Active" },
     { id: "a2", title: "Unattached EBS Volume found", desc: "Volume vol-028a49c has been unattached for 15 days", savings: 45, severity: "High", category: "Storage", status: "Active" },
     { id: "a3", title: "Idle Elastic IP detected", desc: "EIP 54.210.12.89 is unassociated with any instance", savings: 15, severity: "Low", category: "Networking", status: "Acknowledged" },
-    { id: "a4", title: "NAT Gateway Idle Hours", desc: "NAT gateway nat-01fa872 has had zero throughput for 7 days", savings: 65, severity: "High", category: "Networking", status: "Active" },
-    { id: "a5", title: "Unused Redshift Cluster", desc: "Cluster dw-staging has had no connections for 30 days", savings: 350, severity: "Critical", category: "Database", status: "Active" },
-    { id: "a6", title: "Unused Route53 Hosted Zone", desc: "Hosted zone sandbox.dev has had no queries for 3 months", savings: 10, severity: "Low", category: "Networking", status: "Resolved" }
+    { id: "a4", title: "Unused Redshift Cluster", desc: "Cluster dw-staging has had no connections for 30 days", savings: 350, severity: "Critical", category: "Database", status: "Active" },
+    { id: "a5", title: "Unused Route53 Hosted Zone", desc: "Hosted zone sandbox.dev has had no queries for 3 months", savings: 10, severity: "Low", category: "Networking", status: "Resolved" },
+    { id: "a6", title: "Idle Load Balancer", desc: "ELB app-lb-dev has had no traffic for 10 days", savings: 25, severity: "Medium", category: "Networking", status: "Active" },
   ];
 
-  // Resources list with regions
+  // Resources list with regions (Only 3 items shown in dashboard)
   const resources = [
     { id: "1", name: "i-09f482d8c3", service: "EC2", cost: 1420.50, status: "Running", region: "us-east-1", environment: "Production" },
     { id: "2", name: "s3-archive-media", service: "S3", cost: 980.20, status: "Active", region: "us-west-2", environment: "Production" },
-    { id: "3", name: "db-prod-replica", service: "RDS", cost: 850.00, status: "Running", region: "eu-west-1", environment: "Staging" },
+    { id: "3", name: "db-prod-replica", service: "RDS", cost: 850.00, status: "Running", region: "eu-west-1", environment: "Staging" }
   ];
 
   const expandedResources = [
     { id: "1", name: "i-09f482d8c3", service: "EC2", cost: 1420.50, status: "Running", region: "us-east-1", environment: "Production" },
     { id: "2", name: "s3-archive-media", service: "S3", cost: 980.20, status: "Active", region: "us-west-2", environment: "Production" },
-    { id: "3", name: "db-prod-replica", service: "RDS", cost: 850.00, status: "Running", region: "eu-west-1", environment: "Staging" },
-    { id: "4", name: "i-04f811a2d4", service: "EC2", cost: 620.00, status: "Stopped", region: "us-east-1", environment: "Development" },
-    { id: "5", name: "redis-cache-prod", service: "Elasticache", cost: 450.00, status: "Running", region: "us-east-1", environment: "Production" },
-    { id: "6", name: "s3-backup-logs", service: "S3", cost: 95.10, status: "Active", region: "ap-southeast-1", environment: "Staging" },
-
-
-
+    { id: "3", name: "i-04f811a2d4", service: "EC2", cost: 620.00, status: "Stopped", region: "us-east-1", environment: "Development" },
+    { id: "4", name: "s3-backup-logs", service: "S3", cost: 95.10, status: "Active", region: "ap-southeast-1", environment: "Staging" },
+    { id: "5", name: "i-09ab723cd8", service: "EC2", cost: 310.00, status: "Running", region: "us-east-1", environment: "Development" },
+    { id: "6", name: "s3-billing-exports", service: "S3", cost: 45.00, status: "Active", region: "us-east-1", environment: "Management" },
+   
   ];
 
   if (status === "loading" || (status === "unauthenticated" && !isSigningOut)) {
@@ -340,7 +416,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#F9F7F7] text-[#111844] transition-colors duration-300">
+    <div className="h-screen relative overflow-hidden bg-[#F9F7F7] text-[#111844] transition-colors duration-300 flex flex-col">
 
       {/* SIGN OUT TRANSITION SCREEN */}
       <AnimatePresence>
@@ -373,94 +449,34 @@ export default function DashboardPage() {
         <div className="absolute bottom-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-[#DCCBFF]/20 blur-[120px]" />
       </div>
 
-      {/* NAVBAR */}
-      <div className="px-8 pt-4 w-full sticky top-0 z-50">
+      {/* NAVBAR (TOPBAR) */}
+      <div className="px-8 pt-4 pb-2 w-full flex-shrink-0 z-50">
         <header className="h-16 w-full bg-white/60 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-between px-8 shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-500">
-          <div className="flex items-center gap-3">
-            <img
-              src="/logo.png"
-              alt="Logo"
-              className="h-8 object-contain cursor-pointer"
-            />
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-8 object-contain cursor-pointer"
+                onClick={() => router.push("/dashboard")}
+              />
+            </div>
+            
+            {/* Go Back to Home Tab */}
+            <button
+              onClick={() => router.push("/")}
+              className="text-xs font-bold text-gray-500 hover:text-[#792CA2] transition-colors flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-gray-100/50"
+            >
+              <HomeIcon className="w-4 h-4 text-gray-400" />
+              <span>Home</span>
+            </button>
           </div>
 
           <div className="flex items-center gap-4">
-
-            {/* Bell Icon Hover Expandable warning message */}
-            <div className="relative" ref={notificationsRef}>
-              <motion.button
-                onMouseEnter={() => setIsBellHovered(true)}
-                onMouseLeave={() => setIsBellHovered(false)}
-                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className={`h-10 px-3 rounded-xl flex items-center gap-2 border shadow-sm relative active:scale-95 transition-all overflow-hidden ${isNotificationsOpen
-                    ? "bg-black border-black text-white font-bold"
-                    : "bg-white border-gray-200/30 text-gray-600 hover:bg-gray-50 font-bold"
-                  }`}
-                animate={{ width: isBellHovered ? 210 : 40 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              >
-                <AnimatePresence mode="wait">
-                  {isBellHovered ? (
-                    <motion.div
-                      key="info"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="flex items-center gap-2 whitespace-nowrap"
-                    >
-                      <InformationCircleIcon className={`w-5 h-5 ${isNotificationsOpen ? "text-white" : "text-[#792CA2]"}`} />
-                      <span className={`text-[11px] font-bold ${isNotificationsOpen ? "text-white" : "text-gray-600"}`}>
-                        {alerts.length}⚠️ received
-                      </span>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="bell"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="flex items-center justify-center w-full"
-                    >
-                      <BellAlertIcon className={`w-5 h-5 ${isNotificationsOpen ? "text-white" : "text-[#792CA2]"}`} />
-                      {alerts.length > 0 && !isNotificationsOpen && (
-                        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full" />
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.button>
-
-              <AnimatePresence>
-                {isNotificationsOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 12, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 12, scale: 0.95 }}
-                    className="absolute right-0 mt-3 w-80 bg-black text-white rounded-2xl shadow-xl border border-neutral-800 p-4 z-[999] text-left"
-                  >
-                    <div className="flex justify-between items-center mb-3 pb-2 border-b border-neutral-800">
-                      <h4 className="font-semibold text-xs text-white uppercase tracking-wider">Active Alerts</h4>
-                      <span className="text-[10px] bg-red-950 text-red-400 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                        {alerts.length} ⚠️
-                      </span>
-                    </div>
-                    <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-                      {alerts.map((alert) => (
-                        <div key={alert.id} className="p-2.5 bg-neutral-900 border border-neutral-800/60 rounded-xl">
-                          <div className="flex justify-between items-start">
-                            <h5 className="font-bold text-xs text-white">{alert.title}</h5>
-                            <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${alert.severity === "Critical" ? "bg-red-950/80 text-red-400 border border-red-900/50" :
-                                alert.severity === "High" ? "bg-orange-950/80 text-orange-400 border border-orange-900/50" :
-                                  "bg-green-950/80 text-green-400 border border-green-900/50"
-                              }`}>{alert.severity}</span>
-                          </div>
-                          <p className="text-[11px] text-neutral-400 mt-1">{alert.desc}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {/* Current Date Badge */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-100 text-xs font-bold text-gray-500 shadow-sm whitespace-nowrap">
+              <CalendarIcon className="w-4 h-4 text-[#792CA2]" />
+              <span>{currentDate}</span>
             </div>
 
             {/* Download Symbol in Report Button */}
@@ -524,13 +540,14 @@ export default function DashboardPage() {
         </header>
       </div>
 
-      <div className="flex">
+      {/* LOWER AREA (SIDEBAR + MAIN CONTENT AREA) */}
+      <div className="flex flex-grow w-full overflow-hidden relative">
 
         {/* SIDEBAR */}
         <motion.aside
           animate={{ width: isSidebarExpanded ? 240 : 76 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="flex-shrink-0 min-h-screen bg-[#111844] text-white p-5 flex flex-col overflow-hidden"
+          className="flex-shrink-0 h-full bg-[#111844] text-white p-5 flex flex-col overflow-y-auto z-40 border-r border-[#1F215D]/20 rounded-tr-2xl"
         >
           <div className="flex items-center justify-between mb-8">
             {isSidebarExpanded && (
@@ -566,7 +583,7 @@ export default function DashboardPage() {
 
               {[
                 { name: "Resources", icon: CpuChipIcon },
-                { name: "Recommendations", icon: SparklesIcon },
+                { name: "Recommendations", icon: LightBulbIcon },
                 { name: "Alerts", icon: BellAlertIcon },
               ].map((item) => {
                 const Icon = item.icon;
@@ -588,6 +605,44 @@ export default function DashboardPage() {
                   </button>
                 );
               })}
+            </div>
+
+            {/* Live Simulation Toggle */}
+            <div className={`py-3 bg-[#792CA2]/10 border border-[#792CA2]/25 rounded-xl my-4 flex flex-col items-center ${isSidebarExpanded ? "px-4 align-stretch" : "px-1 justify-center"}`}>
+              <div className={`flex items-center justify-between w-full ${isSidebarExpanded ? "" : "justify-center"}`}>
+                {isSidebarExpanded && (
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-[#DCCBFF] font-bold uppercase tracking-wider">Simulation</span>
+                 
+                  </div>
+                )}
+                <button
+                  onClick={() => setIsLiveSimulation(!isLiveSimulation)}
+                  className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 focus:outline-none flex-shrink-0 ${
+                    isLiveSimulation ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" : "bg-gray-600"
+                  }`}
+                >
+                  <motion.div
+                    layout
+                    className="w-4 h-4 bg-white rounded-full shadow-md"
+                    animate={{ x: isLiveSimulation ? 16 : 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                </button>
+              </div>
+              {isLiveSimulation && isSidebarExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="flex items-center gap-1.5 mt-1.5 w-full justify-start animate-pulse"
+                >
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                  </span>
+                 
+                </motion.div>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -625,8 +680,10 @@ export default function DashboardPage() {
           </nav>
         </motion.aside>
 
-        {/* MAIN DASHBOARD CONTENT */}
-        <main className="flex-grow p-8 relative">
+        {/* MAIN CONTENT AREA */}
+        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative">
+          {/* MAIN DASHBOARD CONTENT */}
+          <main className="flex-grow p-8 relative">
 
           {/* WELCOME BANNER (Dynamic Background & Orbital Animation) */}
           <motion.div
@@ -740,7 +797,6 @@ export default function DashboardPage() {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h3 className="text-base font-bold text-[#111844]">{chartTimeframe} Cost Trends</h3>
-                  <p className="text-[11px] text-gray-400">Variances calculated in real-time</p>
                 </div>
                 <div className="bg-gray-100 rounded-lg p-0.5 flex text-[10px]">
                   {["Monthly", "Weekly", "Daily"].map((p) => (
@@ -790,13 +846,15 @@ export default function DashboardPage() {
                           )}
                         </AnimatePresence>
 
-                        <motion.div
-                          className={`w-7 sm:w-9 rounded-t-lg bg-gradient-to-t from-[#792CA2] to-[#9A4DCC] relative transition-all duration-300 ${isHovered ? "brightness-110 shadow-md scale-x-[1.03]" : "opacity-85"
-                            }`}
-                          initial={{ height: 0 }}
-                          animate={{ height: `${heightPercent}%` }}
-                          transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                        />
+                        <div className="w-full h-36 flex items-end justify-center">
+                          <motion.div
+                            className={`w-7 sm:w-9 rounded-t-lg bg-gradient-to-t from-[#792CA2] to-[#9A4DCC] relative transition-all duration-300 ${isHovered ? "brightness-110 shadow-md scale-x-[1.03]" : "opacity-85"
+                              }`}
+                            initial={{ height: 0 }}
+                            animate={{ height: `${heightPercent}%` }}
+                            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                          />
+                        </div>
                         <span className="text-[10px] text-gray-400 font-semibold mt-2">{item.label}</span>
                       </div>
                     );
@@ -816,7 +874,7 @@ export default function DashboardPage() {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h3 className="text-base font-bold text-[#111844]">Cost Distribution</h3>
-                  <p className="text-[11px] text-gray-400">Spending splits by component</p>
+                  
                 </div>
 
                 {/* Resource filter*/}
@@ -874,7 +932,7 @@ export default function DashboardPage() {
                       let accumPercent = 0;
                       return donutData.map((item, idx) => {
                         const percentage = (item.value / donutTotal) * 100;
-                        const strokeLength = (item.value / 100) * donutCircumference;
+                        const strokeLength = (percentage / 100) * donutCircumference;
                         const rotation = (accumPercent / 100) * 360;
                         accumPercent += percentage;
 
@@ -893,7 +951,6 @@ export default function DashboardPage() {
                             strokeDasharray={`${strokeLength} ${donutCircumference}`}
                             strokeDashoffset={0}
                             transform={`rotate(${rotation} 50 50)`}
-                            style={{ transformOrigin: "50px 50px" }}
                             className="cursor-pointer transition-all"
                             onMouseEnter={() => setDonutHoveredSegment(idx)}
                             onMouseLeave={() => setDonutHoveredSegment(null)}
@@ -1065,8 +1122,188 @@ export default function DashboardPage() {
           </div>
 
         </main>
+        <Footer reduced={true} />
+
+        {/* MODALS */}
+        <AnimatePresence>
+          {isResourcesModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 text-[#111844]"
+            >
+              <motion.div
+                initial={{ scale: 0.95, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.95, y: 20 }}
+                className="bg-white rounded-3xl p-6 shadow-2xl max-w-4xl w-full border border-gray-100 max-h-[85vh] overflow-y-auto"
+              >
+                <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#111844]">All Cost Resources</h3>
+                    
+                  </div>
+                  <button
+                    onClick={() => setIsResourcesModalOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <XMarkIcon className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-100 text-[10px] text-gray-400 uppercase font-black">
+                        <th className="pb-3">Resource ID</th>
+                        <th className="pb-3">Region</th>
+                        <th className="pb-3">Service</th>
+                        <th className="pb-3">Status</th>
+                        <th className="pb-3">Environment</th>
+                        <th className="pb-3 text-right">Cost/mo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {expandedResources.map((r) => (
+                        <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-all text-xs">
+                          <td className="py-3 font-semibold text-gray-800">
+                            <div className="flex items-center gap-1.5">
+                              <span>{r.name}</span>
+                              <button
+                                onClick={() => handleCopy(r.name)}
+                                className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                                title="Copy ID"
+                              >
+                                {copiedId === r.name ? (
+                                  <CheckIcon className="w-3.5 h-3.5 text-green-500" />
+                                ) : (
+                                  <DocumentDuplicateIcon className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </div>
+                          </td>
+                          <td className="py-3 text-gray-500">{r.region}</td>
+                          <td className="py-3">
+                            <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-purple-50 text-purple-600 border border-purple-100/50">
+                              {r.service}
+                            </span>
+                          </td>
+                          <td className="py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                              r.status === "Running" 
+                              ?"bg-green-50 text-green-600 border border-green-100"
+                              : r.status ==="Active"
+                              ?"bg-red-50 text-red-600 border border-red-100":
+                              "bg-black-50 text-black-600 border border-black-100"
+                            }`}>
+                              {r.status}
+                            </span>
+                          </td>
+                          <td className="py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                              r.environment === "Production" 
+                                ? "bg-black-50 text-white-600 border border-white-100" 
+                                : r.environment === "Staging"
+                                  ? "bg-black-50 text-white-600 border border-white-100"
+                                  : "bg-black-50 text-white-600 border border-white-100"
+                            }`}>
+                              {r.environment}
+                            </span>
+                          </td>
+                          <td className="py-3 text-right font-bold text-gray-700">${r.cost.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isAlertsModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 text-[#111844]"
+            >
+              <motion.div
+                initial={{ scale: 0.95, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.95, y: 20 }}
+                className="bg-white rounded-3xl p-6 shadow-2xl max-w-4xl w-full border border-gray-100 max-h-[85vh] overflow-y-auto"
+              >
+                <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#111844]">All Optimization Alerts</h3>
+
+                  </div>
+                  <button
+                    onClick={() => setIsAlertsModalOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <XMarkIcon className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-100 text-[10px] text-gray-400 uppercase font-black">
+                        <th className="pb-3">Alert Title</th>
+                        <th className="pb-3">Severity</th>
+                        <th className="pb-3">Category</th>
+                        <th className="pb-3">Status</th>
+                 
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {expandedAlerts.map((a) => (
+                        <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-all text-xs">
+                          <td className="py-3">
+                            <div>
+                              <h4 className="font-extrabold text-gray-800">{a.title}</h4>
+                              <p className="text-[10px] text-gray-400 mt-0.5">{a.desc}</p>
+                            </div>
+                          </td>
+                          <td className="py-3">
+                            <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
+                              a.severity === "Critical" 
+                                ? "bg-red-50 text-red-700 border border-red-100" 
+                                : a.severity === "High" 
+                                  ? "bg-orange-50 text-orange-700 border-orange-100" 
+                                  : a.severity === "Medium"
+                                    ? "bg-yellow-50 text-yellow-700 border border-yellow-100"
+                                    : "bg-green-50 text-green-700 border border-green-100"
+                            }`}>{a.severity}</span>
+                          </td>
+                          <td className="py-3 font-medium text-gray-600">{a.category}</td>
+                          <td className="py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                              a.status === "Active" 
+                                ? "bg-red-50 text-red-600 border border-red-100" 
+                                : a.status === "Acknowledged"
+                                  ? "bg-blue-50 text-blue-600 border border-blue-100"
+                                  : "bg-green-50 text-green-600 border border-green-100"
+                            }`}>
+                              {a.status}
+                            </span>
+                          </td>
+                          
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-      <Footer />
     </div>
+  </div>
   );
 }

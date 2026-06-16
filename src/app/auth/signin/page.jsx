@@ -601,7 +601,7 @@ export default function SignInPage() {
           </div>
         </motion.div>
       </div>
-      <Footer />
+      <Footer reduced={true} />
     </div>
   );
 }
