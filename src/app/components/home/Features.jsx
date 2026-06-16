@@ -436,7 +436,7 @@ export default function FeaturesCarousel() {
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
 
-        <div className="text-center mb-16">
+        <div className="text-center mb-4 md:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111844] mb-4">
             Core Features
           </h2>
@@ -475,7 +475,11 @@ export default function FeaturesCarousel() {
             dragElastic={0}
             onDrag={(e, info) => {
               const slideWidth = isMobile ? 280 : 270;
-              activeIndexVal.set(startIndex - (info.offset.x / slideWidth));
+              const dragPercent = info.offset.x / slideWidth;
+              const clampedDragPercent = isMobile 
+                ? Math.max(-1.1, Math.min(1.1, dragPercent)) 
+                : dragPercent;
+              activeIndexVal.set(startIndex - clampedDragPercent);
             }}
             onDragEnd={(e, info) => {
               const slideWidth = isMobile ? 280 : 270;
@@ -490,7 +494,15 @@ export default function FeaturesCarousel() {
               }
               
               let newIndex = startIndex + indexOffset;
-              newIndex = Math.max(0, Math.min(newIndex, features.length - 1));
+              if (isMobile) {
+                if (newIndex < 0) {
+                  newIndex = features.length - 1;
+                } else if (newIndex >= features.length) {
+                  newIndex = 0;
+                }
+              } else {
+                newIndex = Math.max(0, Math.min(newIndex, features.length - 1));
+              }
               
               if (newIndex === startIndex) {
                 animate(activeIndexVal, startIndex, {

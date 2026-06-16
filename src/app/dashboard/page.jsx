@@ -37,9 +37,38 @@ function ParticleBackground() {
     let particles = [];
     const maxParticles = 40;
 
+    const isMobile = window.innerWidth < 768;
+
+    const drawStatic = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].draw();
+
+        // draw connections
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < 150) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            const opacity = ((150 - dist) / 150) * 0.05;
+            ctx.strokeStyle = `rgba(121, 44, 162, ${opacity})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+    };
+
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      if (window.innerWidth < 768) {
+        drawStatic();
+      }
     };
 
     window.addEventListener("resize", resizeCanvas);
@@ -103,7 +132,11 @@ function ParticleBackground() {
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    animate();
+    if (isMobile) {
+      drawStatic();
+    } else {
+      animate();
+    }
 
     return () => {
       cancelAnimationFrame(animationFrameId);

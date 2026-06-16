@@ -43,9 +43,37 @@ function ParticleBackground() {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseleave", handleMouseLeave);
 
+    const isMobile = window.innerWidth < 768;
+
+    const drawStatic = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].draw();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            const opacity = ((120 - dist) / 120) * 0.12;
+            ctx.strokeStyle = `rgba(121, 44, 162, ${opacity})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+    };
+
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      if (window.innerWidth < 768) {
+        drawStatic();
+      }
     };
 
     window.addEventListener("resize", resizeCanvas);
@@ -137,7 +165,11 @@ function ParticleBackground() {
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    animate();
+    if (isMobile) {
+      drawStatic();
+    } else {
+      animate();
+    }
 
     return () => {
       cancelAnimationFrame(animationFrameId);
