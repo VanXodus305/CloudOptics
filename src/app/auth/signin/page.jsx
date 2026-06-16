@@ -13,7 +13,7 @@ import {
   Link,
   Button,
 } from "@heroui/react";
-import Footer from "../../components/home/Footer";
+import Footer from "../../landing/components/Footer";
 
 function ParticleBackground() {
   const canvasRef = useRef(null);

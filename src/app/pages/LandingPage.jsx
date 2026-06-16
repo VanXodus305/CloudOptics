@@ -1,8 +1,8 @@
-import Navigationbar from "../components/home/Navigationbar";
-import HeroSection from "../components/home/HeroSection";
-import FeaturesCarousel from "../components/home/Features";
-import DashboardPreview from "../components/home/Dashboard";
-import Footer from "../components/home/Footer";
+import Navigationbar from "../landing/components/Navigationbar";
+import HeroSection from "../landing/components/HeroSection";
+import FeaturesCarousel from "../landing/components/Features";
+import DashboardPreview from "../landing/components/Dashboard";
+import Footer from "../landing/components/Footer";
 import ScrollReveal from "../components/common/ScrollReveal";
 
 export default function LandingPage() {

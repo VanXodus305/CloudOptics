@@ -16,7 +16,7 @@ import CostDistributionChart from "./components/CostDistributionChart";
 import ResourcesTable from "./components/ResourcesTable";
 import AlertsTable from "./components/AlertsTable";
 import Modals from "./components/Modals";
-import Footer from "../components/home/Footer";
+import Footer from "../landing/components/Footer";
 
 export const dynamic = "force-dynamic";
 
