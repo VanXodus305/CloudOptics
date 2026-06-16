@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   BellAlertIcon,
   ArrowRightOnRectangleIcon,
@@ -121,7 +122,8 @@ export const dynamic = "force-dynamic";
 
 export default function DashboardPage() {
   // Access actual next-auth session context
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const userName = session?.user?.name || "Admin User";
   const userImage = session?.user?.image || null;
 
@@ -158,11 +160,18 @@ export default function DashboardPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Redirect to sign-in page if not authenticated (and not in the process of signing out)
+  useEffect(() => {
+    if (status === "unauthenticated" && !isSigningOut) {
+      router.push("/auth/signin");
+    }
+  }, [status, isSigningOut, router]);
+
   const handleSignOut = () => {
     setIsProfileOpen(false);
     setIsSigningOut(true);
     setTimeout(() => {
-      window.location.href = "/auth/signin";
+      signOut({ callbackUrl: "/auth/signin" });
     }, 1500);
   };
 
@@ -257,6 +266,14 @@ export default function DashboardPage() {
     { id: "2", name: "s3-archive-media", service: "S3", cost: 980.20, status: "Active", region: "us-west-2" },
     { id: "3", name: "db-prod-replica", service: "RDS", cost: 850.00, status: "Running", region: "eu-west-1" },
   ];
+
+  if (status === "loading" || (status === "unauthenticated" && !isSigningOut)) {
+    return (
+      <div className="min-h-screen bg-[#F9F7F7] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#F9F7F7] text-[#111844] transition-colors duration-300">
