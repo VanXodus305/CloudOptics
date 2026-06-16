@@ -444,7 +444,7 @@ export default function FeaturesCarousel() {
           </h2>
 
           <p className="text-lg text-gray-500 dark:text-gray-400 transition-colors duration-500">
-            Drag the entire stack of cards left or right or use trackpad two-finger swipe.
+             Use trackpad two-finger swipe.
           </p>
         </div>
 
