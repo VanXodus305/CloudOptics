@@ -30,7 +30,7 @@ export default function Topbar({
             <img
               src="/logo.png"
               alt="Logo"
-              className="h-8 object-contain cursor-pointer"
+              className="h-16 object-contain cursor-pointer"
               onClick={() => router.push("/dashboard")}
             />
           </div>

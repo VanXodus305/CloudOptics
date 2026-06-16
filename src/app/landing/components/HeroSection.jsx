@@ -187,7 +187,7 @@ const slides = [
   },
   {
     tag: "INSTANT ALERTS",
-    tagColor: "from-amber-500 to-orange-500",
+    tagColor: "from-sky-500 to-blue-500",
     title: "Real-time Cost Visibility.",
     highlight: "Never Miss An Anomaly.",
     desc: "Get notified instantly of any abnormal spikes in your cloud resources. Keep your cloud engineering teams accountable with precise resource ownership mapping and automated alert routing.",
