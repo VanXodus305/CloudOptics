@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Navbar,
   NavbarBrand,
@@ -193,6 +193,31 @@ export default function SignInPage() {
 
   const [enterpriseId, setEnterpriseId] = useState("");
   const [password, setPassword] = useState("");
+  const [theme, setTheme] = useState("light");
+
+  // Handle mounting and initial theme check
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+    } else {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   useEffect(() => {
     if (session) {
@@ -214,6 +239,11 @@ export default function SignInPage() {
         from-[#F9F7F7]
         via-[#EEEEEE]
         to-[#DCCBFF]
+        dark:from-[#080A1A]
+        dark:via-[#0F122B]
+        dark:to-[#22163A]
+        transition-colors
+        duration-500
         "
       >
         <div className="w-12 h-12 border-4 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -224,7 +254,7 @@ export default function SignInPage() {
   if (session) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9F7F7] via-[#EEEEEE] to-[#DCCBFF] overflow-x-hidden overflow-y-auto flex flex-col relative">
+    <div className="min-h-screen bg-gradient-to-br from-[#F9F7F7] via-[#EEEEEE] to-[#DCCBFF] dark:from-[#080A1A] dark:via-[#0F122B] dark:to-[#22163A] overflow-x-hidden overflow-y-auto flex flex-col relative transition-colors duration-500">
       <Navbar
         isBlurred={false}
         position="sticky"
@@ -237,13 +267,18 @@ export default function SignInPage() {
           max-w-4xl
           z-50
           bg-white/60
+          dark:bg-black/60
           backdrop-blur-xl
           border
           border-white/30
+          dark:border-white/10
           shadow-[0_8px_30px_rgba(0,0,0,0.03)]
+          dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]
           rounded-full
           h-16
           px-4
+          transition-all
+          duration-500
         "
         classNames={{
           wrapper: "max-w-full px-2 h-full justify-between gap-4",
@@ -262,15 +297,118 @@ export default function SignInPage() {
                   src="/logo.png"
                   alt="Logo"
                   width={130}
-                  className="object-contain"
+                  className="object-contain dark:brightness-110"
                 />
               </Link>
             </motion.div>
           </div>
         </NavbarBrand>
 
-        {/* Back to Home Button */}
-        <NavbarContent justify="end">
+        {/* Back to Home Button & Dark Mode Toggle */}
+        <NavbarContent justify="end" className="gap-4">
+          <NavbarItem>
+            <button
+              onClick={toggleTheme}
+              className={`
+                relative
+                w-14
+                h-8
+                rounded-full
+                p-1
+                transition-all
+                duration-500
+                ease-in-out
+                cursor-pointer
+                focus:outline-none
+                select-none
+                overflow-hidden
+                border
+                bg-gradient-to-r
+                shadow-md
+                flex
+                items-center
+                ${theme === "light"
+                  ? "from-sky-300 to-blue-200 border-sky-400/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)]"
+                  : "from-[#0F122B] to-[#22163A] border-purple-500/30 shadow-[0_0_15px_rgba(154,77,204,0.15),inset_0_2px_4px_rgba(0,0,0,0.4)]"
+                }
+              `}
+              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+            >
+              {/* Background elements like clouds or stars */}
+              <div className="absolute inset-0 w-full h-full pointer-events-none opacity-40">
+                {theme === "light" ? (
+                  // Clouds
+                  <div className="absolute right-2 top-2 w-3 h-1.5 bg-white rounded-full opacity-60 filter blur-[0.5px]">
+                    <div className="absolute -top-1 left-1 w-2 h-2 bg-white rounded-full" />
+                  </div>
+                ) : (
+                  // Stars
+                  <div className="absolute left-2.5 top-2.5 w-0.5 h-0.5 bg-white rounded-full animate-pulse">
+                    <div className="absolute top-2 left-6 w-0.5 h-0.5 bg-white rounded-full" />
+                    <div className="absolute -top-1 left-3 w-1 h-1 bg-purple-300 rounded-full opacity-50" />
+                  </div>
+                )}
+              </div>
+
+              {/* Sliding Knob */}
+              <motion.div
+                layout
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                className={`
+                  w-6
+                  h-6
+                  rounded-full
+                  flex
+                  items-center
+                  justify-center
+                  shadow-md
+                  z-10
+                  ${theme === "light"
+                    ? "bg-amber-400 text-amber-950 shadow-[0_2px_8px_rgba(251,191,36,0.5)]"
+                    : "bg-purple-600 text-purple-100 shadow-[0_2px_8px_rgba(154,77,204,0.6)]"
+                  }
+                `}
+                style={{
+                  marginLeft: theme === "light" ? "0" : "auto"
+                }}
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {theme === "light" ? (
+                    <motion.svg
+                      key="sun"
+                      initial={{ scale: 0, rotate: -45 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      exit={{ scale: 0, rotate: 45 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-4 h-4 text-amber-900"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.364l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                    </motion.svg>
+                  ) : (
+                    <motion.svg
+                      key="moon"
+                      initial={{ scale: 0, rotate: -45 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      exit={{ scale: 0, rotate: 45 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-3.5 h-3.5 text-purple-100"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </motion.svg>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </button>
+          </NavbarItem>
+
           <NavbarItem className="pr-2">
             <motion.div
               initial={{ x: 100, opacity: 0 }}
@@ -306,16 +444,21 @@ export default function SignInPage() {
             w-full
             max-w-4xl
             bg-white/70
+            dark:bg-[#111430]/75
             backdrop-blur-2xl
             border
             border-white/30
+            dark:border-white/10
             rounded-3xl
             overflow-hidden
             shadow-[0_20px_50px_rgba(121,44,162,0.08)]
+            dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)]
             grid
             md:grid-cols-12
             relative
             z-10
+            transition-all
+            duration-500
           "
         >
           {/* LEFT PANEL */}
@@ -419,12 +562,15 @@ export default function SignInPage() {
             className="
               md:col-span-7
               bg-white/20
+              dark:bg-slate-950/20
               backdrop-blur-xl
               flex
               items-center
               justify-center
               p-8
               md:p-12
+              transition-colors
+              duration-500
             "
           >
             <div className="w-full max-w-md">
@@ -433,10 +579,10 @@ export default function SignInPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                <h1 className="text-3xl font-bold text-[#111844] mb-2">
+                <h1 className="text-3xl font-bold text-[#111844] dark:text-white mb-2 transition-colors duration-500">
                   Welcome To CloudOptics
                 </h1>
-                <p className="text-sm text-gray-500 mb-8">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 transition-colors duration-500">
                   Your cloud monitoring and optimization buddy!!
                 </p>
               </motion.div>
@@ -456,14 +602,19 @@ export default function SignInPage() {
                   className="
                     w-full
                     bg-white
+                    dark:bg-[#1C1E3D]
                     border
                     border-gray-200
+                    dark:border-neutral-800
                     hover:border-[#792CA2]
+                    dark:hover:border-[#B770FF]
                     hover:bg-gray-50
+                    dark:hover:bg-[#25284E]
                     py-3.5
                     rounded-xl
                     font-semibold
                     text-[#111844]
+                    dark:text-white
                     flex
                     items-center
                     justify-center
@@ -472,6 +623,7 @@ export default function SignInPage() {
                     duration-300
                     hover:scale-[1.01]
                     shadow-[0_4px_20px_rgba(121,44,162,0.03)]
+                    dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]
                   "
                 >
                   <svg
@@ -502,11 +654,11 @@ export default function SignInPage() {
 
               {/* DIVIDER */}
               <div className="flex items-center my-6">
-                <div className="flex-grow border-t border-gray-200" />
-                <span className="px-3 text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
+                <div className="flex-grow border-t border-gray-200 dark:border-neutral-800" />
+                <span className="px-3 text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-semibold transition-colors duration-500">
                   or sign in with Enterprise ID
                 </span>
-                <div className="flex-grow border-t border-gray-200" />
+                <div className="flex-grow border-t border-gray-200 dark:border-neutral-800" />
               </div>
 
               {/* FORM FIELDS */}
@@ -517,7 +669,7 @@ export default function SignInPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors duration-500">
                     Enterprise ID
                   </label>
                   <input
@@ -528,16 +680,22 @@ export default function SignInPage() {
                     className="
                       w-full
                       bg-white/80
+                      dark:bg-[#111430]/60
                       border
                       border-gray-200
+                      dark:border-neutral-800
                       focus:border-[#792CA2]
+                      dark:focus:border-[#B770FF]
                       focus:bg-white
+                      dark:focus:bg-[#111430]
                       rounded-xl
                       px-4
                       py-3
                       outline-none
                       text-[#111844]
+                      dark:text-white
                       placeholder:text-gray-400
+                      dark:placeholder:text-gray-500
                       transition-all
                       duration-300
                     "
@@ -546,10 +704,10 @@ export default function SignInPage() {
 
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                    <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider transition-colors duration-500">
                       Password
                     </label>
-                    <button className="text-xs text-[#792CA2] hover:underline font-semibold transition-all">
+                    <button className="text-xs text-[#792CA2] dark:text-[#B770FF] hover:underline font-semibold transition-all">
                       Forgot Password?
                     </button>
                   </div>
@@ -561,16 +719,22 @@ export default function SignInPage() {
                     className="
                       w-full
                       bg-white/80
+                      dark:bg-[#111430]/60
                       border
                       border-gray-200
+                      dark:border-neutral-800
                       focus:border-[#792CA2]
+                      dark:focus:border-[#B770FF]
                       focus:bg-white
+                      dark:focus:bg-[#111430]
                       rounded-xl
                       px-4
                       py-3
                       outline-none
                       text-[#111844]
+                      dark:text-white
                       placeholder:text-gray-400
+                      dark:placeholder:text-gray-500
                       transition-all
                       duration-300
                     "
@@ -582,7 +746,9 @@ export default function SignInPage() {
                     w-full
                     mt-6
                     bg-[#111844]
+                    dark:bg-[#792CA2]
                     hover:bg-[#0c0e2b]
+                    dark:hover:bg-[#5E1A86]
                     text-white
                     py-3.5
                     rounded-xl
@@ -592,6 +758,7 @@ export default function SignInPage() {
                     duration-300
                     hover:scale-[1.01]
                     shadow-[0_4px_20px_rgba(17,24,68,0.15)]
+                    dark:shadow-[0_4px_20px_rgba(121,44,162,0.3)]
                   "
                 >
                   Sign In
