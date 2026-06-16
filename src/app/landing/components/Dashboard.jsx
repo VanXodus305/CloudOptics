@@ -51,7 +51,11 @@ export default function DashboardPreview() {
           {/* SaaS Dashboard Mockup Panel */}
           <div
             className="
-            h-[480px]
+            min-h-[480px]
+            h-auto
+            sm:h-[480px]
+            pb-4
+            sm:pb-0
             rounded-3xl
             bg-[#F9F7F7]
             dark:bg-[#080A1A]
@@ -406,7 +410,7 @@ export default function DashboardPreview() {
                 </div>
 
                 {/* 2 Charts Grid */}
-                <div className="grid grid-cols-2 gap-3 flex-grow min-h-[190px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
                   {/* Cost Trends Chart */}
                   <div className="bg-white/80 dark:bg-slate-900/80 border border-white/60 dark:border-slate-800/40 p-3 rounded-2xl shadow-sm flex flex-col justify-between transition-colors duration-500">
                     <div className="flex justify-between items-center mb-1">
