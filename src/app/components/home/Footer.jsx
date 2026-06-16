@@ -8,7 +8,10 @@ export default function Footer() {
   const handleScrollTo = (e, id) => {
     e.preventDefault();
     const element = document.getElementById(id);
-    if (!element) return;
+    if (!element) {
+      window.location.href = `/#${id}`;
+      return;
+    }
     const offset = 90;
     const bodyRect = document.body.getBoundingClientRect().top;
     const elementRect = element.getBoundingClientRect().top;

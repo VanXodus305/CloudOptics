@@ -169,7 +169,10 @@ const slides = [
 ];
 
 // Word wrapper component to animate each word individually with 3D effects
-const WordWrapper = ({ text, delayOffset = 0, variantType = "title", className = "" }) => {
+const WordWrapper = ({ text, delayOffset = 0, variantType = "title", className = "", isMobile = false }) => {
+  if (isMobile) {
+    return <span className={className}>{text}</span>;
+  }
   const words = text.split(" ");
   return (
     <span className="inline-flex flex-wrap overflow-visible" style={{ transformStyle: "preserve-3d" }}>
@@ -201,6 +204,18 @@ const containerVariants = {
       staggerDirection: -1,
     },
   },
+};
+
+const mobileContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.3 }
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.3 }
+  }
 };
 
 const wordVariants = {
@@ -311,6 +326,16 @@ export default function HeroSection() {
   const [hoveredWidget, setHoveredWidget] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (isPaused) return;
@@ -334,7 +359,7 @@ export default function HeroSection() {
       pt-28
       pb-36
       md:pt-0
-      md:pb-20
+      md:pb-36
       relative
       overflow-hidden
       "
@@ -454,7 +479,7 @@ export default function HeroSection() {
           </motion.p>
 
           {/* Floating Widgets Cluster */}
-          <div className="mt-12 relative h-[260px] w-full hidden md:block">
+          <div className="mt-12 relative h-[320px] w-full hidden md:block">
             {/* Widget 1: Savings */}
             <motion.div
               onMouseEnter={() => setHoveredWidget("savings")}
@@ -464,13 +489,14 @@ export default function HeroSection() {
                 opacity: 1,
                 y: 0,
                 height: hoveredWidget === "savings" ? 175 : 110,
+                zIndex: hoveredWidget === "savings" ? 40 : 10,
               }}
               transition={{
                 type: "spring",
                 stiffness: 220,
                 damping: 24,
               }}
-              className="absolute top-0 left-0 p-5 bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-60 z-10 overflow-hidden cursor-pointer"
+              className="absolute top-0 left-0 p-5 bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-60 overflow-hidden cursor-pointer"
             >
               <div className="flex justify-between items-center mb-2">
                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Potential Savings</span>
@@ -512,13 +538,14 @@ export default function HeroSection() {
                 opacity: 1,
                 y: 0,
                 height: hoveredWidget === "alert" ? 165 : 105,
+                zIndex: hoveredWidget === "alert" ? 40 : 20,
               }}
               transition={{
                 type: "spring",
                 stiffness: 220,
                 damping: 24,
               }}
-              className="absolute top-16 right-8 p-5 bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-56 z-20 overflow-hidden cursor-pointer"
+              className="absolute top-12 right-2 md:right-6 p-5 bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-56 overflow-hidden cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
@@ -552,13 +579,14 @@ export default function HeroSection() {
                 opacity: 1,
                 scale: 1,
                 height: hoveredWidget === "status" ? 130 : 66,
+                zIndex: hoveredWidget === "status" ? 40 : 30,
               }}
               transition={{
                 type: "spring",
                 stiffness: 220,
                 damping: 24,
               }}
-              className="absolute bottom-2 left-16 p-4 bg-[#792CA2] text-white rounded-2xl shadow-xl w-60 z-30 overflow-hidden cursor-pointer"
+              className="absolute bottom-16 left-10 md:left-14 p-4 bg-[#792CA2] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/10 rounded-xl">
@@ -620,16 +648,16 @@ export default function HeroSection() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
-                variants={containerVariants}
+                variants={isMobile ? mobileContainerVariants : containerVariants}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                style={{ transformStyle: "preserve-3d" }}
+                style={isMobile ? {} : { transformStyle: "preserve-3d" }}
                 className="flex flex-col items-start"
               >
                 {/* Badge Tag with 3D Flip */}
                 <motion.div
-                  variants={tagVariants}
+                  variants={isMobile ? {} : tagVariants}
                   className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${slides[currentSlide].tagColor} shadow-md mb-6`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
@@ -645,20 +673,21 @@ export default function HeroSection() {
                   leading-tight
                   overflow-visible
                   "
-                  style={{ transformStyle: "preserve-3d" }}
+                  style={isMobile ? {} : { transformStyle: "preserve-3d" }}
                 >
-                  <WordWrapper text={slides[currentSlide].title} delayOffset={0.05} variantType="title" />
+                  <WordWrapper text={slides[currentSlide].title} delayOffset={0.05} variantType="title" isMobile={isMobile} />
                   <br />
                   <WordWrapper 
                     text={slides[currentSlide].highlight} 
                     delayOffset={0.25} 
                     variantType="highlight" 
                     className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] bg-clip-text text-transparent font-black pb-2 -mb-2"
+                    isMobile={isMobile}
                   />
                 </motion.h2>
 
                 <motion.p
-                  variants={descVariants}
+                  variants={isMobile ? {} : descVariants}
                   className="
                   mt-8
                   text-lg

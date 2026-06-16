@@ -353,6 +353,15 @@ export default function FeaturesCarousel() {
     });
   }, [startIndex, activeIndexVal]);
 
+  // Auto-switch cards on mobile every 3 seconds
+  useEffect(() => {
+    if (!isMobile) return;
+    const interval = setInterval(() => {
+      setStartIndex((prevIndex) => (prevIndex + 1) % features.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isMobile, startIndex]);
+
   // Handle trackpad two-finger horizontal swipe/scroll
   useEffect(() => {
     const container = containerRef.current;
@@ -433,7 +442,7 @@ export default function FeaturesCarousel() {
           </h2>
 
           <p className="text-lg text-gray-500">
-            Drag the entire stack of cards left or right, use trackpad two-finger swipe, or click any card.
+            Drag the entire stack of cards left or right or use trackpad two-finger swipe.
           </p>
         </div>
 
@@ -470,9 +479,17 @@ export default function FeaturesCarousel() {
             }}
             onDragEnd={(e, info) => {
               const slideWidth = isMobile ? 280 : 270;
-              const slidesMoved = Math.round(info.offset.x / slideWidth);
+              const dragDistance = info.offset.x;
+              const dragVelocity = info.velocity.x;
               
-              let newIndex = startIndex - slidesMoved;
+              let indexOffset = 0;
+              if (dragDistance < -50 || dragVelocity < -200) {
+                indexOffset = 1;
+              } else if (dragDistance > 50 || dragVelocity > 200) {
+                indexOffset = -1;
+              }
+              
+              let newIndex = startIndex + indexOffset;
               newIndex = Math.max(0, Math.min(newIndex, features.length - 1));
               
               if (newIndex === startIndex) {
@@ -485,7 +502,7 @@ export default function FeaturesCarousel() {
                 setStartIndex(newIndex);
               }
             }}
-            className="flex-1 relative flex items-center justify-center h-[520px] overflow-visible w-full select-none cursor-grab active:cursor-grabbing"
+            className="flex-1 relative flex items-center justify-center h-[520px] overflow-visible w-full select-none cursor-grab active:cursor-grabbing touch-pan-y"
             style={{ perspective: "1200px", transformStyle: "preserve-3d" }}
           >
             {features.map((feature, index) => (

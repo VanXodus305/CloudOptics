@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Footer from "../components/home/Footer";
 import {
   BellAlertIcon,
   ArrowRightOnRectangleIcon,
@@ -984,7 +985,7 @@ export default function DashboardPage() {
 
         </main>
       </div>
-
+      <Footer />
     </div>
   );
 }

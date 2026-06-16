@@ -4,7 +4,16 @@ import React, { useEffect, useState, useRef } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Image, Link, Button } from "@heroui/react";
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  Image,
+  Link,
+  Button,
+} from "@heroui/react";
+import Footer from "../../components/home/Footer";
 
 function ParticleBackground() {
   const canvasRef = useRef(null);
@@ -49,7 +58,10 @@ function ParticleBackground() {
         this.vx = (Math.random() - 0.5) * 0.8;
         this.vy = (Math.random() - 0.5) * 0.8;
         this.radius = Math.random() * 2 + 1;
-        this.color = Math.random() > 0.5 ? "rgba(121, 44, 162, 0.35)" : "rgba(154, 77, 204, 0.35)";
+        this.color =
+          Math.random() > 0.5
+            ? "rgba(121, 44, 162, 0.35)"
+            : "rgba(154, 77, 204, 0.35)";
       }
 
       update() {
@@ -180,7 +192,7 @@ export default function SignInPage() {
   if (session) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9F7F7] via-[#EEEEEE] to-[#DCCBFF] overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[#F9F7F7] via-[#EEEEEE] to-[#DCCBFF] overflow-x-hidden overflow-y-auto flex flex-col relative">
       <Navbar
         isBlurred={false}
         position="sticky"
@@ -214,7 +226,12 @@ export default function SignInPage() {
               className="z-10 flex items-center pl-2"
             >
               <Link href={"/"}>
-                <Image src="/logo.png" alt="Logo" width={130} className="object-contain" />
+                <Image
+                  src="/logo.png"
+                  alt="Logo"
+                  width={130}
+                  className="object-contain"
+                />
               </Link>
             </motion.div>
           </div>
@@ -233,7 +250,8 @@ export default function SignInPage() {
                   size="sm"
                   className="bg-[#792CA2]/10 hover:bg-[#792CA2]/20 text-[#792CA2] font-bold rounded-full transition-all duration-300 hover:scale-[1.03]"
                 >
-                  ← Back to Home
+                  <span className="hidden sm:inline">← Back to Home</span>
+                  <span className="inline sm:hidden">← Back</span>
                 </Button>
               </Link>
             </motion.div>
@@ -241,7 +259,7 @@ export default function SignInPage() {
         </NavbarContent>
       </Navbar>
 
-      <div className="flex-grow flex items-center justify-center p-6 relative">
+      <div className="flex-grow flex items-center justify-center pt-24 pb-8 mb-10 md:pt-28 md:pb-12 px-4 md:px-6 relative">
         <ParticleBackground />
 
         {/* Dynamic Glowing background blobs */}
@@ -302,7 +320,11 @@ export default function SignInPage() {
               />
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
                 className="absolute inset-16 rounded-full bg-white/5 blur-sm"
               />
             </div>
@@ -314,7 +336,9 @@ export default function SignInPage() {
                 transition={{ delay: 0.2, duration: 0.6 }}
               >
                 <h1 className="text-3xl font-black tracking-wider flex items-center gap-1">
-                  <span className="text-[#DCCBFF] text-4xl font-mono">{">"}</span>
+                  <span className="text-[#DCCBFF] text-4xl font-mono">
+                    {">"}
+                  </span>
                   <span>CloudOptics</span>
                 </h1>
               </motion.div>
@@ -377,7 +401,9 @@ export default function SignInPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                <h1 className="text-3xl font-bold text-[#111844] mb-2">Welcome To CloudOptics</h1>
+                <h1 className="text-3xl font-bold text-[#111844] mb-2">
+                  Welcome To CloudOptics
+                </h1>
                 <p className="text-sm text-gray-500 mb-8">
                   Your cloud monitoring and optimization buddy!!
                 </p>
@@ -543,6 +569,7 @@ export default function SignInPage() {
           </div>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 }
