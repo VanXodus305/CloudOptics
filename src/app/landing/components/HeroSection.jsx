@@ -376,6 +376,8 @@ export default function HeroSection() {
 
   const [hoveredWidget, setHoveredWidget] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentMacroSlide, setCurrentMacroSlide] = useState(0);
+  const totalMacroSlides = 4;
   const [isPaused, setIsPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -390,16 +392,28 @@ export default function HeroSection() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Auto-play controller for inner highlights carousel
+  // Auto-play controller for inner & macro carousels
   useEffect(() => {
     if (isPaused) return;
 
     const timer = setTimeout(() => {
-      setCurrentSlide((prev) => (prev < slides.length - 1 ? prev + 1 : 0));
+      if (currentMacroSlide === 0) {
+        if (currentSlide < slides.length - 1) {
+          setCurrentSlide((prev) => prev + 1);
+        } else {
+          setCurrentMacroSlide(1);
+        }
+      } else {
+        setCurrentMacroSlide((prev) => {
+          const next = prev < totalMacroSlides - 1 ? prev + 1 : 0;
+          if (next === 0) setCurrentSlide(0);
+          return next;
+        });
+      }
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [currentSlide, isPaused]);
+  }, [currentSlide, currentMacroSlide, isPaused]);
 
   return (
     <section
@@ -446,24 +460,58 @@ export default function HeroSection() {
         />
       </div>
 
-      <motion.div
-        key="slide1-brand"
-        initial={{ opacity: 0, x: isMobile ? 0 : -40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, ease: "easeInOut" }}
-        className="
-        max-w-7xl
-        mx-auto
-        grid
-        lg:grid-cols-2
-            gap-12
-            lg:gap-24
-            items-center
-            relative
-            z-10  
-            w-full
-            "
+      {/* Left/Right Navigation Arrows for Macro Carousel */}
+      <button
+        onClick={() => {
+          setCurrentMacroSlide((prev) => {
+            const next = prev === 0 ? totalMacroSlides - 1 : prev - 1;
+            if (next === 0) setCurrentSlide(0);
+            return next;
+          });
+        }}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-50 p-2 md:p-4 rounded-full bg-white/10 hover:bg-white/20 dark:bg-black/20 dark:hover:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/10 text-gray-800 dark:text-white transition-all hover:scale-110"
       >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+      </button>
+
+      <button
+        onClick={() => {
+          if (currentMacroSlide === 0 && currentSlide < slides.length - 1) {
+            setCurrentSlide((prev) => prev + 1);
+          } else {
+            setCurrentMacroSlide((prev) => {
+              const next = prev < totalMacroSlides - 1 ? prev + 1 : 0;
+              if (next === 0) setCurrentSlide(0);
+              return next;
+            });
+          }
+        }}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-50 p-2 md:p-4 rounded-full bg-white/10 hover:bg-white/20 dark:bg-black/20 dark:hover:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/10 text-gray-800 dark:text-white transition-all hover:scale-110"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+      </button>
+
+      <AnimatePresence mode="wait">
+        {currentMacroSlide === 0 && (
+          <motion.div
+            key="slide1-brand"
+            initial={{ opacity: 0, x: isMobile ? 0 : -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isMobile ? 0 : 40 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="
+            max-w-7xl
+            mx-auto
+            grid
+            lg:grid-cols-2
+                gap-12
+                lg:gap-24
+                items-center
+                relative
+                z-10  
+                w-full
+                "
+          >
         {/* Slide 1 Left Column: Cloud Optics branding & Widgets */}
         <div>
           <motion.h1
@@ -740,7 +788,7 @@ export default function HeroSection() {
                 transition={{ duration: 0.6 }}
                 className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
                 style={{
-                  backgroundImage: `url('/hero-${currentSlide + 1}.png')`,
+                  backgroundImage: `url('/hero-${currentSlide + 1}.jpg')`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   maskImage:
@@ -860,11 +908,10 @@ export default function HeroSection() {
                     onClick={() => {
                       setCurrentSlide(idx);
                     }}
-                    className={`h-2.5 rounded-full overflow-hidden relative transition-all duration-500 ease-out ${
-                      isActive
+                    className={`h-2.5 rounded-full overflow-hidden relative transition-all duration-500 ease-out ${isActive
                         ? "w-8 bg-gray-200 dark:bg-neutral-800"
                         : "w-2.5 bg-gray-300 dark:bg-neutral-700 hover:bg-gray-400 dark:hover:bg-neutral-600"
-                    }`}
+                      }`}
                     aria-label={`Go to slide ${idx + 1}`}
                   >
                     {isActive && (
@@ -886,6 +933,230 @@ export default function HeroSection() {
           </motion.div>
         </div>
       </motion.div>
+        )}
+
+        {/* Macro Slide 1 */}
+        {currentMacroSlide === 1 && (
+          <motion.div
+            key="macro-slide-1"
+            initial={{ opacity: 0, x: isMobile ? 0 : 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isMobile ? 0 : -40 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full"
+          >
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, x: -200 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1.2 }}
+                className="text-5xl sm:text-6xl md:text-8xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3"
+              >
+                Advanced
+                <br />
+                Analytics
+              </motion.h1>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "180px" }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="h-1 bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] rounded-full mt-4"
+              />
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="uppercase tracking-[4px] text-[#792CA2] dark:text-[#B770FF] font-bold text-sm md:text-base mt-6"
+              >
+                Deep Dive Into Your Cloud Costs
+              </motion.p>
+              
+              <div className="mt-8 relative h-[320px] w-full hidden md:block" />
+            </div>
+
+            <div
+              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/60 dark:bg-slate-950/60 border border-white/50 dark:border-white/20 backdrop-blur-md shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
+            >
+              <div className="absolute -top-5 -bottom-5 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.40] dark:opacity-[0.30] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
+                <motion.div
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
+                  style={{
+                    backgroundImage: `url('/slide-bg-1.jpg')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    maskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                    WebkitMaskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                  }}
+                />
+              </div>
+
+              <div className="min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
+                <div className="flex flex-col items-start">
+                  <h2 className="text-4xl md:text-5xl font-black text-[#111844] dark:text-white leading-tight overflow-visible">
+                    Interactive Dashboards.
+                    <br />
+                    <span className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2">Visualized Efficiency.</span>
+                  </h2>
+                  <p className="mt-8 text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl">
+                    Understand your expenditure like never before with powerful data visualization tools tailored for complex cloud architectures.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Macro Slide 2 */}
+        {currentMacroSlide === 2 && (
+          <motion.div
+            key="macro-slide-2"
+            initial={{ opacity: 0, x: isMobile ? 0 : 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isMobile ? 0 : -40 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full"
+          >
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, x: -200 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1.2 }}
+                className="text-5xl sm:text-6xl md:text-8xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3"
+              >
+                Security
+                <br />
+                Posture
+              </motion.h1>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "180px" }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="h-1 bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] rounded-full mt-4"
+              />
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="uppercase tracking-[4px] text-[#792CA2] dark:text-[#B770FF] font-bold text-sm md:text-base mt-6"
+              >
+                Ensure Compliance Across Regions
+              </motion.p>
+              
+              <div className="mt-8 relative h-[320px] w-full hidden md:block" />
+            </div>
+
+            <div
+              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/60 dark:bg-slate-950/60 border border-white/50 dark:border-white/20 backdrop-blur-md shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
+            >
+              <div className="absolute -top-5 -bottom-5 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.40] dark:opacity-[0.30] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
+                <motion.div
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
+                  style={{
+                    backgroundImage: `url('/slide-bg-2.jpg')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    maskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                    WebkitMaskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                  }}
+                />
+              </div>
+
+              <div className="min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
+                <div className="flex flex-col items-start">
+                  <h2 className="text-4xl md:text-5xl font-black text-[#111844] dark:text-white leading-tight overflow-visible">
+                    Zero Vulnerabilities.
+                    <br />
+                    <span className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2">Total Control.</span>
+                  </h2>
+                  <p className="mt-8 text-lg md:text-xl text-gary-900 dark:text-gray-900 leading-relaxed max-w-xl">
+                    Continuously scan for misconfigurations and vulnerabilities, keeping your infrastructure fortified against modern threats.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Macro Slide 3 */}
+        {currentMacroSlide === 3 && (
+          <motion.div
+            key="macro-slide-3"
+            initial={{ opacity: 0, x: isMobile ? 0 : 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isMobile ? 0 : -40 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full"
+          >
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, x: -200 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1.2 }}
+                className="text-5xl sm:text-6xl md:text-8xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3"
+              >
+                Automated
+                <br />
+                Governance
+              </motion.h1>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "180px" }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="h-1 bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] rounded-full mt-4"
+              />
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="uppercase tracking-[4px] text-[#792CA2] dark:text-[#B770FF] font-bold text-sm md:text-base mt-6"
+              >
+                Policy-Driven Infrastructure
+              </motion.p>
+              
+              <div className="mt-8 relative h-[320px] w-full hidden md:block" />
+            </div>
+
+            <div
+              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/60 dark:bg-slate-950/60 border border-white/50 dark:border-white/20 backdrop-blur-md shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
+            >
+              <div className="absolute -top-5 -bottom-5 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.40] dark:opacity-[0.30] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
+                <motion.div
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
+                  style={{
+                    backgroundImage: `url('/slide-bg-3.jpg')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    maskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                    WebkitMaskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                  }}
+                />
+              </div>
+
+              <div className="min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
+                <div className="flex flex-col items-start">
+                  <h2 className="text-4xl md:text-5xl font-black text-[#111844] dark:text-white leading-tight overflow-visible">
+                    Standardize.
+                    <br />
+                    <span className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2">Scale Efficiently.</span>
+                  </h2>
+                  <p className="mt-8 text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl">
+                    Implement robust governance rules that enforce consistent standards globally without slowing down your engineering velocity.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
