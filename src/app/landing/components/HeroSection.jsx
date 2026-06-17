@@ -79,7 +79,10 @@ function ParticleBackground() {
         this.vx = (Math.random() - 0.5) * 0.7;
         this.vy = (Math.random() - 0.5) * 0.7;
         this.radius = Math.random() * 2 + 1;
-        this.color = Math.random() > 0.5 ? "rgba(121, 44, 162, 0.25)" : "rgba(154, 77, 204, 0.25)";
+        this.color =
+          Math.random() > 0.5
+            ? "rgba(121, 44, 162, 0.25)"
+            : "rgba(154, 77, 204, 0.25)";
       }
 
       update() {
@@ -198,17 +201,26 @@ const slides = [
     title: "Actionable Savings Insights.",
     highlight: "Cut Cloud Waste by 30%.",
     desc: "Our rule-based engine continuously scans your infrastructure to pinpoint idle systems, oversized instances, and orphaned disks, giving you exact steps to reduce spend instantly.",
-  }
+  },
 ];
 
 // Word wrapper component to animate each word individually with 3D effects
-const WordWrapper = ({ text, delayOffset = 0, variantType = "title", className = "", isMobile = false }) => {
+const WordWrapper = ({
+  text,
+  delayOffset = 0,
+  variantType = "title",
+  className = "",
+  isMobile = false,
+}) => {
   if (isMobile) {
     return <span className={className}>{text}</span>;
   }
   const words = text.split(" ");
   return (
-    <span className="inline-flex flex-wrap overflow-visible" style={{ transformStyle: "preserve-3d" }}>
+    <span
+      className="inline-flex flex-wrap overflow-visible"
+      style={{ transformStyle: "preserve-3d" }}
+    >
       {words.map((word, index) => (
         <motion.span
           key={index}
@@ -243,12 +255,12 @@ const mobileContainerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.3 }
+    transition: { duration: 0.3 },
   },
   exit: {
     opacity: 0,
-    transition: { duration: 0.3 }
-  }
+    transition: { duration: 0.3 },
+  },
 };
 
 const wordVariants = {
@@ -325,7 +337,13 @@ const tagVariants = {
 };
 
 const descVariants = {
-  hidden: { opacity: 0, y: 35, scale: 0.95, rotateX: -20, filter: "blur(10px)" },
+  hidden: {
+    opacity: 0,
+    y: 35,
+    scale: 0.95,
+    rotateX: -20,
+    filter: "blur(10px)",
+  },
   visible: {
     opacity: 1,
     y: 0,
@@ -445,22 +463,22 @@ export default function HeroSection() {
             z-10  
             w-full
             "
-          >
-            {/* Slide 1 Left Column: Cloud Optics branding & Widgets */}
-            <div>
-              <motion.h1
-                initial={{
-                  opacity: 0,
-                  x: -200,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-                transition={{
-                  duration: 1.2,
-                }}
-                className="
+      >
+        {/* Slide 1 Left Column: Cloud Optics branding & Widgets */}
+        <div>
+          <motion.h1
+            initial={{
+              opacity: 0,
+              x: -200,
+            }}
+            animate={{
+              opacity: 1,
+              x: 0,
+            }}
+            transition={{
+              duration: 1.2,
+            }}
+            className="
                 text-5xl
                 sm:text-6xl
                 md:text-8xl
@@ -478,20 +496,20 @@ export default function HeroSection() {
                 overflow-visible
                 pb-3
                 "
-              >
-                Cloud
-                <br />
-                Optics
-              </motion.h1>
+          >
+            Cloud
+            <br />
+            Optics
+          </motion.h1>
 
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "180px" }}
-                transition={{
-                  duration: 1,
-                  delay: 0.5,
-                }}
-                className="
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: "180px" }}
+            transition={{
+              duration: 1,
+              delay: 0.5,
+            }}
+            className="
                 h-1
                 bg-gradient-to-r
                 from-[#792CA2]
@@ -501,22 +519,22 @@ export default function HeroSection() {
                 rounded-full
                 mt-4
                 "
-              />
+          />
 
-              <motion.p
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.6,
-                }}
-                className="
+          <motion.p
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.8,
+              delay: 0.6,
+            }}
+            className="
                 uppercase
                 tracking-[4px]
                 text-[#792CA2]
@@ -526,191 +544,234 @@ export default function HeroSection() {
                 md:text-base
                 mt-6
                 "
-              >
-                Cloud Cost Optimization & Monitoring
-              </motion.p>
+          >
+            Cloud Cost Optimization & Monitoring
+          </motion.p>
 
-              {/* Floating Widgets Cluster */}
-              <div className="mt-8 relative h-[320px] w-full hidden md:block">
-                {/* Widget 1: Savings */}
-                <motion.div
-                  onMouseEnter={() => setHoveredWidget("savings")}
-                  onMouseLeave={() => setHoveredWidget(null)}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    height: hoveredWidget === "savings" ? 175 : 110,
-                    zIndex: hoveredWidget === "savings" ? 40 : 10,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 220,
-                    damping: 24,
-                  }}
-                  className="absolute top-0 left-0 p-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-white/40 dark:border-slate-800/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-60 overflow-hidden cursor-pointer"
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">Potential Savings</span>
-                  </div>
-                  <p className="text-3xl font-black text-[#111844] dark:text-white">$8,450<span className="text-sm font-medium text-gray-500 dark:text-slate-400">/mo</span></p>
-
-                  {hoveredWidget === "savings" ? (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-3 pt-3 border-t border-gray-150/50 dark:border-slate-800 space-y-1 text-[10px] text-gray-600 dark:text-slate-300"
-                    >
-                      <div className="flex justify-between font-semibold">
-                        <span>☁ Compute (EC2):</span>
-                        <span className="text-emerald-600 dark:text-emerald-400">$3,200</span>
-                      </div>
-                      <div className="flex justify-between font-semibold">
-                        <span>💾 Storage (S3):</span>
-                        <span className="text-emerald-600 dark:text-emerald-400">$2,850</span>
-                      </div>
-                      <div className="flex justify-between font-semibold">
-                        <span>🗄 Databases (RDS):</span>
-                        <span className="text-emerald-600 dark:text-emerald-400">$2,400</span>
-                      </div>
-                    </motion.div>
-                  ) : (
-                    ""
-                  )}
-                </motion.div>
-
-                {/* Widget 2: Real-time alert */}
-                <motion.div
-                  onMouseEnter={() => setHoveredWidget("alert")}
-                  onMouseLeave={() => setHoveredWidget(null)}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    height: hoveredWidget === "alert" ? 165 : 105,
-                    zIndex: hoveredWidget === "alert" ? 40 : 20,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 220,
-                    damping: 24,
-                  }}
-                  className="absolute top-12 right-2 md:right-6 p-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-white/40 dark:border-slate-800/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-56 overflow-hidden cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                    <div className="w-2 h-2 rounded-full bg-amber-500 absolute" />
-                    <span className="text-[9px] text-amber-800 dark:text-amber-400 font-bold uppercase tracking-wider">Active Alerts</span>
-                  </div>
-                  <p className="text-sm font-bold text-[#111844] dark:text-white mt-2">Idle Database Instance</p>
-
-                  {hoveredWidget === "alert" ? (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-2.5 pt-2.5 border-t border-gray-150/50 dark:border-slate-800 text-[10px] text-gray-600 dark:text-slate-300 space-y-0.5"
-                    >
-                      <p className="font-semibold"><span className="text-gray-400">ID:</span> db-prod-replica</p>
-                      <p className="font-semibold"><span className="text-gray-400">Action:</span> Terminate</p>
-                      <p className="text-amber-600 dark:text-amber-400 font-bold">Waste: $140/mo</p>
-                    </motion.div>
-                  ) : (
-                    <p className="text-xs text-gray-500 dark:text-slate-400">Saving potential: $140/mo</p>
-                  )}
-                </motion.div>
-
-                {/* Widget 3: Status check */}
-                <motion.div
-                  onMouseEnter={() => setHoveredWidget("status")}
-                  onMouseLeave={() => setHoveredWidget(null)}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    height: hoveredWidget === "status" ? 130 : 66,
-                    zIndex: hoveredWidget === "status" ? 40 : 30,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 220,
-                    damping: 24,
-                  }}
-                  className="absolute bottom-16 left-10 md:left-14 p-4 bg-[#792CA2] dark:bg-[#5E1A86] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/10 rounded-xl">
-                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-[#DCCBFF] dark:text-slate-300 font-bold uppercase tracking-wider">Active Monitoring</p>
-                      <p className="text-sm font-black">Systems Optimized</p>
-                    </div>
-                  </div>
-
-                  {hoveredWidget === "status" && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-3 pt-2.5 border-t border-white/10 text-[9px] text-[#DCCBFF] dark:text-slate-300 grid grid-cols-2 gap-1 font-semibold"
-                    >
-                      <div>✔ Budgets: OK</div>
-                      <div>✔ Anomalies: 0</div>
-                      <div>✔ Multi-cloud: Active</div>
-                      <div>✔ Scan: 100% OK</div>
-                    </motion.div>
-                  )}
-                </motion.div>
-              </div>
-            </div>
-
-            {/* Slide 1 Right Column: Text Highlights Slider */}
-            <div
-              className="flex flex-col justify-center relative"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
+          {/* Floating Widgets Cluster */}
+          <div className="mt-8 relative h-[320px] w-full hidden md:block">
+            {/* Widget 1: Savings */}
+            <motion.div
+              onMouseEnter={() => setHoveredWidget("savings")}
+              onMouseLeave={() => setHoveredWidget(null)}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                height: hoveredWidget === "savings" ? 175 : 110,
+                zIndex: hoveredWidget === "savings" ? 40 : 10,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 220,
+                damping: 24,
+              }}
+              className="absolute top-0 left-0 p-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-white/40 dark:border-slate-800/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-60 overflow-hidden cursor-pointer"
             >
-              {/* Slide-specific ambient backdrop glow */}
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                  Potential Savings
+                </span>
+              </div>
+              <p className="text-3xl font-black text-[#111844] dark:text-white">
+                $8,450
+                <span className="text-sm font-medium text-gray-500 dark:text-slate-400">
+                  /mo
+                </span>
+              </p>
+
+              {hoveredWidget === "savings" ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-3 pt-3 border-t border-gray-150/50 dark:border-slate-800 space-y-1 text-[10px] text-gray-600 dark:text-slate-300"
+                >
+                  <div className="flex justify-between font-semibold">
+                    <span>☁ Compute (EC2):</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      $3,200
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-semibold">
+                    <span>💾 Storage (S3):</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      $2,850
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-semibold">
+                    <span>🗄 Databases (RDS):</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      $2,400
+                    </span>
+                  </div>
+                </motion.div>
+              ) : (
+                ""
+              )}
+            </motion.div>
+
+            {/* Widget 2: Real-time alert */}
+            <motion.div
+              onMouseEnter={() => setHoveredWidget("alert")}
+              onMouseLeave={() => setHoveredWidget(null)}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                height: hoveredWidget === "alert" ? 165 : 105,
+                zIndex: hoveredWidget === "alert" ? 40 : 20,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 220,
+                damping: 24,
+              }}
+              className="absolute top-12 right-2 md:right-6 p-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-white/40 dark:border-slate-800/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-56 overflow-hidden cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                <div className="w-2 h-2 rounded-full bg-amber-500 absolute" />
+                <span className="text-[9px] text-amber-800 dark:text-amber-400 font-bold uppercase tracking-wider">
+                  Active Alerts
+                </span>
+              </div>
+              <p className="text-sm font-bold text-[#111844] dark:text-white mt-2">
+                Idle Database Instance
+              </p>
+
+              {hoveredWidget === "alert" ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-2.5 pt-2.5 border-t border-gray-150/50 dark:border-slate-800 text-[10px] text-gray-600 dark:text-slate-300 space-y-0.5"
+                >
+                  <p className="font-semibold">
+                    <span className="text-gray-400">ID:</span> db-prod-replica
+                  </p>
+                  <p className="font-semibold">
+                    <span className="text-gray-400">Action:</span> Terminate
+                  </p>
+                  <p className="text-amber-600 dark:text-amber-400 font-bold">
+                    Waste: $140/mo
+                  </p>
+                </motion.div>
+              ) : (
+                <p className="text-xs text-gray-500 dark:text-slate-400">
+                  Saving potential: $140/mo
+                </p>
+              )}
+            </motion.div>
+
+            {/* Widget 3: Status check */}
+            <motion.div
+              onMouseEnter={() => setHoveredWidget("status")}
+              onMouseLeave={() => setHoveredWidget(null)}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                height: hoveredWidget === "status" ? 130 : 66,
+                zIndex: hoveredWidget === "status" ? 40 : 30,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 220,
+                damping: 24,
+              }}
+              className="absolute bottom-16 left-10 md:left-14 p-4 bg-[#792CA2] dark:bg-[#5E1A86] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/10 rounded-xl">
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-[10px] text-[#DCCBFF] dark:text-slate-300 font-bold uppercase tracking-wider">
+                    Active Monitoring
+                  </p>
+                  <p className="text-sm font-black">Systems Optimized</p>
+                </div>
+              </div>
+
+              {hoveredWidget === "status" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-3 pt-2.5 border-t border-white/10 text-[9px] text-[#DCCBFF] dark:text-slate-300 grid grid-cols-2 gap-1 font-semibold"
+                >
+                  <div>✔ Budgets: OK</div>
+                  <div>✔ Anomalies: 0</div>
+                  <div>✔ Multi-cloud: Active</div>
+                  <div>✔ Scan: 100% OK</div>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Slide 1 Right Column: Text Highlights Slider */}
+        <div
+          className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/10 dark:bg-slate-950/20 border border-white/30 dark:border-white/5 backdrop-blur-[2px] shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {/* Subtle background image that bleeds outside the card edges, extending leftward */}
+          <div className="absolute -top-5 -bottom-5 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.20] dark:opacity-[0.15] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.6 }}
+                className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
+                style={{
+                  backgroundImage: `url('/hero-${currentSlide + 1}.png')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  maskImage:
+                    "radial-gradient(ellipse at 80% 50%, black 25%, transparent 70%)",
+                  WebkitMaskImage:
+                    "radial-gradient(ellipse at 80% 50%, black 25%, transparent 70%)",
+                }}
+              />
+            </AnimatePresence>
+          </div>
+
+          {/* Automatic transitioning carousel for headings & descriptions */}
+          <div
+            className="min-h-[340px] flex flex-col justify-center relative z-10"
+            style={{ perspective: "1200px", transformStyle: "preserve-3d" }}
+          >
+            {mounted && (
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={`ambient-${currentSlide}`}
-                  initial={{ opacity: 0, scale: 0.6, rotate: -30, filter: "blur(100px)" }}
-                  animate={{ opacity: 1, scale: 1.1, rotate: 15, filter: "blur(80px)" }}
-                  exit={{ opacity: 0, scale: 1.3, rotate: 60, filter: "blur(110px)" }}
-                  transition={{ duration: 1, ease: "easeInOut" }}
-                  className={`absolute -inset-16 -z-10 rounded-full pointer-events-none ${currentSlide === 0
-                      ? "bg-gradient-to-tr from-[#792CA2]/15 via-[#B770FF]/15 dark:from-[#9A4DCC]/20 dark:via-[#C084FC]/10 to-transparent"
-                      : currentSlide === 1
-                        ? "bg-gradient-to-br from-[#00F2FE]/15 via-[#4FACFE]/15 dark:from-[#00F2FE]/20 dark:via-[#4FACFE]/10 to-transparent"
-                        : "bg-gradient-to-tr from-[#FF0844]/15 via-[#FFB199]/15 dark:from-[#FF0844]/20 dark:via-[#FFB199]/10 to-transparent"
-                    }`}
-                />
-              </AnimatePresence>
-
-              {/* Automatic transitioning carousel for headings & descriptions */}
-              <div
-                className="min-h-[340px] flex flex-col justify-center relative z-10"
-                style={{ perspective: "1200px", transformStyle: "preserve-3d" }}
-              >
-                {mounted && (
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={currentSlide}
-                      variants={isMobile ? mobileContainerVariants : containerVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      style={isMobile ? {} : { transformStyle: "preserve-3d" }}
-                      className="flex flex-col items-start"
-                    >
-                     
-
-                      <motion.h2
-                        className="
+                  key={currentSlide}
+                  variants={
+                    isMobile ? mobileContainerVariants : containerVariants
+                  }
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  style={isMobile ? {} : { transformStyle: "preserve-3d" }}
+                  className="flex flex-col items-start"
+                >
+                  <motion.h2
+                    className="
                         text-4xl
                         md:text-5xl
                         font-black
@@ -719,22 +780,27 @@ export default function HeroSection() {
                         leading-tight
                         overflow-visible
                         "
-                        style={isMobile ? {} : { transformStyle: "preserve-3d" }}
-                      >
-                        <WordWrapper text={slides[currentSlide].title} delayOffset={0.05} variantType="title" isMobile={isMobile} />
-                        <br />
-                        <WordWrapper
-                          text={slides[currentSlide].highlight}
-                          delayOffset={0.25}
-                          variantType="highlight"
-                          className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2"
-                          isMobile={isMobile}
-                        />
-                      </motion.h2>
+                    style={isMobile ? {} : { transformStyle: "preserve-3d" }}
+                  >
+                    <WordWrapper
+                      text={slides[currentSlide].title}
+                      delayOffset={0.05}
+                      variantType="title"
+                      isMobile={isMobile}
+                    />
+                    <br />
+                    <WordWrapper
+                      text={slides[currentSlide].highlight}
+                      delayOffset={0.25}
+                      variantType="highlight"
+                      className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2"
+                      isMobile={isMobile}
+                    />
+                  </motion.h2>
 
-                      <motion.p
-                        variants={isMobile ? {} : descVariants}
-                        className="
+                  <motion.p
+                    variants={isMobile ? {} : descVariants}
+                    className="
                         mt-8
                         text-lg
                         md:text-xl
@@ -743,29 +809,29 @@ export default function HeroSection() {
                         leading-relaxed
                         max-w-xl
                         "
-                      >
-                        {slides[currentSlide].desc}
-                      </motion.p>
-                    </motion.div>
-                  </AnimatePresence>
-                )}
-              </div>
+                  >
+                    {slides[currentSlide].desc}
+                  </motion.p>
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </div>
 
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                className="mt-8 flex items-center gap-6 relative z-10"
-              >
-                <a href={isLoggedIn ? "/dashboard" : "/auth/signin"}>
-                  <Button
-                    size="lg"
-                    className="
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            className="mt-8 flex flex-wrap items-center gap-4 sm:gap-6 relative z-10 w-full"
+          >
+            <a href={isLoggedIn ? "/dashboard" : "/auth/signin"}>
+              <Button
+                size="lg"
+                className="
                     bg-[#111844]
                     dark:bg-white
                     hover:bg-[#0c0e2b]
@@ -773,45 +839,52 @@ export default function HeroSection() {
                     text-white
                     dark:text-[#111844]
                     font-bold
-                    px-8
+                    px-5
+                    sm:px-8
                     shadow-[0_4px_25px_rgba(17,24,68,0.25)]
                     transition-all
                     hover:scale-[1.02]
                     "
-                  >
-                    {isLoggedIn ? "Go To Dashboard" : "Explore Dashboard"}
-                  </Button>
-                </a>
+              >
+                {isLoggedIn ? "Go To Dashboard" : "Explore Dashboard"}
+              </Button>
+            </a>
 
-                {/* Slide Navigation Indicators */}
-                <div className="flex gap-2">
-                  {slides.map((_, idx) => {
-                    const isActive = currentSlide === idx;
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          setCurrentSlide(idx);
+            {/* Slide Navigation Indicators */}
+            <div className="flex gap-2">
+              {slides.map((_, idx) => {
+                const isActive = currentSlide === idx;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setCurrentSlide(idx);
+                    }}
+                    className={`h-2.5 rounded-full overflow-hidden relative transition-all duration-500 ease-out ${
+                      isActive
+                        ? "w-8 bg-gray-200 dark:bg-neutral-800"
+                        : "w-2.5 bg-gray-300 dark:bg-neutral-700 hover:bg-gray-400 dark:hover:bg-neutral-600"
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        key={`progress-${idx}-${isPaused}`}
+                        initial={{ width: isPaused ? "100%" : "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{
+                          duration: isPaused ? 0 : 3,
+                          ease: "linear",
                         }}
-                        className={`h-2.5 rounded-full overflow-hidden relative transition-all duration-500 ease-out ${isActive ? "w-8 bg-gray-200 dark:bg-neutral-800" : "w-2.5 bg-gray-300 dark:bg-neutral-700 hover:bg-gray-400 dark:hover:bg-neutral-600"
-                          }`}
-                        aria-label={`Go to slide ${idx + 1}`}
-                      >
-                        {isActive && (
-                          <motion.div
-                            key={`progress-${idx}-${isPaused}`}
-                            initial={{ width: isPaused ? "100%" : "0%" }}
-                            animate={{ width: "100%" }}
-                            transition={{ duration: isPaused ? 0 : 3, ease: "linear" }}
-                            className="absolute inset-y-0 left-0 bg-[#792CA2] dark:bg-[#B770FF]"
-                          />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
+                        className="absolute inset-y-0 left-0 bg-[#792CA2] dark:bg-[#B770FF]"
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
+          </motion.div>
+        </div>
       </motion.div>
     </section>
   );
