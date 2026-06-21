@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Squares2X2Icon,
@@ -24,6 +26,18 @@ export default function Sidebar({
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState("Dashboard");
+  const [isNavigatingTo, setIsNavigatingTo] = useState(null);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setIsNavigatingTo(null);
+    if (pathname === "/resources") setActiveTab("Resources");
+    else if (pathname === "/dashboard") setActiveTab("Dashboard");
+    else if (pathname === "/recommendations") setActiveTab("Recommendations");
+    else if (pathname === "/alerts") setActiveTab("Alerts");
+    else if (pathname === "/settings") setActiveTab("Settings");
+  }, [pathname]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -36,18 +50,22 @@ export default function Sidebar({
     {
       name: "Dashboard",
       icon: Squares2X2Icon,
+      href: "/dashboard",
     },
     {
       name: "Resources",
       icon: CpuChipIcon,
+      href: "/resources",
     },
     {
       name: "Recommendations",
       icon: LightBulbIcon,
+      href: "/recommendations",
     },
     {
       name: "Alerts",
       icon: BellAlertIcon,
+      href: "/alerts",
     },
     {
       name: "Simulation",
@@ -60,6 +78,7 @@ export default function Sidebar({
     {
       name: "Settings",
       icon: Cog6ToothIcon,
+      href: "/settings",
     },
     {
       name: "Sign Out",
@@ -139,19 +158,16 @@ export default function Sidebar({
                 }
               }
 
-              return (
-                <motion.button
-                  key={item.name}
-                  layout
-                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                  onClick={() => {
-                    setActiveTab(item.name);
-                    if (item.action) item.action();
-                  }}
-                  className={`${btnClass} relative focus:outline-none flex-shrink-0`}
-                  title={item.name}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
+              const innerContent = (
+                <>
+                  {isNavigatingTo === item.name ? (
+                    <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                  )}
                   
                   {item.isSimulation && isLiveSimulation && !isActive && (
                     <span className="absolute top-1 right-1 flex h-1.5 w-1.5">
@@ -171,6 +187,37 @@ export default function Sidebar({
                       {item.name}
                     </motion.span>
                   )}
+                </>
+              );
+
+              return item.href ? (
+                <Link href={item.href} passHref legacyBehavior key={item.name}>
+                  <motion.a
+                    layout
+                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                    onClick={() => {
+                      setActiveTab(item.name);
+                      if (pathname !== item.href) setIsNavigatingTo(item.name);
+                    }}
+                    className={`${btnClass} relative focus:outline-none flex-shrink-0`}
+                    title={item.name}
+                  >
+                    {innerContent}
+                  </motion.a>
+                </Link>
+              ) : (
+                <motion.button
+                  key={item.name}
+                  layout
+                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                  onClick={() => {
+                    setActiveTab(item.name);
+                    if (item.action) item.action();
+                  }}
+                  className={`${btnClass} relative focus:outline-none flex-shrink-0`}
+                  title={item.name}
+                >
+                  {innerContent}
                 </motion.button>
               );
             })}
@@ -179,37 +226,59 @@ export default function Sidebar({
       ) : (
         <nav className="flex-grow flex flex-col justify-between pb-12">
           <div className="space-y-4">
-            <button
-              className={`text-xs font-semibold text-white relative flex items-center transition-all duration-150 ${
+            <Link
+              href="/dashboard"
+              onClick={() => {
+                if (pathname !== "/dashboard") setIsNavigatingTo("Dashboard");
+              }}
+              className={`text-xs font-semibold relative flex items-center transition-all duration-150 ${
                 shouldBeExpanded
-                  ? "w-full text-left px-4 py-3 rounded-xl bg-[#792CA2] gap-3 shadow-md hover:bg-[#9A4DCC] border border-transparent"
-                  : "w-11 h-11 rounded-xl bg-[#792CA2] mx-auto justify-center hover:brightness-110 active:translate-y-[2px] active:shadow-[0_2px_0_#5c1f7e,0_2px_6px_rgba(121,44,162,0.3)] shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30"
+                  ? `w-full text-left px-4 py-3 rounded-xl gap-3 shadow-md border border-transparent ${activeTab === "Dashboard" ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC]" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
+                  : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === "Dashboard" ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
               }`}
             >
-              <Squares2X2Icon className="w-5 h-5 flex-shrink-0" />
+              {isNavigatingTo === "Dashboard" ? (
+                <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <Squares2X2Icon className="w-5 h-5 flex-shrink-0" />
+              )}
               {shouldBeExpanded && (
                 <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   Dashboard
                 </motion.span>
               )}
-            </button>
+            </Link>
 
             {[
-              { name: "Resources", icon: CpuChipIcon },
-              { name: "Recommendations", icon: LightBulbIcon },
-              { name: "Alerts", icon: BellAlertIcon },
+              { name: "Resources", icon: CpuChipIcon, href: "/resources" },
+              { name: "Recommendations", icon: LightBulbIcon, href: "/recommendations" },
+              { name: "Alerts", icon: BellAlertIcon, href: "/alerts" },
             ].map((item) => {
               const Icon = item.icon;
               return (
-                <button
+                <Link
                   key={item.name}
+                  href={item.href}
+                  onClick={() => {
+                    if (pathname !== item.href) setIsNavigatingTo(item.name);
+                  }}
                   className={`text-xs transition-all duration-150 font-medium flex items-center ${
                     shouldBeExpanded
-                      ? "w-full text-left px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-[#792CA2]/25 gap-3 border border-transparent"
-                      : "w-11 h-11 rounded-xl text-gray-400 hover:text-white hover:bg-[#792CA2]/15 border border-gray-700/40 bg-white/5 mx-auto justify-center active:translate-y-[2px] active:shadow-[0_2px_0_#0d1235,0_2px_6px_rgba(0,0,0,0.2)] shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"
+                      ? `w-full text-left px-4 py-3 rounded-xl gap-3 border border-transparent ${activeTab === item.name ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC] shadow-md" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
+                      : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === item.name ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
                   }`}
                 >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {isNavigatingTo === item.name ? (
+                    <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                  )}
                   {shouldBeExpanded && (
                     <motion.span
                       initial={{ opacity: 0 }}
@@ -219,7 +288,7 @@ export default function Sidebar({
                       {item.name}
                     </motion.span>
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -278,14 +347,25 @@ export default function Sidebar({
           )}
 
           <div className="space-y-4">
-            <button
+            <Link
+              href="/settings"
+              onClick={() => {
+                if (pathname !== "/settings") setIsNavigatingTo("Settings");
+              }}
               className={`text-xs font-medium flex items-center transition-all duration-150 ${
                 shouldBeExpanded
-                  ? "w-full text-left px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-[#792CA2]/25 gap-3 border border-transparent"
-                  : "w-11 h-11 rounded-xl text-gray-400 hover:text-white hover:bg-[#792CA2]/15 border border-gray-700/40 bg-white/5 mx-auto justify-center active:translate-y-[2px] active:shadow-[0_2px_0_#0d1235,0_2px_6px_rgba(0,0,0,0.2)] shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"
+                  ? `w-full text-left px-4 py-3 rounded-xl gap-3 border border-transparent ${activeTab === "Settings" ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC] shadow-md" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
+                  : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === "Settings" ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
               }`}
             >
-              <Cog6ToothIcon className="w-5 h-5 flex-shrink-0" />
+              {isNavigatingTo === "Settings" ? (
+                <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <Cog6ToothIcon className="w-5 h-5 flex-shrink-0" />
+              )}
               {shouldBeExpanded && (
                 <motion.span
                   initial={{ opacity: 0 }}
@@ -295,7 +375,7 @@ export default function Sidebar({
                   Settings
                 </motion.span>
               )}
-            </button>
+            </Link>
 
             <button
               onClick={handleSignOut}

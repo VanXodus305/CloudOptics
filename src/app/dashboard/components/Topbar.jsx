@@ -19,6 +19,7 @@ export default function Topbar({
   handleSignOut,
   profileRef,
   session,
+  hideReportButton = false,
 }) {
   const router = useRouter();
 
@@ -53,10 +54,12 @@ export default function Topbar({
           </div>
 
           {/* Download Symbol in Report Button */}
-          <button className="hidden md:flex bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-xs px-4 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm font-semibold items-center gap-2">
-            <span>Report</span>
-            <ArrowDownTrayIcon className="w-4 h-4 text-white" />
-          </button>
+          {!hideReportButton && (
+            <button className="hidden md:flex bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-xs px-4 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm font-semibold items-center gap-2">
+              <span>Report</span>
+              <ArrowDownTrayIcon className="w-4 h-4 text-white" />
+            </button>
+          )}
 
           {/* User Image Logo in Navbar */}
           <div className="relative" ref={profileRef}>
@@ -105,13 +108,15 @@ export default function Topbar({
                     </div>
 
                     {/* Report Download */}
-                    <button
-                      onClick={() => setIsProfileOpen(false)}
-                      className="w-full bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-[10px] px-3.5 py-2 rounded-xl active:scale-95 hover:scale-[1.02] transition-all font-semibold flex items-center justify-between h-9 shadow-sm"
-                    >
-                      <span>Download Report</span>
-                      <ArrowDownTrayIcon className="w-3.5 h-3.5 text-white" />
-                    </button>
+                    {!hideReportButton && (
+                      <button
+                        onClick={() => setIsProfileOpen(false)}
+                        className="w-full bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-[10px] px-3.5 py-2 rounded-xl active:scale-95 hover:scale-[1.02] transition-all font-semibold flex items-center justify-between h-9 shadow-sm"
+                      >
+                        <span>Download Report</span>
+                        <ArrowDownTrayIcon className="w-3.5 h-3.5 text-white" />
+                      </button>
+                    )}
 
                     {/* Home Navigation link */}
                     <button

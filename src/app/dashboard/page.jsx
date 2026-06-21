@@ -4,12 +4,10 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Sub-components
 import ParticleBackground from "./components/ParticleBackground";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import WelcomeBanner from "./components/WelcomeBanner";
-import PerformanceMetricsHeader from "./components/PerformanceMetricsHeader";
 import KPICards from "./components/KPICards";
 import CostTrendsChart from "./components/CostTrendsChart";
 import CostDistributionChart from "./components/CostDistributionChart";
@@ -486,58 +484,57 @@ export default function DashboardPage() {
         {/* MAIN CONTENT AREA */}
         <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative">
           {/* MAIN DASHBOARD CONTENT */}
-          <main className="flex-grow p-4 md:p-8 pb-24 md:pb-8 relative">
-            {/* WELCOME BANNER */}
-            <WelcomeBanner userName={userName} />
+          <main className="flex-grow p-4 md:p-6 pb-24 md:pb-8 relative">
+            <div className="flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
+              {/* WELCOME BANNER */}
+              <WelcomeBanner userName={userName} />
 
-            {/* PERFORMANCE METRICS HEADER */}
-            <PerformanceMetricsHeader />
+              {/* KPI CARDS */}
+              <KPICards />
 
-            {/* KPI CARDS */}
-            <KPICards />
+              {/* ANALYTICS SECTION */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Cost Trends Card */}
+                <CostTrendsChart
+                  chartTimeframe={chartTimeframe}
+                  setChartTimeframe={setChartTimeframe}
+                  currentChartData={currentChartData}
+                  maxChartValue={maxChartValue}
+                  hoveredBar={hoveredBar}
+                  setHoveredBar={setHoveredBar}
+                />
 
-            {/* ANALYTICS SECTION */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-              {/* Cost Trends Card */}
-              <CostTrendsChart
-                chartTimeframe={chartTimeframe}
-                setChartTimeframe={setChartTimeframe}
-                currentChartData={currentChartData}
-                maxChartValue={maxChartValue}
-                hoveredBar={hoveredBar}
-                setHoveredBar={setHoveredBar}
-              />
+                {/* Cost Distribution Card */}
+                <CostDistributionChart
+                  donutFilter={donutFilter}
+                  setDonutFilter={setDonutFilter}
+                  donutData={donutData}
+                  donutTotal={donutTotal}
+                  donutRadius={donutRadius}
+                  donutCircumference={donutCircumference}
+                  donutHoveredSegment={donutHoveredSegment}
+                  setDonutHoveredSegment={setDonutHoveredSegment}
+                  donutSelectedSegment={donutSelectedSegment}
+                  setDonutSelectedSegment={setDonutSelectedSegment}
+                />
+              </div>
 
-              {/* Cost Distribution Card */}
-              <CostDistributionChart
-                donutFilter={donutFilter}
-                setDonutFilter={setDonutFilter}
-                donutData={donutData}
-                donutTotal={donutTotal}
-                donutRadius={donutRadius}
-                donutCircumference={donutCircumference}
-                donutHoveredSegment={donutHoveredSegment}
-                setDonutHoveredSegment={setDonutHoveredSegment}
-                donutSelectedSegment={donutSelectedSegment}
-                setDonutSelectedSegment={setDonutSelectedSegment}
-              />
-            </div>
+              {/* LOWER GRIDS: TABLES & ALERTS */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Top Cost Resources Table */}
+                <ResourcesTable
+                  resources={resources}
+                  copiedId={copiedId}
+                  handleCopy={handleCopy}
+                  setIsResourcesModalOpen={setIsResourcesModalOpen}
+                />
 
-            {/* LOWER GRIDS: TABLES & ALERTS */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Top Cost Resources Table */}
-              <ResourcesTable
-                resources={resources}
-                copiedId={copiedId}
-                handleCopy={handleCopy}
-                setIsResourcesModalOpen={setIsResourcesModalOpen}
-              />
-
-              {/* Optimization Alerts */}
-              <AlertsTable
-                alerts={alerts}
-                setIsAlertsModalOpen={setIsAlertsModalOpen}
-              />
+                {/* Optimization Alerts */}
+                <AlertsTable
+                  alerts={alerts}
+                  setIsAlertsModalOpen={setIsAlertsModalOpen}
+                />
+              </div>
             </div>
           </main>
 
