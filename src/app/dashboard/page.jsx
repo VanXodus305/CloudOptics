@@ -128,6 +128,7 @@ export default function DashboardPage() {
   const [resourcesData, setResourcesData] = useState([]);
   const [alertsData, setAlertsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isServicesLoading, setIsServicesLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Client-side cache and request coordinator
@@ -138,32 +139,49 @@ export default function DashboardPage() {
   const fetchDashboardData = useCallback(async (filter, isPolling = false) => {
     currentRequestFilter.current = filter;
 
+    const cachedServices = cacheRef.current[filter];
+    const cachedGlobal = cacheRef.current["global"];
+
     // Check if we have cached data for instantaneous transition
-    const cached = cacheRef.current[filter];
-    if (cached && !isPolling) {
-      setSummaryData(cached.summary);
-      setTrendsData(cached.trends);
-      setServicesData(cached.services);
-      setResourcesData(cached.resources);
-      setAlertsData(cached.alerts);
+    if (cachedGlobal && !isPolling) {
+      setSummaryData(cachedGlobal.summary);
+      setTrendsData(cachedGlobal.trends);
+      setResourcesData(cachedGlobal.resources);
+      setAlertsData(cachedGlobal.alerts);
       setIsLoading(false);
     } else {
-      if (!isPolling) setIsLoading(true);
+      if (!isPolling && !cachedGlobal) setIsLoading(true);
+    }
+
+    if (cachedServices && !isPolling) {
+      setServicesData(cachedServices);
+      setIsServicesLoading(false);
+    } else {
+      if (!isPolling) setIsServicesLoading(true);
     }
 
     try {
-      const envParam = filter === "All" ? "" : `?environment=${filter}`;
-      
-      const [summaryRes, trendsRes, servicesRes, resourcesRes, alertsRes] = await Promise.all([
-        fetch(`/api/dashboard/summary${envParam}`),
-        fetch(`/api/dashboard/trends${envParam}`),
-        fetch(`/api/dashboard/services${envParam}`),
-        fetch(`/api/resources${envParam}`),
-        fetch(`/api/optimization/alerts${envParam}`)
-      ]);
+      const servicesEnvParam = filter === "All" ? "" : `?environment=${filter}`;
+      const shouldFetchGlobal = !cacheRef.current["global"] || isPolling;
 
-      if (!summaryRes.ok || !trendsRes.ok || !servicesRes.ok || !resourcesRes.ok || !alertsRes.ok) {
-        throw new Error("One or more dashboard API requests failed");
+      const promises = [
+        fetch(`/api/dashboard/services${servicesEnvParam}`)
+      ];
+      if (shouldFetchGlobal) {
+        promises.push(
+          fetch(`/api/dashboard/summary`),
+          fetch(`/api/dashboard/trends`),
+          fetch(`/api/resources`),
+          fetch(`/api/optimization/alerts`)
+        );
+      }
+
+      const results = await Promise.all(promises);
+
+      for (const res of results) {
+        if (!res.ok) {
+          throw new Error("One or more dashboard API requests failed");
+        }
       }
 
       // Check if this response belongs to the current selected filter
@@ -171,28 +189,30 @@ export default function DashboardPage() {
         return;
       }
 
-      const [summaryJson, trendsJson, servicesJson, resourcesJson, alertsJson] = await Promise.all([
-        summaryRes.json(),
-        trendsRes.json(),
-        servicesRes.json(),
-        resourcesRes.json(),
-        alertsRes.json()
-      ]);
-
-      // Cache the result
-      cacheRef.current[filter] = {
-        summary: summaryJson,
-        trends: trendsJson,
-        services: servicesJson,
-        resources: resourcesJson,
-        alerts: alertsJson,
-      };
-
-      setSummaryData(summaryJson);
-      setTrendsData(trendsJson);
+      const servicesJson = await results[0].json();
       setServicesData(servicesJson);
-      setResourcesData(resourcesJson);
-      setAlertsData(alertsJson);
+      cacheRef.current[filter] = servicesJson;
+      setIsServicesLoading(false);
+
+      if (shouldFetchGlobal) {
+        const [summaryJson, trendsJson, resourcesJson, alertsJson] = await Promise.all(
+          results.slice(1).map((r) => r.json())
+        );
+
+        cacheRef.current["global"] = {
+          summary: summaryJson,
+          trends: trendsJson,
+          resources: resourcesJson,
+          alerts: alertsJson,
+        };
+
+        setSummaryData(summaryJson);
+        setTrendsData(trendsJson);
+        setResourcesData(resourcesJson);
+        setAlertsData(alertsJson);
+        setIsLoading(false);
+      }
+
       setError(null);
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
@@ -202,6 +222,7 @@ export default function DashboardPage() {
     } finally {
       if (currentRequestFilter.current === filter && !isPolling) {
         setIsLoading(false);
+        setIsServicesLoading(false);
       }
     }
   }, []);
@@ -378,6 +399,11 @@ export default function DashboardPage() {
   const donutRadius = 38;
   const donutCircumference = 2 * Math.PI * donutRadius;
 
+  const donutTotalSpend = useMemo(() => {
+    if (!servicesData || servicesData.length === 0) return 0;
+    return servicesData.reduce((sum, item) => sum + item.value, 0);
+  }, [servicesData]);
+
   // Alerts array formatted for view layout
   const formattedAlerts = useMemo(() => {
     if (!alertsData || alertsData.length === 0) return [];
@@ -518,8 +544,8 @@ export default function DashboardPage() {
                   setDonutHoveredSegment={setDonutHoveredSegment}
                   donutSelectedSegment={donutSelectedSegment}
                   setDonutSelectedSegment={setDonutSelectedSegment}
-                  donutTotalSpend={summaryData?.totalSpend || 0}
-                  isLoading={isLoading}
+                  donutTotalSpend={donutTotalSpend}
+                  isLoading={isServicesLoading}
                 />
               </div>
 
