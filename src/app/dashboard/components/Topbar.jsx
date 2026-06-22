@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -8,6 +8,9 @@ import {
   ArrowDownTrayIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
+  DocumentChartBarIcon,
+  TableCellsIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 
 export default function Topbar({
@@ -20,8 +23,53 @@ export default function Topbar({
   profileRef,
   session,
   hideReportButton = false,
+  onDownloadPDF,
+  onDownloadXLSX,
 }) {
   const router = useRouter();
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(null);
+  const reportRef = useRef(null);
+
+  // Close report dropdown on outside click
+  React.useEffect(() => {
+    function handler(e) {
+      if (reportRef.current && !reportRef.current.contains(e.target)) {
+        setIsReportOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  async function handlePDF() {
+    setIsReportOpen(false);
+    setIsGenerating("pdf");
+    try { await onDownloadPDF?.(); } finally { setIsGenerating(null); }
+  }
+
+  async function handleXLSX() {
+    setIsReportOpen(false);
+    setIsGenerating("xlsx");
+    try { await onDownloadXLSX?.(); } finally { setIsGenerating(null); }
+  }
+
+  const reportOptions = [
+    {
+      label: "PDF Report",
+      sub: "Formatted multi-page document",
+      icon: DocumentChartBarIcon,
+      action: handlePDF,
+      key: "pdf",
+    },
+    {
+      label: "Excel (XLSX)",
+      sub: "Spreadsheet with 5 data sheets",
+      icon: TableCellsIcon,
+      action: handleXLSX,
+      key: "xlsx",
+    },
+  ];
 
   return (
     <div className="px-4 md:px-8 pt-4 pb-2 w-full flex-shrink-0 z-50">
@@ -53,12 +101,60 @@ export default function Topbar({
             <span>{currentDate}</span>
           </div>
 
-          {/* Download Symbol in Report Button */}
+          {/* ── Report Dropdown ── */}
           {!hideReportButton && (
-            <button className="hidden md:flex bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-xs px-4 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm font-semibold items-center gap-2">
-              <span>Report</span>
-              <ArrowDownTrayIcon className="w-4 h-4 text-white" />
-            </button>
+            <div className="hidden md:block relative" ref={reportRef}>
+              <button
+                onClick={() => setIsReportOpen((v) => !v)}
+                className="flex bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-xs px-4 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm font-semibold items-center gap-2 select-none"
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                    <span>Generating…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Report</span>
+                    <ArrowDownTrayIcon className="w-4 h-4 text-white" />
+                    <ChevronDownIcon
+                      className={`w-3 h-3 text-white/80 transition-transform duration-200 ${isReportOpen ? "rotate-180" : ""}`}
+                    />
+                  </>
+                )}
+              </button>
+
+              <AnimatePresence>
+                {isReportOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-xl border border-gray-100 p-2 z-[999]"
+                  >
+                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest px-2.5 pt-1 pb-2">
+                      Download Format
+                    </p>
+                    {reportOptions.map((opt) => (
+                      <button
+                        key={opt.key}
+                        onClick={opt.action}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-purple-50 transition-colors group text-left"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#792CA2]/10 to-[#9A4DCC]/10 flex items-center justify-center flex-shrink-0 group-hover:from-[#792CA2]/20 group-hover:to-[#9A4DCC]/20 transition-all">
+                          <opt.icon className="w-4 h-4 text-[#792CA2]" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-[#111844]">{opt.label}</p>
+                          <p className="text-[9px] text-gray-400 font-medium">{opt.sub}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           )}
 
           {/* User Image Logo in Navbar */}
@@ -91,39 +187,38 @@ export default function Topbar({
                   className="absolute right-0 mt-3 w-56 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-xl border border-gray-100 p-2 z-[999] text-left"
                 >
                   <div className="p-2.5 border-b border-gray-100">
-                    <p className="font-bold text-xs text-[#111844] truncate">
-                      {userName}
-                    </p>
-                    <p className="text-[10px] text-gray-400 truncate">
-                      {session?.user?.email}
-                    </p>
+                    <p className="font-bold text-xs text-[#111844] truncate">{userName}</p>
+                    <p className="text-[10px] text-gray-400 truncate">{session?.user?.email}</p>
                   </div>
 
-                  {/* Mobile-Only Dropdown Navigation Drawer */}
+                  {/* Mobile-Only section */}
                   <div className="md:hidden border-b border-gray-100 py-2 flex flex-col gap-2">
-                    {/* Date badge */}
                     <div className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-gray-50/80 border border-gray-100/50 text-[10px] font-bold text-gray-500">
                       <CalendarIcon className="w-4 h-4 text-[#792CA2]" />
                       <span>{currentDate}</span>
                     </div>
 
-                    {/* Report Download */}
                     {!hideReportButton && (
-                      <button
-                        onClick={() => setIsProfileOpen(false)}
-                        className="w-full bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-[10px] px-3.5 py-2 rounded-xl active:scale-95 hover:scale-[1.02] transition-all font-semibold flex items-center justify-between h-9 shadow-sm"
-                      >
-                        <span>Download Report</span>
-                        <ArrowDownTrayIcon className="w-3.5 h-3.5 text-white" />
-                      </button>
+                      <div className="flex flex-col gap-1">
+                        <button
+                          onClick={() => { setIsProfileOpen(false); handlePDF(); }}
+                          className="w-full bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white text-[10px] px-3.5 py-2 rounded-xl active:scale-95 hover:scale-[1.02] transition-all font-semibold flex items-center justify-between h-9 shadow-sm"
+                        >
+                          <span>PDF Report</span>
+                          <DocumentChartBarIcon className="w-3.5 h-3.5 text-white" />
+                        </button>
+                        <button
+                          onClick={() => { setIsProfileOpen(false); handleXLSX(); }}
+                          className="w-full bg-gradient-to-r from-[#5B21B6] to-[#792CA2] text-white text-[10px] px-3.5 py-2 rounded-xl active:scale-95 hover:scale-[1.02] transition-all font-semibold flex items-center justify-between h-9 shadow-sm"
+                        >
+                          <span>Excel Report</span>
+                          <TableCellsIcon className="w-3.5 h-3.5 text-white" />
+                        </button>
+                      </div>
                     )}
 
-                    {/* Home Navigation link */}
                     <button
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        router.push("/");
-                      }}
+                      onClick={() => { setIsProfileOpen(false); router.push("/"); }}
                       className="w-full text-left text-xs px-2.5 py-2 rounded-xl hover:bg-[#792CA2]/10 text-gray-600 hover:text-[#792CA2] transition-colors flex items-center gap-2 font-medium"
                     >
                       <HomeIcon className="w-4 h-4 text-gray-400" />

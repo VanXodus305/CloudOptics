@@ -15,6 +15,8 @@ import ResourcesTable from "./components/ResourcesTable";
 import AlertsTable from "./components/AlertsTable";
 import Modals from "./components/Modals";
 import Footer from "../landing/components/Footer";
+import { generatePDF }  from "../../lib/reports/generatePDF";
+import { generateXLSX } from "../../lib/reports/generateXLSX";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +82,33 @@ export default function DashboardPage() {
     setTimeout(() => {
       signOut({ callbackUrl: "/auth/signin" });
     }, 1500);
+  };
+
+  const handleDownloadPDF = async () => {
+    await generatePDF({
+      summaryData,
+      kpiTrends,
+      donutData,
+      donutFilter,
+      resourcesData,
+      formattedAlerts,
+      currentChartData,
+      chartTimeframe,
+    });
+  };
+
+  const handleDownloadXLSX = async () => {
+    await generateXLSX({
+      summaryData,
+      kpiTrends,
+      donutData,
+      donutFilter,
+      resourcesData,
+      formattedAlerts,
+      currentChartData,
+      chartTimeframe,
+      trendsData,
+    });
   };
 
   // Cost Timeframes & Donut Resource filter state
@@ -436,6 +465,8 @@ export default function DashboardPage() {
         handleSignOut={handleSignOut}
         profileRef={profileRef}
         session={session}
+        onDownloadPDF={handleDownloadPDF}
+        onDownloadXLSX={handleDownloadXLSX}
       />
 
       {/* LOWER AREA (SIDEBAR + MAIN CONTENT AREA) */}
