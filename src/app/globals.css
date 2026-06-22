@@ -78,3 +78,10 @@ section {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Remove Recharts Default Focus Outline */
+.recharts-wrapper *:focus,
+.recharts-surface:focus,
+.recharts-wrapper {
+  outline: none !important;
+}

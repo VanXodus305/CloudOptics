@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import {
   BarChart,
@@ -10,6 +10,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Label,
+  Cell
 } from "recharts";
 
 const mockDataByDept = {
@@ -48,64 +50,164 @@ const mockDataByDept = {
 export default function UtilizationChart({ department = "Production" }) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState("CPU Utilization");
+  const [drilldownServer, setDrilldownServer] = useState(null);
+  const filterRef = useRef(null);
+
+  useEffect(() => {
+    setDrilldownServer(null);
+  }, [department]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setFilterOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const data = mockDataByDept[department] || mockDataByDept["Production"];
+
+  const handleBarClick = (data) => {
+    if (data && data.name) {
+      setDrilldownServer(data.name);
+    }
+  };
 
   const renderBar = () => {
     switch (selectedMetric) {
       case "Memory Utilization":
-        return <Bar dataKey="memory" name="Memory (%)" fill="#10B981" radius={[0, 4, 4, 0]} />;
+        return <Bar dataKey="memory" name="Memory (%)" fill="#792CA2" radius={[0, 4, 4, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />;
       case "Storage":
-        return <Bar dataKey="storage" name="Storage (%)" fill="#F59E0B" radius={[0, 4, 4, 0]} />;
+        return <Bar dataKey="storage" name="Storage (%)" fill="#792CA2" radius={[0, 4, 4, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />;
       case "Network":
-        return <Bar dataKey="network" name="Network (MB/s)" fill="#8B5CF6" radius={[0, 4, 4, 0]} />;
+        return <Bar dataKey="network" name="Network (MB/s)" fill="#792CA2" radius={[0, 4, 4, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />;
       case "CPU Utilization":
       default:
-        return <Bar dataKey="cpu" name="CPU (%)" fill="#3B82F6" radius={[0, 4, 4, 0]} />;
+        return <Bar dataKey="cpu" name="CPU (%)" fill="#792CA2" radius={[0, 4, 4, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />;
     }
   };
 
+  let drilldownData = [];
+  let serverObj = null;
+  if (drilldownServer) {
+    serverObj = data.find(s => s.name === drilldownServer);
+    if (serverObj) {
+      drilldownData = [
+        { name: "CPU", value: serverObj.cpu, fill: "#792CA2" },
+        { name: "Memory", value: serverObj.memory, fill: "#9A4DCC" },
+        { name: "Storage", value: serverObj.storage, fill: "#1F215D" },
+        { name: "Network", value: serverObj.network, fill: "#DCCBFF" }
+      ];
+    }
+  }
+
   return (
-    <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 h-[400px] w-full flex flex-col relative transition-all hover:shadow-xl mt-8">
+    <div className={`bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 mt-8 ${drilldownServer ? 'h-auto min-h-[500px]' : 'h-[350px]'}`}>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-base font-bold text-[#111844]">
-          Utilization Metrics
-        </h3>
-        <div className="relative">
-          <button
-            onClick={() => setFilterOpen(!filterOpen)}
-            className="bg-[#F9F7F7] border border-gray-200 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] hover:bg-gray-50 transition-colors flex items-center gap-2"
-          >
-            {selectedMetric} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
-          </button>
-          {filterOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 z-[999] py-1 overflow-hidden">
-              {["CPU Utilization", "Memory Utilization", "Storage", "Network"].map((metric) => (
-                <button
-                  key={metric}
-                  onClick={() => {
-                    setSelectedMetric(metric);
-                    setFilterOpen(false);
-                  }}
-                  className={`block w-full text-left px-4 py-2 text-xs font-medium hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors ${selectedMetric === metric ? "bg-[#792CA2]/5 text-[#792CA2]" : "text-gray-700"}`}
-                >
-                  {metric}
-                </button>
-              ))}
+        <h3 className="flex items-center gap-2">
+          {drilldownServer ? (
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setDrilldownServer(null)}
+                className="text-gray-400 hover:text-[#792CA2] transition-colors"
+                title="Back to Servers"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              </button>
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">{drilldownServer} Details</span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-start">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">Utilization Metrics</span>
+              <span className="text-[11px] text-gray-400 font-medium mt-0.5 tracking-normal">Click chart bar for details</span>
             </div>
           )}
-        </div>
+        </h3>
+        {!drilldownServer && (
+          <div className="relative" ref={filterRef}>
+            <button
+              onClick={() => setFilterOpen(!filterOpen)}
+              className="bg-[#F9F7F7] border border-gray-200 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] hover:bg-gray-50 transition-colors flex items-center gap-2"
+            >
+              {selectedMetric} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+            </button>
+            {filterOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 z-[999] py-1 overflow-hidden">
+                {["CPU Utilization", "Memory Utilization", "Storage", "Network"].map((metric) => (
+                  <button
+                    key={metric}
+                    onClick={() => {
+                      setSelectedMetric(metric);
+                      setFilterOpen(false);
+                    }}
+                    className={`block w-full text-left px-4 py-2 text-xs font-medium hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors ${selectedMetric === metric ? "bg-[#792CA2]/5 text-[#792CA2]" : "text-gray-700"}`}
+                  >
+                    {metric}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
       <div className="flex-grow w-full relative">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart layout="vertical" data={data} margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
-            <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} />
-            <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} width={100} />
-            <Tooltip cursor={{ fill: 'rgba(59, 130, 246, 0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
-            <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '12px' }} />
-            {renderBar()}
-          </BarChart>
-        </ResponsiveContainer>
+        {drilldownServer && serverObj ? (
+          <div className="flex flex-col h-full gap-4">
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+              {[
+                { label: "CPU", value: serverObj.cpu, color: "text-[#792CA2]", bg: "bg-[#792CA2]/10" },
+                { label: "Memory", value: serverObj.memory, color: "text-[#9A4DCC]", bg: "bg-[#9A4DCC]/10" },
+                { label: "Storage", value: serverObj.storage, color: "text-[#1F215D]", bg: "bg-[#1F215D]/10" },
+                { label: "Network", value: serverObj.network, color: "text-[#792CA2]", bg: "bg-[#DCCBFF]/40" }
+              ].map((kpi, idx) => (
+                <div key={idx} className={`rounded-xl p-4 flex flex-col justify-center items-start ${kpi.bg}`}>
+                  <p className="text-xs font-semibold text-gray-500 mb-1">{kpi.label} Usage</p>
+                  <p className={`text-2xl font-bold ${kpi.color}`}>{kpi.value}%</p>
+                </div>
+              ))}
+            </div>
+            
+            {/* Detailed Chart */}
+            <div className="flex-grow w-full relative" style={{ height: 260 }}>
+              {/* Y-axis label */}
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)', fontSize: 12, fontWeight: 700, color: '#111844', userSelect: 'none', pointerEvents: 'none' }}>Percentage ➔</div>
+              <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
+                <BarChart style={{ outline: 'none' }} data={drilldownData} margin={{ top: 20, right: 10, left: 40, bottom: 30 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} dy={6} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} dx={-4} />
+                  <Tooltip cursor={{ fill: 'rgba(121, 44, 162, 0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
+                  <Bar dataKey="value" radius={[4, 4, 0, 0]} isAnimationActive={true}>
+                    {drilldownData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              {/* X-axis label */}
+              <div className="text-center" style={{ fontSize: 12, fontWeight: 700, color: '#111844', marginTop: 2 }}>Metric ➔</div>
+            </div>
+          </div>
+        ) : (
+          <div className="relative w-full h-full flex flex-col">
+            {/* Y-axis label (Server) */}
+            <div className="absolute left-0 top-1/2" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)', fontSize: 12, fontWeight: 700, color: '#111844', userSelect: 'none', pointerEvents: 'none' }}>Server ➔</div>
+            <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
+              <BarChart style={{ outline: 'none' }} layout="vertical" data={data} margin={{ top: 30, right: 10, left: 20, bottom: 30 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
+                <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} dy={6} />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} width={140} dx={-6} interval={0} />
+                <Tooltip cursor={{ fill: 'rgba(121, 44, 162, 0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
+                <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '12px' }} />
+                {renderBar()}
+              </BarChart>
+            </ResponsiveContainer>
+            {/* X-axis label (Percentage) */}
+            <div className="text-center pb-1" style={{ fontSize: 12, fontWeight: 700, color: '#111844' }}>Percentage ➔</div>
+          </div>
+        )}
       </div>
     </div>
   );

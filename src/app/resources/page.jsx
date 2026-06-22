@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDownIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 // Shared Components
 import ParticleBackground from "../dashboard/components/ParticleBackground";
@@ -13,11 +13,68 @@ import Footer from "../landing/components/Footer";
 
 // Resources Components
 import MostlyUsedChart from "./components/MostlyUsedChart";
-import TimeResourceChart from "./components/TimeResourceChart";
+import TopCostChart from "./components/TopCostChart";
 import CostResourceChart from "./components/CostResourceChart";
 import UtilizationChart from "./components/UtilizationChart";
 
 export const dynamic = "force-dynamic";
+
+const KPI_DATA = [
+  {
+    label: "Total Resources",
+    value: "142",
+    change: "+12 this month",
+    positive: true,
+    icon: (
+      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    ),
+    gradient: "from-[#792CA2] to-[#9A4DCC]",
+    shadow: "shadow-[#792CA2]/20",
+  },
+  {
+    label: "Monthly Cost",
+    value: "$18,420",
+    change: "-3.4% vs last month",
+    positive: true,
+    icon: (
+      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-2.21 0-4 1.343-4 3s1.79 3 4 3 4 1.343 4 3-1.79 3-4 3m0-18v2m0 16v2" />
+      </svg>
+    ),
+    gradient: "from-[#1F215D] to-[#3A3D8F]",
+    shadow: "shadow-[#1F215D]/20",
+  },
+  {
+    label: "Avg CPU Usage",
+    value: "67.3%",
+    change: "+5.1% vs yesterday",
+    positive: false,
+    icon: (
+      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
+      </svg>
+    ),
+    gradient: "from-[#5B21B6] to-[#7C3AED]",
+    shadow: "shadow-[#5B21B6]/20",
+  },
+  {
+    label: "Health Score",
+    value: "98.6%",
+    change: "All systems nominal",
+    positive: true,
+    icon: (
+      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    gradient: "from-[#059669] to-[#10B981]",
+    shadow: "shadow-[#059669]/20",
+  },
+];
+
+const DEPARTMENTS = ["Production", "Staging", "Development", "Management", "Finance"];
 
 export default function ResourcesPage() {
   const { data: session, status } = useSession();
@@ -33,6 +90,7 @@ export default function ResourcesPage() {
   const [selectedDepartment, setSelectedDepartment] = useState("Production");
 
   const profileRef = useRef(null);
+  const filterRef = useRef(null);
 
   useEffect(() => {
     setCurrentDate(
@@ -45,18 +103,19 @@ export default function ResourcesPage() {
     );
   }, []);
 
-  // Close dropdowns on click-away
   useEffect(() => {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
+      }
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setIsTopFilterOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Redirect to sign-in page if not authenticated
   useEffect(() => {
     if (status === "unauthenticated" && !isSigningOut) {
       router.push("/auth/signin");
@@ -107,10 +166,23 @@ export default function ResourcesPage() {
 
       <ParticleBackground />
 
-      {/* DYNAMIC BACKDROP BLOBS */}
+      {/* ANIMATED BACKDROP BLOBS */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#792CA2]/15 blur-[120px]" />
-        <div className="absolute bottom-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-[#DCCBFF]/20 blur-[120px]" />
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], x: [0, 30, 0], y: [0, -20, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full bg-[#792CA2]/10 blur-[130px]"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], x: [0, -25, 0], y: [0, 25, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          className="absolute bottom-[-200px] right-[-150px] w-[700px] h-[700px] rounded-full bg-[#DCCBFF]/15 blur-[130px]"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], y: [0, -30, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 6 }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#1F215D]/5 blur-[100px]"
+        />
       </div>
 
       {/* NAVBAR */}
@@ -140,49 +212,121 @@ export default function ResourcesPage() {
 
         {/* MAIN CONTENT AREA */}
         <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 md:p-8">
-          <div className="flex justify-end items-center mb-6 relative z-50">
 
-            <div className="relative">
-              <button 
-                onClick={() => setIsTopFilterOpen(!isTopFilterOpen)}
-                className="bg-white text-[#792CA2] p-2.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center border border-gray-100"
+          {/* ── HERO HEADER ── */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 relative z-50 max-w-[1600px] mx-auto w-full">
+            <motion.div
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="flex items-center gap-4"
+            >
+              {/* Animated Icon Badge */}
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 6 }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="p-3.5 bg-gradient-to-br from-[#792CA2] to-[#9A4DCC] rounded-2xl shadow-xl shadow-[#792CA2]/30 flex items-center justify-center"
               >
-                <ChevronDownIcon className="w-5 h-5" />
+                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </motion.div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">
+                  Resource Center
+                </h1>
+                <p className="text-sm text-gray-400 font-medium mt-0.5">
+                  Real-time analytics · <span className="text-[#792CA2] font-semibold">{selectedDepartment}</span> Department
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Department Filter */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="relative"
+              ref={filterRef}
+            >
+              <button
+                onClick={() => setIsTopFilterOpen(!isTopFilterOpen)}
+                className="bg-white/90 backdrop-blur-sm text-[#792CA2] px-5 py-2.5 rounded-2xl shadow-lg shadow-[#792CA2]/10 hover:shadow-xl hover:shadow-[#792CA2]/20 transition-all duration-300 flex items-center gap-2.5 border border-[#792CA2]/15 font-semibold text-sm hover:-translate-y-0.5"
+              >
+                <span className="w-2 h-2 rounded-full bg-[#792CA2] animate-pulse" />
+                {selectedDepartment}
+                <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isTopFilterOpen ? "rotate-180" : ""}`} />
               </button>
-              {isTopFilterOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-[999] py-2 overflow-hidden">
-                  {["Production", "Staging", "Development", "Management", "Finance"].map((dept) => (
-                    <button 
-                      key={dept}
-                      onClick={() => {
-                        setSelectedDepartment(dept);
-                        setIsTopFilterOpen(false);
-                      }}
-                      className={`block w-full text-left px-4 py-2.5 text-xs font-semibold hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors ${selectedDepartment === dept ? "text-[#792CA2] bg-[#792CA2]/5" : "text-gray-700"}`}
-                    >
-                      {dept}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+              <AnimatePresence>
+                {isTopFilterOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100/80 z-[999] py-2 overflow-hidden"
+                  >
+                    {DEPARTMENTS.map((dept) => (
+                      <button
+                        key={dept}
+                        onClick={() => { setSelectedDepartment(dept); setIsTopFilterOpen(false); }}
+                        className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedDepartment === dept ? "text-[#792CA2] bg-[#792CA2]/8" : "text-gray-600 hover:bg-[#792CA2]/6 hover:text-[#792CA2]"}`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedDepartment === dept ? "bg-[#792CA2]" : "bg-gray-300"}`} />
+                        {dept}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
 
+          {/* ── CHARTS GRID ── */}
           <div className="flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
-            {/* Top Chart (Span full width) */}
-            <MostlyUsedChart department={selectedDepartment} />
 
-            {/* Middle Grid (2 columns on large screens) */}
+            {/* Top Chart — full width */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+            >
+              <TopCostChart department={selectedDepartment} />
+            </motion.div>
+
+            {/* Middle Grid — 2 columns */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TimeResourceChart department={selectedDepartment} />
-              <CostResourceChart department={selectedDepartment} />
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+              >
+                <MostlyUsedChart department={selectedDepartment} />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+              >
+                <CostResourceChart department={selectedDepartment} />
+              </motion.div>
             </div>
 
-            {/* Bottom Chart (Span full width) */}
-            <UtilizationChart department={selectedDepartment} />
+            {/* Bottom Chart — full width */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+            >
+              <UtilizationChart department={selectedDepartment} />
+            </motion.div>
           </div>
-          
-          <div className="mt-12 hidden md:block">
+
+          <div className="mt-12 hidden md:block -mx-4 md:-mx-8 -mb-4 md:-mb-8">
             <Footer reduced={true} />
           </div>
         </div>

@@ -544,7 +544,7 @@ export default function DashboardPage() {
             </div>
           </main>
 
-          <div className="hidden md:block">
+          <div className="hidden md:block -mx-4 md:-mx-8 -mb-4 md:-mb-8">
             <Footer reduced={true} />
           </div>
 
