@@ -109,35 +109,34 @@ export default function CostDistributionChart({
       })()}
 
       <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-4">
-        <div className="relative w-36 h-36 flex items-center justify-center">
-          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-            {/* Concentric Double Outline Rings to make it visually impressive */}
+        {/* Donut — bigger (w-48/h-48) and hover-safe: only the arc strokes receive pointer events */}
+        <div className="relative w-48 h-48 flex-shrink-0 flex items-center justify-center">
+          <svg
+            className="w-full h-full transform -rotate-90"
+            viewBox="0 0 100 100"
+            style={{ pointerEvents: "none" }}
+          >
+            {/* Decorative rings — no events */}
             <circle
-              cx="50"
-              cy="50"
-              r={donutRadius + 7}
+              cx="50" cy="50" r={donutRadius + 7}
               fill="transparent"
               stroke="rgba(121, 44, 162, 0.18)"
               strokeWidth="0.75"
               strokeDasharray="2 2"
             />
             <circle
-              cx="50"
-              cy="50"
-              r={donutRadius - 7}
+              cx="50" cy="50" r={donutRadius - 7}
               fill="transparent"
               stroke="rgba(121, 44, 162, 0.18)"
               strokeWidth="0.75"
               strokeDasharray="2 2"
             />
+            {/* Track ring */}
             <circle
-              cx="50"
-              cy="50"
-              r={donutRadius}
+              cx="50" cy="50" r={donutRadius}
               fill="transparent"
               stroke="rgba(255, 255, 255, 0.25)"
               strokeWidth={10}
-              className="pointer-events-none"
             />
 
             {(() => {
@@ -154,29 +153,37 @@ export default function CostDistributionChart({
                 return (
                   <motion.circle
                     key={item.name}
-                    cx="50"
-                    cy="50"
-                    r={donutRadius}
+                    cx="50" cy="50" r={donutRadius}
                     fill="transparent"
                     stroke={item.colorHex}
-                    strokeWidth={isHovered || isSelected ? 11 : 8}
                     strokeDasharray={`${strokeLength} ${donutCircumference}`}
                     strokeDashoffset={0}
                     transform={`rotate(${rotation} 50 50)`}
-                    className="cursor-pointer transition-all"
+                    style={{
+                      /* re-enable events only on the arc itself */
+                      pointerEvents: "stroke",
+                      cursor: "pointer",
+                    }}
+                    animate={{
+                      strokeWidth: isHovered || isSelected ? 12 : 8,
+                      strokeDasharray: `${strokeLength} ${donutCircumference}`,
+                      filter: isHovered || isSelected
+                        ? "drop-shadow(0 0 4px rgba(121,44,162,0.5))"
+                        : "none",
+                    }}
+                    initial={{ strokeDasharray: `0 ${donutCircumference}`, strokeWidth: 8 }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
                     onMouseEnter={() => setDonutHoveredSegment(idx)}
                     onMouseLeave={() => setDonutHoveredSegment(null)}
                     onClick={() => setDonutSelectedSegment(isSelected ? null : idx)}
-                    initial={{ strokeDasharray: `0 ${donutCircumference}` }}
-                    animate={{ strokeDasharray: `${strokeLength} ${donutCircumference}` }}
-                    transition={{ duration: 1.2, ease: "easeOut" }}
                   />
                 );
               });
             })()}
           </svg>
 
-          <div className="absolute flex flex-col items-center text-center">
+          {/* Centre label — sits above the SVG */}
+          <div className="absolute flex flex-col items-center text-center pointer-events-none">
             <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">
               {donutSelectedSegment !== null
                 ? donutData[donutSelectedSegment].name.split(" ")[0]

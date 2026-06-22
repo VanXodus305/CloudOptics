@@ -56,16 +56,17 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{
             type: "spring",
-            stiffness: 100,
-            damping: 15,
-            delay: index * 0.08,
+            stiffness: 260,
+            damping: 22,
+            delay: index * 0.06,
           }}
           whileHover={{
-            y: -6,
+            y: -5,
             scale: 1.02,
-            boxShadow: "0 15px 35px rgba(121, 44, 162, 0.1)",
+            boxShadow: "0 15px 35px rgba(121, 44, 162, 0.12)",
+            transition: { duration: 0.15, ease: "easeOut" },
           }}
-          className={`relative bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-lg border border-white/60 border-t-4 ${card.border} flex flex-col justify-between min-h-[110px] md:min-h-[160px] transition-all`}
+          className={`relative bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-lg border border-white/60 border-t-4 ${card.border} flex flex-col justify-between min-h-[110px] md:min-h-[160px]`}
         >
           {/* Subtle loading overlay */}
           {isLoading && (
@@ -83,10 +84,10 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
               <div className="flex flex-col items-end">
                 <span
                   className={`text-[8px] md:text-[9.5px] px-1.5 py-0.5 rounded-full font-bold select-none ${
-                    card.trendType === "positive"
-                      ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                      : card.trendType === "negative"
+                    card.trend.startsWith("-")
                       ? "bg-rose-50 text-rose-600 border border-rose-100"
+                      : card.trend.startsWith("+")
+                      ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
                       : "bg-gray-50 text-gray-500 border border-gray-100"
                   }`}
                 >

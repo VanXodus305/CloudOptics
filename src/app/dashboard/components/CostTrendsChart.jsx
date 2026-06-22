@@ -87,17 +87,25 @@ export default function CostTrendsChart({
               return (
                 <div
                   key={`${item.label}-${index}`}
-                  className="flex-1 flex flex-col justify-end items-center h-full relative group cursor-pointer"
+                  className="flex-1 flex flex-col justify-end items-center h-full relative cursor-pointer"
                   onMouseEnter={() => setHoveredBar(index)}
                   onMouseLeave={() => setHoveredBar(null)}
                 >
+                  {/* Tooltip: on the column div so scaleX never affects it.
+                      bottom = bar height% + 8px gap, centered via left-1/2 */}
                   <AnimatePresence>
                     {isHovered && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        initial={{ opacity: 0, y: 6, scale: 0.92 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute -top-12 z-20 bg-[#111844] text-white px-3 py-1.5 rounded-xl shadow-lg text-[10px] font-bold whitespace-nowrap"
+                        exit={{ opacity: 0, y: 6, scale: 0.92 }}
+                        transition={{ duration: 0.12, ease: "easeOut" }}
+                        className="absolute z-20 bg-[#111844] text-white px-3 py-1.5 rounded-xl shadow-lg text-[10px] font-bold whitespace-nowrap pointer-events-none"
+                        style={{
+                          left: "50%",
+                          x: "-50%",
+                          bottom: `calc(${heightPercent}% + 8px)`,
+                        }}
                       >
                         ${item.value.toLocaleString()}
                       </motion.div>
@@ -105,14 +113,16 @@ export default function CostTrendsChart({
                   </AnimatePresence>
 
                   <motion.div
-                    className={`w-7 sm:w-9 rounded-t-lg bg-gradient-to-t from-[#792CA2] to-[#9A4DCC] relative transition-all duration-300 ${
-                      isHovered
-                        ? "brightness-110 shadow-md scale-x-[1.03]"
-                        : "opacity-85"
+                    className={`w-7 sm:w-9 rounded-t-lg bg-gradient-to-t from-[#792CA2] to-[#9A4DCC] ${
+                      isHovered ? "brightness-110 shadow-lg" : "opacity-85"
                     }`}
                     initial={{ height: 0 }}
                     animate={{ height: `${heightPercent}%` }}
-                    transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                    transition={{
+                      duration: 0.38,
+                      ease: [0.25, 0.46, 0.45, 0.94],
+                      delay: index * 0.04,
+                    }}
                   />
                 </div>
               );

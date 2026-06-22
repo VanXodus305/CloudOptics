@@ -267,12 +267,20 @@ export default function DashboardPage() {
 
     // Weekly: Group last 28 days of trends into 4 weeks (7 days each)
     const weekly = [];
+    const fmt = (dateStr) => {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    };
     for (let i = 0; i < 4; i++) {
       const startIndex = Math.max(0, trendsData.length - (4 - i) * 7);
       const endIndex = trendsData.length - (3 - i) * 7;
       const weekSlice = trendsData.slice(startIndex, endIndex);
       const weekSum = weekSlice.reduce((sum, t) => sum + t.spend, 0);
-      weekly.push({ label: `Week ${i + 1}`, value: Math.round(weekSum) });
+      const rangeLabel =
+        weekSlice.length > 0
+          ? `${fmt(weekSlice[0].date)}–${fmt(weekSlice[weekSlice.length - 1].date)}`
+          : `Week ${i + 1}`;
+      weekly.push({ label: rangeLabel, value: Math.round(weekSum) });
     }
 
     // Monthly: Group by calendar month name
