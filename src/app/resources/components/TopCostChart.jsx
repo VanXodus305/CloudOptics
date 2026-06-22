@@ -294,8 +294,18 @@ export default function MostlyUsedChart({ department = "Production" }) {
               </YAxis>
               {showDetails && (
                 <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value) => [`$${value}`, "Cost"]}
+                  cursor={{ stroke: 'rgba(121, 44, 162, 0.1)', strokeWidth: 2 }}
+                  offset={0}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-[#111844] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg whitespace-nowrap" style={{ transform: 'translate(-50%, -100%)', marginTop: '-10px' }}>
+                          ${payload[0].value.toLocaleString()}
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
               )}
               <Line

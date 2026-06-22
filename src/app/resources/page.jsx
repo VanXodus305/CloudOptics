@@ -211,7 +211,7 @@ export default function ResourcesPage() {
         />
 
         {/* MAIN CONTENT AREA */}
-        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 md:p-8">
+        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 pb-24 md:p-8">
 
           {/* ── HERO HEADER ── */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 relative z-50 max-w-[1600px] mx-auto w-full">
@@ -246,39 +246,59 @@ export default function ResourcesPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="relative"
+              className="relative w-full sm:w-auto"
               ref={filterRef}
             >
-              <button
-                onClick={() => setIsTopFilterOpen(!isTopFilterOpen)}
-                className="bg-white/90 backdrop-blur-sm text-[#792CA2] px-5 py-2.5 rounded-2xl shadow-lg shadow-[#792CA2]/10 hover:shadow-xl hover:shadow-[#792CA2]/20 transition-all duration-300 flex items-center gap-2.5 border border-[#792CA2]/15 font-semibold text-sm hover:-translate-y-0.5"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#792CA2] animate-pulse" />
-                {selectedDepartment}
-                <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isTopFilterOpen ? "rotate-180" : ""}`} />
-              </button>
-              <AnimatePresence>
-                {isTopFilterOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100/80 z-[999] py-2 overflow-hidden"
+              {/* Desktop Dropdown */}
+              <div className="hidden sm:block">
+                <button
+                  onClick={() => setIsTopFilterOpen(!isTopFilterOpen)}
+                  className="bg-white/90 backdrop-blur-sm text-[#792CA2] px-5 py-2.5 rounded-2xl shadow-lg shadow-[#792CA2]/10 hover:shadow-xl hover:shadow-[#792CA2]/20 transition-all duration-300 flex items-center gap-2.5 border border-[#792CA2]/15 font-semibold text-sm hover:-translate-y-0.5"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#792CA2] animate-pulse" />
+                  {selectedDepartment}
+                  <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isTopFilterOpen ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence>
+                  {isTopFilterOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100/80 z-[999] py-2 overflow-hidden"
+                    >
+                      {DEPARTMENTS.map((dept) => (
+                        <button
+                          key={dept}
+                          onClick={() => { setSelectedDepartment(dept); setIsTopFilterOpen(false); }}
+                          className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedDepartment === dept ? "text-[#792CA2] bg-[#792CA2]/8" : "text-gray-600 hover:bg-[#792CA2]/6 hover:text-[#792CA2]"}`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedDepartment === dept ? "bg-[#792CA2]" : "bg-gray-300"}`} />
+                          {dept}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Mobile Horizontal Scroll Buttons */}
+              <div className="flex sm:hidden overflow-x-auto gap-2 pb-2 scrollbar-hide snap-x w-full">
+                {DEPARTMENTS.map((dept) => (
+                  <button
+                    key={dept}
+                    onClick={() => setSelectedDepartment(dept)}
+                    className={`snap-start flex-shrink-0 whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                      selectedDepartment === dept 
+                        ? "bg-[#792CA2] text-white shadow-md shadow-[#792CA2]/30" 
+                        : "bg-white/80 text-gray-600 border border-gray-200 hover:bg-gray-50"
+                    }`}
                   >
-                    {DEPARTMENTS.map((dept) => (
-                      <button
-                        key={dept}
-                        onClick={() => { setSelectedDepartment(dept); setIsTopFilterOpen(false); }}
-                        className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedDepartment === dept ? "text-[#792CA2] bg-[#792CA2]/8" : "text-gray-600 hover:bg-[#792CA2]/6 hover:text-[#792CA2]"}`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedDepartment === dept ? "bg-[#792CA2]" : "bg-gray-300"}`} />
-                        {dept}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    {dept}
+                  </button>
+                ))}
+              </div>
             </motion.div>
           </div>
 

@@ -12,7 +12,8 @@ import {
   Cell,
   Label,
   AreaChart,
-  Area
+  Area,
+  LabelList
 } from "recharts";
 
 const mockDataByDept = {
@@ -60,6 +61,7 @@ export default function CostResourceChart({ department = "Production" }) {
   const [timeFilter, setTimeFilter] = useState("Hourly");
   const [showDetails, setShowDetails] = useState(false);
   const [drilldownResource, setDrilldownResource] = useState(null);
+  const coordsRef = useRef({});
   const filterRef = useRef(null);
 
   useEffect(() => {
@@ -186,9 +188,9 @@ export default function CostResourceChart({ department = "Production" }) {
             </div>
             <div className="flex-grow w-full relative min-h-[120px]">
               {/* Y-axis label */}
-              <div className="absolute left-[-15px] top-[40%]" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)', fontSize: 11, fontWeight: 700, color: '#111844', userSelect: 'none', pointerEvents: 'none', zIndex: 10 }}>Usage ➔</div>
+              <div className="absolute left-[-20px] top-[40%]" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)', fontSize: 11, fontWeight: 700, color: '#111844', userSelect: 'none', pointerEvents: 'none', zIndex: 10 }}>Usage ➔</div>
               <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
-                <AreaChart style={{ outline: 'none' }} data={drilldownTrendData} margin={{ top: 20, right: 10, left: -5, bottom: 35 }}>
+                <AreaChart style={{ outline: 'none' }} data={drilldownTrendData} margin={{ top: 20, right: 10, left: 15, bottom: 35 }}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#792CA2" stopOpacity={0.3}/>
@@ -200,7 +202,20 @@ export default function CostResourceChart({ department = "Production" }) {
                     <Label value="Time ➔" offset={-25} position="insideBottom" style={{ fill: '#111844', fontSize: 11, fontWeight: 'bold' }} />
                   </XAxis>
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 10 }} dx={-10} />
-                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(121, 44, 162, 0.05)' }}
+                    offset={0}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-[#111844] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg whitespace-nowrap" style={{ transform: 'translate(-50%, -100%)', marginTop: '-10px' }}>
+                            {payload[0].value.toLocaleString()}
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
                   <Area type="monotone" dataKey="value" stroke="#792CA2" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" isAnimationActive={true} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -209,20 +224,56 @@ export default function CostResourceChart({ department = "Production" }) {
         ) : (
           <div className="relative w-full h-full">
             {/* Y-axis label */}
-            <div className="absolute left-[-15px] top-[40%]" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)', fontSize: 13, fontWeight: 700, color: '#111844', userSelect: 'none', pointerEvents: 'none', zIndex: 10 }}>Usage ➔</div>
+            <div className="absolute left-[-20px] top-[40%]" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)', fontSize: 13, fontWeight: 700, color: '#111844', userSelect: 'none', pointerEvents: 'none', zIndex: 10 }}>Usage ➔</div>
             <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
-              <BarChart style={{ outline: 'none' }} key={`${department}-${timeFilter}`} data={data} margin={{ top: 30, right: 20, left: -5, bottom: 45 }}>
+              <BarChart 
+                style={{ outline: 'none' }} 
+                key={`${department}-${timeFilter}`} 
+                data={data} 
+                margin={{ top: 30, right: 20, left: 15, bottom: 45 }}
+              >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} dy={10}>
                 <Label value="Resources ➔" offset={-30} position="insideBottom" style={{ fill: '#111844', fontSize: 13, fontWeight: 'bold' }} />
               </XAxis>
               <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} dx={-10} />
               <Tooltip 
-                cursor={{ fill: 'rgba(121, 44, 162, 0.05)' }} 
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} 
-                formatter={(value) => [value, "Usage"]} 
+                cursor={{ fill: 'rgba(121, 44, 162, 0.05)' }}
+                position={{ x: 0, y: 0 }}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const name = payload[0].payload.name;
+                    const pos = coordsRef.current[name];
+                    if (!pos) return null;
+                    return (
+                      <div style={{ position: 'absolute', left: pos.x, top: pos.y, transform: 'translate(-50%, -100%)', marginTop: '-10px' }}>
+                        <div className="bg-[#111844] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg whitespace-nowrap">
+                          {payload[0].value.toLocaleString()}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
-              <Bar dataKey="usage" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={2000} animationEasing="ease-in-out">
+              <Bar 
+                dataKey="usage" 
+                isAnimationActive={true} 
+                animationDuration={2000} 
+                animationEasing="ease-in-out"
+                shape={(props) => {
+                  const { x, y, width, height, fill, payload, onClick, className } = props;
+                  if (payload && payload.name) {
+                    coordsRef.current[payload.name] = { x: x + width / 2, y };
+                  }
+                  const r = 4;
+                  if (height < r) {
+                    return <rect x={x} y={y} width={width} height={height} fill={fill} onClick={onClick} className={className} />;
+                  }
+                  const d = `M${x},${y+height} L${x},${y+r} A${r},${r} 0 0,1 ${x+r},${y} L${x+width-r},${y} A${r},${r} 0 0,1 ${x+width},${y+r} L${x+width},${y+height} Z`;
+                  return <path d={d} fill={fill} onClick={onClick} className={className} />;
+                }}
+              >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} onClick={() => handleBarClick(entry)} className="cursor-pointer hover:opacity-80 transition-opacity" />
                 ))}

@@ -11,7 +11,8 @@ import {
   Legend,
   ResponsiveContainer,
   Label,
-  Cell
+  Cell,
+  LabelList
 } from "recharts";
 
 const mockDataByDept = {
@@ -51,6 +52,7 @@ export default function UtilizationChart({ department = "Production" }) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState("CPU Utilization");
   const [drilldownServer, setDrilldownServer] = useState(null);
+  const coordsRef = useRef({});
   const filterRef = useRef(null);
 
   useEffect(() => {
@@ -75,16 +77,33 @@ export default function UtilizationChart({ department = "Production" }) {
   };
 
   const renderBar = () => {
+    const commonProps = {
+      onClick: handleBarClick,
+      className: "cursor-pointer hover:opacity-80 transition-opacity",
+      shape: (props) => {
+        const { x, y, width, height, fill, payload, onClick, className } = props;
+        if (payload && payload.name) {
+          coordsRef.current[payload.name] = { x: x + width, y: y + height / 2 };
+        }
+        const r = 4;
+        if (width < r) {
+          return <rect x={x} y={y} width={width} height={height} fill={fill} onClick={onClick} className={className} />;
+        }
+        const d = `M${x},${y} L${x+width-r},${y} A${r},${r} 0 0,1 ${x+width},${y+r} L${x+width},${y+height-r} A${r},${r} 0 0,1 ${x+width-r},${y+height} L${x},${y+height} Z`;
+        return <path d={d} fill={fill} onClick={onClick} className={className} />;
+      }
+    };
+
     switch (selectedMetric) {
       case "Memory Utilization":
-        return <Bar dataKey="memory" name="Memory (%)" fill="#792CA2" radius={[0, 4, 4, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />;
+        return <Bar dataKey="memory" name="Memory (%)" fill="#792CA2" {...commonProps} />;
       case "Storage":
-        return <Bar dataKey="storage" name="Storage (%)" fill="#792CA2" radius={[0, 4, 4, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />;
+        return <Bar dataKey="storage" name="Storage (%)" fill="#792CA2" {...commonProps} />;
       case "Network":
-        return <Bar dataKey="network" name="Network (MB/s)" fill="#792CA2" radius={[0, 4, 4, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />;
+        return <Bar dataKey="network" name="Network (MB/s)" fill="#792CA2" {...commonProps} />;
       case "CPU Utilization":
       default:
-        return <Bar dataKey="cpu" name="CPU (%)" fill="#792CA2" radius={[0, 4, 4, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />;
+        return <Bar dataKey="cpu" name="CPU (%)" fill="#792CA2" {...commonProps} />;
     }
   };
 
@@ -179,7 +198,7 @@ export default function UtilizationChart({ department = "Production" }) {
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} dy={6} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} dx={-4} />
                   <Tooltip cursor={{ fill: 'rgba(121, 44, 162, 0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
-                  <Bar dataKey="value" radius={[4, 4, 0, 0]} isAnimationActive={true}>
+                  <Bar dataKey="value" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={2000} animationEasing="ease-in-out">
                     {drilldownData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
@@ -195,11 +214,34 @@ export default function UtilizationChart({ department = "Production" }) {
             {/* Y-axis label (Server) */}
             <div className="absolute left-0 top-1/2" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)', fontSize: 12, fontWeight: 700, color: '#111844', userSelect: 'none', pointerEvents: 'none' }}>Server ➔</div>
             <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
-              <BarChart style={{ outline: 'none' }} layout="vertical" data={data} margin={{ top: 30, right: 10, left: 20, bottom: 30 }}>
+              <BarChart 
+                style={{ outline: 'none' }} 
+                layout="vertical" 
+                data={data} 
+                margin={{ top: 30, right: 10, left: 20, bottom: 30 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
                 <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} dy={6} />
                 <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 11 }} width={140} dx={-6} interval={0} />
-                <Tooltip cursor={{ fill: 'rgba(121, 44, 162, 0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }} />
+                <Tooltip 
+                  cursor={{ fill: 'rgba(121, 44, 162, 0.05)' }} 
+                  position={{ x: 0, y: 0 }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const name = payload[0].payload.name;
+                      const pos = coordsRef.current[name];
+                      if (!pos) return null;
+                      return (
+                        <div style={{ position: 'absolute', left: pos.x, top: pos.y, transform: 'translate(0%, -50%)', marginLeft: '10px' }}>
+                          <div className="bg-[#111844] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg whitespace-nowrap">
+                            {payload[0].value}%
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
                 <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '12px' }} />
                 {renderBar()}
               </BarChart>
