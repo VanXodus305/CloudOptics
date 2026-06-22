@@ -39,12 +39,12 @@ export default function CostDistributionChart({
         </div>
       )}
 
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex flex-row justify-between items-center sm:items-start gap-2 mb-4 flex-wrap">
         <div>
-          <h3 className="text-base font-bold text-[#111844]">
+          <h3 className="text-sm sm:text-base font-bold text-[#111844]">
             Cost Distribution
           </h3>
-          <span className="text-[10px] text-gray-400 font-semibold mt-1 block">
+          <span className="text-[10px] text-gray-400 font-semibold mt-0.5 sm:mt-1 block">
             Resource share breakdown by service category.
           </span>
         </div>
@@ -55,11 +55,14 @@ export default function CostDistributionChart({
             <Button
               size="sm"
               variant="flat"
-              className="bg-gray-100 hover:bg-gray-200/60 border border-gray-200/30 text-[10px] font-bold text-[#111844] rounded-xl px-3 h-8 min-w-0"
+              className="bg-[#792CA2]/10 hover:bg-[#792CA2]/20 border border-[#792CA2]/20 text-[10px] sm:text-xs font-bold text-[#792CA2] rounded-xl px-2.5 sm:px-3 h-8 min-w-0 flex items-center gap-1.5 transition-all select-none whitespace-nowrap"
             >
-              <span className="text-gray-400 font-semibold mr-1">Filter:</span>
-              {filterMap[donutFilter]}
-              <span className="text-[8px] ml-1 text-gray-500">▼</span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#792CA2] opacity-80 flex-shrink-0">
+                <path fillRule="evenodd" d="M2.628 1.6A1 1 0 013.6 1h12.8a1 1 0 01.972.6l-5.633 11.265a1 1 0 01-.972.535H9.203a1 1 0 01-.972-.535L2.628 2.2a1 1 0 010-.6z" clipRule="evenodd" />
+              </svg>
+              <span className="hidden sm:inline text-[#792CA2]/70 font-medium">Filter:</span>
+              <span className="truncate">{filterMap[donutFilter]}</span>
+              <span className="text-[8px] opacity-75">▼</span>
             </Button>
           </DropdownTrigger>
           <DropdownMenu
