@@ -81,7 +81,7 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
                 {card.title}
               </h3>
               {/* Trend Badge and Label */}
-              <div className="flex flex-col items-end">
+              <div className="flex flex-col items-center">
                 <span
                   className={`text-[8px] md:text-[9.5px] px-1.5 py-0.5 rounded-full font-bold select-none ${
                     card.trend.startsWith("-")
