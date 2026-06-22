@@ -4,55 +4,7 @@ import { motion } from "framer-motion";
 
 const COLORS = ['#792CA2', '#9A4DCC', '#1F215D', '#111844', '#DCCBFF'];
 
-const mockDataByDept = {
-  Production: [
-    { name: "EC2", count: 120 },
-    { name: "S3", count: 80 },
-    { name: "RDS", count: 45 },
-    { name: "Lambda", count: 200 },
-    { name: "VPC", count: 10 },
-  ],
-  Staging: [
-    { name: "EC2", count: 50 },
-    { name: "S3", count: 60 },
-    { name: "RDS", count: 20 },
-    { name: "Lambda", count: 150 },
-    { name: "VPC", count: 5 },
-  ],
-  Development: [
-    { name: "EC2", count: 200 },
-    { name: "S3", count: 150 },
-    { name: "RDS", count: 80 },
-    { name: "Lambda", count: 350 },
-    { name: "VPC", count: 15 },
-  ],
-  Management: [
-    { name: "EC2", count: 5 },
-    { name: "S3", count: 20 },
-    { name: "RDS", count: 2 },
-    { name: "Lambda", count: 10 },
-    { name: "VPC", count: 1 },
-  ],
-  Finance: [
-    { name: "EC2", count: 10 },
-    { name: "S3", count: 40 },
-    { name: "RDS", count: 5 },
-    { name: "Lambda", count: 20 },
-    { name: "VPC", count: 2 },
-  ],
-};
-
-const generateMockResources = (serviceType, department) => {
-  return Array.from({ length: 15 }).map((_, i) => ({
-    resourceId: `${serviceType}-${Math.floor(1000 + Math.random() * 9000)}`,
-    region: "us-east-1",
-    status: i % 4 === 0 ? "stopped" : "running",
-    costPerHour: "$" + (Math.random() * 5).toFixed(2),
-    department: department,
-  }));
-};
-
-export default function TimeResourceChart({ department = "Production" }) {
+export default function TimeResourceChart({ environment = "Production", serviceCounts = [], resources = [], isLoading = false }) {
   const [drilldownService, setDrilldownService] = useState(null);
   const [hoveredSegment, setHoveredSegment] = useState(null);
   const [selectedSegment, setSelectedSegment] = useState(null);
@@ -61,19 +13,28 @@ export default function TimeResourceChart({ department = "Production" }) {
     setDrilldownService(null);
     setHoveredSegment(null);
     setSelectedSegment(null);
-  }, [department]);
+  }, [environment]);
 
-  const rawData = mockDataByDept[department] || mockDataByDept["Production"];
+  const rawData = serviceCounts && serviceCounts.length > 0 ? serviceCounts : [
+    { name: "EC2", count: 0 },
+    { name: "S3", count: 0 },
+    { name: "RDS", count: 0 }
+  ];
   const total = rawData.reduce((sum, d) => sum + d.count, 0);
 
   // Enrich data with percentage and color
-  const data = rawData.map((d, i) => ({
-    ...d,
-    value: Math.round((d.count / total) * 100),
-    colorHex: COLORS[i % COLORS.length],
-  }));
+  const data = rawData.map((d, i) => {
+    const percentage = total > 0 ? Math.round((d.count / total) * 100) : 0;
+    return {
+      ...d,
+      value: percentage,
+      colorHex: COLORS[i % COLORS.length],
+    };
+  });
 
-  const mockResources = drilldownService ? generateMockResources(drilldownService, department) : [];
+  const drilldownResources = drilldownService
+    ? resources.filter((r) => r.service === drilldownService)
+    : [];
 
   // SVG donut params
   const donutRadius = 38;
@@ -81,6 +42,13 @@ export default function TimeResourceChart({ department = "Production" }) {
 
   return (
     <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 h-[380px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+      {/* Subtle loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
+          <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-4">
         <h3 className="flex items-center gap-2">
           {drilldownService ? (
@@ -121,23 +89,29 @@ export default function TimeResourceChart({ department = "Production" }) {
                   <th className="p-2 font-semibold">Region</th>
                   <th className="p-2 font-semibold">Status</th>
                   <th className="p-2 font-semibold">Cost/Hr</th>
-                  <th className="p-2 font-semibold rounded-tr-lg">Department</th>
+                  <th className="p-2 font-semibold rounded-tr-lg">Environment</th>
                 </tr>
               </thead>
               <tbody>
-                {mockResources.map((res, i) => (
-                  <tr key={i} className="border-b border-gray-50 hover:bg-[#792CA2]/5 transition-colors">
-                    <td className="p-2 font-medium text-[#792CA2]">{res.resourceId}</td>
-                    <td className="p-2 text-gray-500">{res.region}</td>
-                    <td className="p-2">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${res.status === 'running' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {res.status}
-                      </span>
-                    </td>
-                    <td className="p-2 text-gray-500">{res.costPerHour}</td>
-                    <td className="p-2 text-gray-500">{res.department}</td>
+                {drilldownResources.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center text-gray-400 font-medium">No resources found</td>
                   </tr>
-                ))}
+                ) : (
+                  drilldownResources.map((res, i) => (
+                    <tr key={i} className="border-b border-gray-50 hover:bg-[#792CA2]/5 transition-colors">
+                      <td className="p-2 font-medium text-[#792CA2]">{res.resourceId}</td>
+                      <td className="p-2 text-gray-500">{res.region}</td>
+                      <td className="p-2">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${res.status === 'Running' || res.status === 'running' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {res.status}
+                        </span>
+                      </td>
+                      <td className="p-2 text-gray-500">${typeof res.costPerHour === 'number' ? res.costPerHour.toFixed(3) : res.costPerHour}/hr</td>
+                      <td className="p-2 text-gray-500">{res.environment}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

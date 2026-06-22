@@ -74,7 +74,7 @@ const KPI_DATA = [
   },
 ];
 
-const DEPARTMENTS = ["Production", "Staging", "Development", "Management", "Finance"];
+const ENVIRONMENTS = ["All", "Production", "Testing", "Development"];
 
 export default function ResourcesPage() {
   const { data: session, status } = useSession();
@@ -87,7 +87,9 @@ export default function ResourcesPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [currentDate, setCurrentDate] = useState("");
   const [isTopFilterOpen, setIsTopFilterOpen] = useState(false);
-  const [selectedDepartment, setSelectedDepartment] = useState("Production");
+  const [selectedEnvironment, setSelectedEnvironment] = useState("All");
+  const [dashboardData, setDashboardData] = useState(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
   const profileRef = useRef(null);
   const filterRef = useRef(null);
@@ -121,6 +123,34 @@ export default function ResourcesPage() {
       router.push("/auth/signin");
     }
   }, [status, isSigningOut, router]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+
+    let active = true;
+    async function fetchData() {
+      setIsDataLoading(true);
+      try {
+        const res = await fetch(`/api/resources/dashboard?environment=${selectedEnvironment}`);
+        if (!res.ok) throw new Error("Failed to fetch dashboard data");
+        const json = await res.json();
+        if (active) {
+          setDashboardData(json);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (active) {
+          setIsDataLoading(false);
+        }
+      }
+    }
+
+    fetchData();
+    return () => {
+      active = false;
+    };
+  }, [status, selectedEnvironment]);
 
   const handleSignOut = () => {
     setIsProfileOpen(false);
@@ -236,12 +266,12 @@ export default function ResourcesPage() {
                   Resource Center
                 </h1>
                 <p className="text-sm text-gray-400 font-medium mt-0.5">
-                  Real-time analytics · <span className="text-[#792CA2] font-semibold">{selectedDepartment}</span> Department
+                  Real-time analytics · <span className="text-[#792CA2] font-semibold">{selectedEnvironment === "All" ? "All Environments" : `${selectedEnvironment} Environment`}</span>
                 </p>
               </div>
             </motion.div>
 
-            {/* Department Filter */}
+            {/* Environment Filter */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -256,7 +286,7 @@ export default function ResourcesPage() {
                   className="bg-white/90 backdrop-blur-sm text-[#792CA2] px-5 py-2.5 rounded-2xl shadow-lg shadow-[#792CA2]/10 hover:shadow-xl hover:shadow-[#792CA2]/20 transition-all duration-300 flex items-center gap-2.5 border border-[#792CA2]/15 font-semibold text-sm hover:-translate-y-0.5"
                 >
                   <span className="w-2 h-2 rounded-full bg-[#792CA2] animate-pulse" />
-                  {selectedDepartment}
+                  {selectedEnvironment}
                   <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isTopFilterOpen ? "rotate-180" : ""}`} />
                 </button>
                 <AnimatePresence>
@@ -268,14 +298,14 @@ export default function ResourcesPage() {
                       transition={{ duration: 0.15 }}
                       className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100/80 z-[999] py-2 overflow-hidden"
                     >
-                      {DEPARTMENTS.map((dept) => (
+                      {ENVIRONMENTS.map((env) => (
                         <button
-                          key={dept}
-                          onClick={() => { setSelectedDepartment(dept); setIsTopFilterOpen(false); }}
-                          className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedDepartment === dept ? "text-[#792CA2] bg-[#792CA2]/8" : "text-gray-600 hover:bg-[#792CA2]/6 hover:text-[#792CA2]"}`}
+                          key={env}
+                          onClick={() => { setSelectedEnvironment(env); setIsTopFilterOpen(false); }}
+                          className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedEnvironment === env ? "text-[#792CA2] bg-[#792CA2]/8" : "text-gray-600 hover:bg-[#792CA2]/6 hover:text-[#792CA2]"}`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedDepartment === dept ? "bg-[#792CA2]" : "bg-gray-300"}`} />
-                          {dept}
+                          <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedEnvironment === env ? "bg-[#792CA2]" : "bg-gray-300"}`} />
+                          {env}
                         </button>
                       ))}
                     </motion.div>
@@ -285,17 +315,17 @@ export default function ResourcesPage() {
 
               {/* Mobile Horizontal Scroll Buttons */}
               <div className="flex sm:hidden overflow-x-auto gap-2 pb-2 scrollbar-hide snap-x w-full">
-                {DEPARTMENTS.map((dept) => (
+                {ENVIRONMENTS.map((env) => (
                   <button
-                    key={dept}
-                    onClick={() => setSelectedDepartment(dept)}
+                    key={env}
+                    onClick={() => setSelectedEnvironment(env)}
                     className={`snap-start flex-shrink-0 whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                      selectedDepartment === dept 
+                      selectedEnvironment === env 
                         ? "bg-[#792CA2] text-white shadow-md shadow-[#792CA2]/30" 
                         : "bg-white/80 text-gray-600 border border-gray-200 hover:bg-gray-50"
                     }`}
                   >
-                    {dept}
+                    {env}
                   </button>
                 ))}
               </div>
@@ -305,14 +335,19 @@ export default function ResourcesPage() {
           {/* ── CHARTS GRID ── */}
           <div className="flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
 
-            {/* Top Chart — full width */}
+             {/* Top Chart — full width */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
             >
-              <TopCostChart department={selectedDepartment} />
+              <TopCostChart
+                environment={selectedEnvironment}
+                costTrends={dashboardData?.costTrends || []}
+                resources={dashboardData?.resources || []}
+                isLoading={isDataLoading}
+              />
             </motion.div>
 
             {/* Middle Grid — 2 columns */}
@@ -323,7 +358,12 @@ export default function ResourcesPage() {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
               >
-                <MostlyUsedChart department={selectedDepartment} />
+                <MostlyUsedChart
+                  environment={selectedEnvironment}
+                  serviceCounts={dashboardData?.serviceCounts || []}
+                  resources={dashboardData?.resources || []}
+                  isLoading={isDataLoading}
+                />
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
@@ -331,7 +371,12 @@ export default function ResourcesPage() {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
               >
-                <CostResourceChart department={selectedDepartment} />
+                <CostResourceChart
+                  environment={selectedEnvironment}
+                  resources={dashboardData?.resources || []}
+                  costTrends={dashboardData?.costTrends || []}
+                  isLoading={isDataLoading}
+                />
               </motion.div>
             </div>
 
@@ -342,7 +387,11 @@ export default function ResourcesPage() {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
             >
-              <UtilizationChart department={selectedDepartment} />
+              <UtilizationChart
+                environment={selectedEnvironment}
+                resources={dashboardData?.resources || []}
+                isLoading={isDataLoading}
+              />
             </motion.div>
           </div>
 
