@@ -29,11 +29,6 @@ export async function GET(request) {
     // Get budget limit from environment or default
     const budget = parseFloat(process.env.BUDGET_LIMIT || "5000");
 
-    // Fetch alerts to calculate activeAlerts and totalSavings
-    const activeAlertsList = await calculateAlerts(environment);
-    const activeAlerts = activeAlertsList.length;
-    const totalSavings = activeAlertsList.reduce((sum, a) => sum + a.potentialSavings, 0);
-
     if (resources.length === 0) {
       return Response.json({
         totalSpend: 0,
@@ -57,35 +52,42 @@ export async function GET(request) {
     const s3Ids = resources.filter((r) => r.serviceType === "S3").map((r) => r.resourceId);
     const rdsIds = resources.filter((r) => r.serviceType === "RDS").map((r) => r.resourceId);
 
-    const spendStats = await Metric.aggregate([
-      {
-        $match: {
-          timestamp: { $gte: thirtyDaysAgo },
-          resourceId: { $in: resourceIds },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalSpend: { $sum: "$costIncurred" },
-          computeSpend: {
-            $sum: {
-              $cond: [{ $in: ["$resourceId", ec2Ids] }, "$costIncurred", 0],
-            },
-          },
-          storageSpend: {
-            $sum: {
-              $cond: [{ $in: ["$resourceId", s3Ids] }, "$costIncurred", 0],
-            },
-          },
-          rdsSpend: {
-            $sum: {
-              $cond: [{ $in: ["$resourceId", rdsIds] }, "$costIncurred", 0],
-            },
+    // Fetch spendStats and alerts in parallel
+    const [spendStats, activeAlertsList] = await Promise.all([
+      Metric.aggregate([
+        {
+          $match: {
+            timestamp: { $gte: thirtyDaysAgo },
+            resourceId: { $in: resourceIds },
           },
         },
-      },
+        {
+          $group: {
+            _id: null,
+            totalSpend: { $sum: "$costIncurred" },
+            computeSpend: {
+              $sum: {
+                $cond: [{ $in: ["$resourceId", ec2Ids] }, "$costIncurred", 0],
+              },
+            },
+            storageSpend: {
+              $sum: {
+                $cond: [{ $in: ["$resourceId", s3Ids] }, "$costIncurred", 0],
+              },
+            },
+            rdsSpend: {
+              $sum: {
+                $cond: [{ $in: ["$resourceId", rdsIds] }, "$costIncurred", 0],
+              },
+            },
+          },
+        },
+      ]),
+      calculateAlerts(environment, resources)
     ]);
+
+    const activeAlerts = activeAlertsList.length;
+    const totalSavings = activeAlertsList.reduce((sum, a) => sum + a.potentialSavings, 0);
 
     const stats = spendStats[0] || {
       totalSpend: 0,

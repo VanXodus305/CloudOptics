@@ -64,7 +64,7 @@ export default function Modals({
                     {expandedResources.map((r) => (
                       <tr
                         key={r.id}
-                        className="border-b border-gray-50 hover:bg-gray-55/50 transition-all text-xs"
+                        className="border-b border-gray-50 hover:bg-gray-50/50 transition-all text-xs"
                       >
                         <td className="py-3 font-semibold text-gray-800">
                           <div className="flex items-center gap-1.5">

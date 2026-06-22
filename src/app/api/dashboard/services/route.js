@@ -16,49 +16,58 @@ export async function GET(request) {
     const url = new URL(request.url);
     const environment = url.searchParams.get("environment");
 
-    let matchQuery = {};
-
-    // If environment filter is provided, get matching resource IDs first
+    let resourceQuery = {};
     if (environment && ["Production", "Development", "Testing"].includes(environment)) {
-      const resources = await Resource.find({ environment }).lean();
-      const resourceIds = resources.map((r) => r.resourceId);
-      matchQuery.resourceId = { $in: resourceIds };
+      resourceQuery.environment = environment;
     }
 
-    // Get last 30 days of data
+    const resources = await Resource.find(resourceQuery).lean();
+    const resourceIds = resources.map((r) => r.resourceId);
+
+    if (resourceIds.length === 0) {
+      return Response.json([]);
+    }
+
+    const resourceMap = {};
+    resources.forEach((r) => {
+      resourceMap[r.resourceId] = r.serviceType;
+    });
+
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    matchQuery.timestamp = { $gte: thirtyDaysAgo };
 
-    const serviceBreakdown = await Metric.aggregate([
+    const spendByResource = await Metric.aggregate([
       {
-        $match: matchQuery,
-      },
-      {
-        $lookup: {
-          from: "resources",
-          localField: "resourceId",
-          foreignField: "resourceId",
-          as: "resource",
+        $match: {
+          resourceId: { $in: resourceIds },
+          timestamp: { $gte: thirtyDaysAgo },
         },
-      },
-      {
-        $unwind: "$resource",
       },
       {
         $group: {
-          _id: "$resource.serviceType",
+          _id: "$resourceId",
           value: { $sum: "$costIncurred" },
         },
       },
-      {
-        $project: {
-          service: "$_id",
-          value: 1,
-          _id: 0,
-        },
-      },
     ]);
+
+    const serviceMap = {
+      EC2: 0,
+      S3: 0,
+      RDS: 0,
+    };
+
+    spendByResource.forEach((item) => {
+      const serviceType = resourceMap[item._id];
+      if (serviceType) {
+        serviceMap[serviceType] += item.value;
+      }
+    });
+
+    const serviceBreakdown = Object.entries(serviceMap).map(([service, value]) => ({
+      service,
+      value,
+    }));
 
     return Response.json(serviceBreakdown);
   } catch (error) {

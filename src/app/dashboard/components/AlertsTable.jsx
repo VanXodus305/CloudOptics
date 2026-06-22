@@ -2,15 +2,21 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function AlertsTable({ alerts, setIsAlertsModalOpen }) {
+export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: 0.1 }}
-      className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60"
+      className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 relative"
     >
+      {/* Subtle loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
+          <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
       <div className="flex justify-between items-start mb-2">
         <div>
           <h3 className="text-base font-bold text-[#111844]">

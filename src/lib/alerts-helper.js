@@ -1,54 +1,63 @@
-import { Metric } from "../models/Metric";
-import { Resource } from "../models/Resource";
+import { Metric } from "../models/Metric.js";
+import { Resource } from "../models/Resource.js";
 
-export async function calculateAlerts(environmentFilter = null) {
+export async function calculateAlerts(environmentFilter = null, preloadedResources = null) {
   const alerts = [];
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  const resourceQuery = { status: "running" };
-  if (environmentFilter && ["Production", "Development", "Testing"].includes(environmentFilter)) {
-    resourceQuery.environment = environmentFilter;
+  let resources;
+  if (preloadedResources) {
+    resources = preloadedResources.filter((r) => r.status === "running");
+  } else {
+    const resourceQuery = { status: "running" };
+    if (environmentFilter && ["Production", "Development", "Testing"].includes(environmentFilter)) {
+      resourceQuery.environment = environmentFilter;
+    }
+    resources = await Resource.find(resourceQuery).lean();
+  }
+  const resourceIds = resources.map((r) => r.resourceId);
+
+  if (resourceIds.length === 0) return [];
+
+  // Run a single aggregation query on the database
+  const metricStats = await Metric.aggregate([
+    {
+      $match: {
+        resourceId: { $in: resourceIds },
+        timestamp: { $gte: sevenDaysAgo },
+      },
+    },
+    {
+      $group: {
+        _id: "$resourceId",
+        avgCpu: { $avg: "$cpuUtilization" },
+        maxCpu: { $max: "$cpuUtilization" },
+        avgMemory: { $avg: "$memoryUtilization" },
+        maxMemory: { $max: "$memoryUtilization" },
+        totalCost: { $sum: "$costIncurred" },
+        totalReadOps: { $sum: "$readOperations" },
+        totalWriteOps: { $sum: "$writeOperations" },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  // Index the aggregated results by resourceId for fast lookup
+  const statsMap = {};
+  for (const stat of metricStats) {
+    statsMap[stat._id] = stat;
   }
 
-  const resources = await Resource.find(resourceQuery).lean();
-
   for (const resource of resources) {
-    const metrics = await Metric.find({
-      resourceId: resource.resourceId,
-      timestamp: { $gte: sevenDaysAgo },
-    }).lean();
+    const stat = statsMap[resource.resourceId];
+    if (!stat || stat.count === 0) continue;
 
-    if (metrics.length === 0) continue;
-
-    const validCpuMetrics = metrics.filter((m) => m.cpuUtilization != null);
-    const avgCpu =
-      validCpuMetrics.length > 0
-        ? validCpuMetrics.reduce((sum, m) => sum + m.cpuUtilization, 0) /
-          validCpuMetrics.length
-        : 0;
-
-    const validMemoryMetrics = metrics.filter(
-      (m) => m.memoryUtilization != null,
-    );
-    const avgMemory =
-      validMemoryMetrics.length > 0
-        ? validMemoryMetrics.reduce(
-            (sum, m) => sum + m.memoryUtilization,
-            0,
-          ) / validMemoryMetrics.length
-        : 0;
-
-    const maxCpu = Math.max(
-      ...validCpuMetrics.map((m) => m.cpuUtilization),
-      0,
-    );
-    const maxMemory = Math.max(
-      ...validMemoryMetrics.map((m) => m.memoryUtilization),
-      0,
-    );
-
-    const totalCost = metrics.reduce((sum, m) => sum + m.costIncurred, 0);
+    const avgCpu = stat.avgCpu || 0;
+    const avgMemory = stat.avgMemory || 0;
+    const maxCpu = stat.maxCpu || 0;
+    const maxMemory = stat.maxMemory || 0;
+    const totalCost = stat.totalCost || 0;
     const monthlyCost = totalCost * (30 / 7); // Extrapolate 7-day to 30-day cost
 
     // Rule 1: Idle Resource Alert (CPU < 5% for 7 days)
@@ -87,11 +96,8 @@ export async function calculateAlerts(environmentFilter = null) {
 
     // Rule 3: Unattached Storage Alert (S3 with 0 read/write operations for 7 days)
     if (resource.serviceType === "S3") {
-      const withOperations = metrics.filter(
-        (m) => (m.readOperations || 0) > 0 || (m.writeOperations || 0) > 0,
-      );
-
-      if (withOperations.length === 0) {
+      const totalOps = (stat.totalReadOps || 0) + (stat.totalWriteOps || 0);
+      if (totalOps === 0) {
         alerts.push({
           resourceId: resource.resourceId,
           type: "UnattachedStorage",

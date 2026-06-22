@@ -6,10 +6,8 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@
 const filterMap = {
   All: "All Clusters",
   Production: "Production",
-  Staging: "Staging",
   Development: "Development",
-  Management: "Management",
-  Finance: "Finance",
+  Testing: "Testing",
 };
 
 export default function CostDistributionChart({
@@ -23,6 +21,8 @@ export default function CostDistributionChart({
   setDonutHoveredSegment,
   donutSelectedSegment,
   setDonutSelectedSegment,
+  donutTotalSpend = 0,
+  isLoading,
 }) {
   return (
     <motion.div
@@ -30,13 +30,23 @@ export default function CostDistributionChart({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: 0.1 }}
-      className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 flex flex-col justify-between"
+      className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 flex flex-col justify-between relative"
     >
-      <div className="flex justify-between items-center mb-6">
+      {/* Subtle loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
+          <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+
+      <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-base font-bold text-[#111844]">
             Cost Distribution
           </h3>
+          <span className="text-[10px] text-gray-400 font-semibold mt-1 block">
+            Resource share breakdown by service category.
+          </span>
         </div>
 
         {/* Resource filter*/}
@@ -66,13 +76,37 @@ export default function CostDistributionChart({
           >
             <DropdownItem key="All">All Clusters</DropdownItem>
             <DropdownItem key="Production">Production</DropdownItem>
-            <DropdownItem key="Staging">Staging</DropdownItem>
             <DropdownItem key="Development">Development</DropdownItem>
-            <DropdownItem key="Management">Management</DropdownItem>
-            <DropdownItem key="Finance">Finance</DropdownItem>
+            <DropdownItem key="Testing">Testing</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       </div>
+
+      {/* Information Banner */}
+      {(() => {
+        const primaryService = donutData && donutData.length > 0
+          ? [...donutData].sort((a, b) => b.value - a.value)[0]
+          : null;
+
+        const allocationMsg = primaryService && primaryService.value > 0
+          ? `${primaryService.name} is the primary cost driver (${primaryService.value}% of share).`
+          : "Cost allocation is evenly distributed.";
+
+        return (
+          <div className="bg-gradient-to-r from-[#792CA2]/5 to-[#9A4DCC]/5 border border-purple-500/10 rounded-2xl p-3 mb-2 flex items-center justify-between text-[10px]">
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-gray-500 font-semibold">{allocationMsg}</span>
+            </div>
+            <div className="text-[#792CA2] font-bold">
+              Active Services: {donutData?.length || 3}
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-4">
         <div className="relative w-36 h-36 flex items-center justify-center">
@@ -151,7 +185,7 @@ export default function CostDistributionChart({
             <span className="text-base font-black text-[#111844] font-mono mt-0.5">
               {donutSelectedSegment !== null
                 ? `${donutData[donutSelectedSegment].value}%`
-                : `$14,892`}
+                : `$${Math.round(donutTotalSpend).toLocaleString()}`}
             </span>
           </div>
         </div>

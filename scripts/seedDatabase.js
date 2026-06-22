@@ -265,10 +265,17 @@ async function seedDatabase() {
     // Generate 30 days of hourly metrics
     console.log("📊 Generating metrics for 30 days (hourly data)...");
 
-    const metricsPerBatch = 10000;
-    let metricsCreated = 0;
+    const allMetrics = [];
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const thirtyDaysAgoMs = thirtyDaysAgo.getTime();
+
+    // Create daily fluctuation factors so that daily trends look organic
+    const dailyMultipliers = {};
+    for (let d = 0; d <= 31; d++) {
+      // Each day has its own base multiplier between 0.75 and 1.25
+      dailyMultipliers[d] = 0.75 + Math.random() * 0.5;
+    }
 
     // For each hour in the last 30 days
     for (
@@ -276,11 +283,15 @@ async function seedDatabase() {
       timestamp < new Date();
       timestamp.setHours(timestamp.getHours() + 1)
     ) {
-      const metricsForThisHour = [];
+      const dayDiff = Math.floor((timestamp.getTime() - thirtyDaysAgoMs) / (24 * 60 * 60 * 1000));
+      const dailyMult = dailyMultipliers[dayDiff] !== undefined ? dailyMultipliers[dayDiff] : 1.0;
 
       for (const resource of resources) {
         const metrics = generateResourceMetrics(resource);
-        metricsForThisHour.push({
+        const hourlyNoise = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
+        const costIncurred = Math.round(resource.costPerHour * dailyMult * hourlyNoise * 1000) / 1000;
+
+        allMetrics.push({
           resourceId: resource.resourceId,
           timestamp: new Date(timestamp),
           cpuUtilization: metrics.cpuUtilization,
@@ -288,29 +299,20 @@ async function seedDatabase() {
           storageSizeGB: metrics.storageSizeGB,
           readOperations: metrics.readOperations,
           writeOperations: metrics.writeOperations,
-          costIncurred: resource.costPerHour,
+          costIncurred,
         });
       }
-
-      // Show batch progress
-      if (metricsCreated % metricsPerBatch === 0 && metricsCreated > 0) {
-        const batchNumber = Math.floor(metricsCreated / metricsPerBatch);
-        console.log(
-          `  ✓ Batch ${batchNumber}: ${metricsCreated} metrics created`,
-        );
-      }
-
-      await Metric.insertMany(metricsForThisHour);
-      metricsCreated += metricsForThisHour.length;
     }
 
-    console.log(`✓ Created ${metricsCreated} metrics`);
+    console.log(`📝 Inserting ${allMetrics.length} metrics in bulk...`);
+    await Metric.insertMany(allMetrics);
+    console.log(`✓ Created ${allMetrics.length} metrics`);
 
     await mongoose.disconnect();
     console.log("\n✅ Database seeding completed successfully!");
     console.log(`\n📈 Summary:`);
     console.log(`   Resources: ${resources.length}`);
-    console.log(`   Metrics: ${metricsCreated}`);
+    console.log(`   Metrics: ${allMetrics.length}`);
     console.log(`   Data: Last 30 days of hourly metrics`);
     process.exit(0);
   } catch (error) {

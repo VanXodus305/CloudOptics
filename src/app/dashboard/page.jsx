@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -89,146 +89,250 @@ export default function DashboardPage() {
   const [donutHoveredSegment, setDonutHoveredSegment] = useState(null);
   const [donutSelectedSegment, setDonutSelectedSegment] = useState(null);
 
-  // Hardcoded chart data switcher
-  const chartDatasets = {
-    Monthly: [
-      { label: "Jan", value: 12500 },
-      { label: "Feb", value: 14200 },
-      { label: "Mar", value: 13800 },
-      { label: "Apr", value: 15100 },
-      { label: "May", value: 16400 },
-      { label: "Jun", value: 14800 },
-    ],
-    Weekly: [
-      { label: "Week 1", value: 3200 },
-      { label: "Week 2", value: 3800 },
-      { label: "Week 3", value: 3500 },
-      { label: "Week 4", value: 4392 },
-    ],
-    Daily: [
-      { label: "Mon", value: 510 },
-      { label: "Tue", value: 480 },
-      { label: "Wed", value: 620 },
-      { label: "Thu", value: 580 },
-      { label: "Fri", value: 650 },
-      { label: "Sat", value: 420 },
-      { label: "Sun", value: 390 },
-    ],
-  };
-
+  // Simulation State
   const [isLiveSimulation, setIsLiveSimulation] = useState(false);
-  const [liveChartData, setLiveChartData] = useState(null);
-  const [liveDonutData, setLiveDonutData] = useState(null);
 
-  const currentChartData = useMemo(() => {
-    if (isLiveSimulation && liveChartData) {
-      return liveChartData[chartTimeframe];
+  // Database-backed states
+  const [summaryData, setSummaryData] = useState(null);
+  const [trendsData, setTrendsData] = useState([]);
+  const [servicesData, setServicesData] = useState([]);
+  const [resourcesData, setResourcesData] = useState([]);
+  const [alertsData, setAlertsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Client-side cache and request coordinator
+  const cacheRef = useRef({});
+  const currentRequestFilter = useRef(null);
+
+  // Fetch function for database data
+  const fetchDashboardData = useCallback(async (filter, isPolling = false) => {
+    currentRequestFilter.current = filter;
+
+    // Check if we have cached data for instantaneous transition
+    const cached = cacheRef.current[filter];
+    if (cached && !isPolling) {
+      setSummaryData(cached.summary);
+      setTrendsData(cached.trends);
+      setServicesData(cached.services);
+      setResourcesData(cached.resources);
+      setAlertsData(cached.alerts);
+      setIsLoading(false);
+    } else {
+      if (!isPolling) setIsLoading(true);
     }
-    return chartDatasets[chartTimeframe];
-  }, [isLiveSimulation, liveChartData, chartTimeframe]);
 
-  const maxChartValue = useMemo(() => {
-    return Math.max(...currentChartData.map((d) => d.value)) * 1.1;
-  }, [currentChartData]);
+    try {
+      const envParam = filter === "All" ? "" : `?environment=${filter}`;
+      
+      const [summaryRes, trendsRes, servicesRes, resourcesRes, alertsRes] = await Promise.all([
+        fetch(`/api/dashboard/summary${envParam}`),
+        fetch(`/api/dashboard/trends${envParam}`),
+        fetch(`/api/dashboard/services${envParam}`),
+        fetch(`/api/resources${envParam}`),
+        fetch(`/api/optimization/alerts${envParam}`)
+      ]);
 
-  // Donut data changes according to dropdown filter
-  const donutDatasets = {
-    All: [
-      { name: "Compute (EC2)", value: 45, colorHex: "#792CA2" },
-      { name: "Storage (S3)", value: 25, colorHex: "#9A4DCC" },
-      { name: "Database (RDS)", value: 15, colorHex: "#1F215D" },
-      { name: "Networking", value: 10, colorHex: "#111844" },
-      { name: "Other Services", value: 5, colorHex: "#DCCBFF" },
-    ],
-    Production: [
-      { name: "Compute (EC2)", value: 60, colorHex: "#792CA2" },
-      { name: "Storage (S3)", value: 15, colorHex: "#9A4DCC" },
-      { name: "Database (RDS)", value: 15, colorHex: "#1F215D" },
-      { name: "Networking", value: 8, colorHex: "#111844" },
-      { name: "Other Services", value: 2, colorHex: "#DCCBFF" },
-    ],
-    Staging: [
-      { name: "Compute (EC2)", value: 40, colorHex: "#792CA2" },
-      { name: "Storage (S3)", value: 30, colorHex: "#9A4DCC" },
-      { name: "Database (RDS)", value: 12, colorHex: "#1F215D" },
-      { name: "Networking", value: 12, colorHex: "#111844" },
-      { name: "Other Services", value: 6, colorHex: "#DCCBFF" },
-    ],
-    Development: [
-      { name: "Compute (EC2)", value: 30, colorHex: "#792CA2" },
-      { name: "Storage (S3)", value: 35, colorHex: "#9A4DCC" },
-      { name: "Database (RDS)", value: 10, colorHex: "#1F215D" },
-      { name: "Networking", value: 15, colorHex: "#111844" },
-      { name: "Other Services", value: 10, colorHex: "#DCCBFF" },
-    ],
-    Management: [
-      { name: "Compute (EC2)", value: 15, colorHex: "#792CA2" },
-      { name: "Storage (S3)", value: 25, colorHex: "#9A4DCC" },
-      { name: "Database (RDS)", value: 12, colorHex: "#1F215D" },
-      { name: "Networking", value: 17, colorHex: "#111844" },
-      { name: "Other Services", value: 10, colorHex: "#DCCBFF" },
-    ],
-    Finance: [
-      { name: "Compute (EC2)", value: 18, colorHex: "#792CA2" },
-      { name: "Storage (S3)", value: 22, colorHex: "#9A4DCC" },
-      { name: "Database (RDS)", value: 16, colorHex: "#1F215D" },
-      { name: "Networking", value: 27, colorHex: "#111844" },
-      { name: "Other Services", value: 40, colorHex: "#DCCBFF" },
-    ],
-  };
+      if (!summaryRes.ok || !trendsRes.ok || !servicesRes.ok || !resourcesRes.ok || !alertsRes.ok) {
+        throw new Error("One or more dashboard API requests failed");
+      }
 
-  // Live Simulation effect
+      // Check if this response belongs to the current selected filter
+      if (currentRequestFilter.current !== filter) {
+        return;
+      }
+
+      const [summaryJson, trendsJson, servicesJson, resourcesJson, alertsJson] = await Promise.all([
+        summaryRes.json(),
+        trendsRes.json(),
+        servicesRes.json(),
+        resourcesRes.json(),
+        alertsRes.json()
+      ]);
+
+      // Cache the result
+      cacheRef.current[filter] = {
+        summary: summaryJson,
+        trends: trendsJson,
+        services: servicesJson,
+        resources: resourcesJson,
+        alerts: alertsJson,
+      };
+
+      setSummaryData(summaryJson);
+      setTrendsData(trendsJson);
+      setServicesData(servicesJson);
+      setResourcesData(resourcesJson);
+      setAlertsData(alertsJson);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      if (currentRequestFilter.current === filter) {
+        setError(err.message || "Failed to load dashboard data");
+      }
+    } finally {
+      if (currentRequestFilter.current === filter && !isPolling) {
+        setIsLoading(false);
+      }
+    }
+  }, []);
+
+  // Initial and environment change fetch
   useEffect(() => {
-    if (!isLiveSimulation) {
-      setLiveChartData(null);
-      setLiveDonutData(null);
-      return;
+    if (status === "authenticated") {
+      fetchDashboardData(donutFilter);
     }
+  }, [status, donutFilter, fetchDashboardData]);
 
-    setLiveChartData(JSON.parse(JSON.stringify(chartDatasets)));
-    setLiveDonutData(JSON.parse(JSON.stringify(donutDatasets)));
+  // Polling simulation when toggle is active
+  useEffect(() => {
+    if (!isLiveSimulation || status !== "authenticated") return;
 
     const interval = setInterval(() => {
-      setLiveChartData((prev) => {
-        if (!prev) return prev;
-        const copy = JSON.parse(JSON.stringify(prev));
-        Object.keys(copy).forEach((key) => {
-          copy[key] = copy[key].map((item) => {
-            const changePercent = 1 + (Math.random() * 0.1 - 0.05); // +/- 5%
-            return {
-              ...item,
-              value: Math.max(10, Math.round(item.value * changePercent)),
-            };
-          });
-        });
-        return copy;
-      });
-
-      setLiveDonutData((prev) => {
-        if (!prev) return prev;
-        const copy = JSON.parse(JSON.stringify(prev));
-        Object.keys(copy).forEach((key) => {
-          copy[key] = copy[key].map((item) => {
-            const changePercent = 1 + (Math.random() * 0.08 - 0.04); // +/- 4%
-            return {
-              ...item,
-              value: Math.max(2, Math.round(item.value * changePercent)),
-            };
-          });
-        });
-        return copy;
-      });
-    }, 1500);
+      fetchDashboardData(donutFilter, true);
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [isLiveSimulation]);
+  }, [isLiveSimulation, status, donutFilter, fetchDashboardData]);
 
-  const donutData = useMemo(() => {
-    if (isLiveSimulation && liveDonutData) {
-      return liveDonutData[donutFilter];
+  // Dynamic KPI trends calculation from trendsData
+  const kpiTrends = useMemo(() => {
+    if (!trendsData || trendsData.length === 0) {
+      return {
+        totalSpend: { trend: "0.0%", type: "neutral", label: "vs last week" },
+        computeSpend: { trend: "0.0%", type: "neutral", label: "vs last week" },
+        storageSpend: { trend: "0.0%", type: "neutral", label: "vs last week" },
+        totalSavings: { trend: "0.0%", type: "positive", label: "of spend" },
+      };
     }
-    return donutDatasets[donutFilter];
-  }, [isLiveSimulation, liveDonutData, donutFilter]);
+
+    const calcTrend = (key) => {
+      // Sum last 7 days (Week 4)
+      const week4Slice = trendsData.slice(-7);
+      const week4Sum = week4Slice.reduce((sum, t) => sum + (t[key] || 0), 0);
+
+      // Sum previous 7 days (Week 3, days 15 to 21 ago)
+      const week3Slice = trendsData.slice(-14, -7);
+      const week3Sum = week3Slice.reduce((sum, t) => sum + (t[key] || 0), 0);
+
+      if (week3Sum === 0) {
+        return { trend: "0.0%", type: "neutral", label: "vs last week" };
+      }
+
+      const pctChange = ((week4Sum - week3Sum) / week3Sum) * 100;
+      const type = pctChange < 0 ? "positive" : pctChange > 0 ? "negative" : "neutral";
+      const sign = pctChange > 0 ? "+" : "";
+
+      return {
+        trend: `${sign}${pctChange.toFixed(1)}%`,
+        type,
+        label: "vs last week"
+      };
+    };
+
+    // Calculate spend trends (lower is positive/green, higher is negative/red)
+    const totalSpendTrend = calcTrend("spend");
+    const computeSpendTrend = calcTrend("computeSpend");
+    const storageSpendTrend = calcTrend("storageSpend");
+
+    // For savings, we show percentage of total spend
+    const totalSpendVal = summaryData?.totalSpend || 1;
+    const savingsVal = summaryData?.totalSavings || 0;
+    const savingsPct = totalSpendVal > 0 ? (savingsVal / totalSpendVal) * 100 : 0;
+
+    return {
+      totalSpend: totalSpendTrend,
+      computeSpend: computeSpendTrend,
+      storageSpend: storageSpendTrend,
+      totalSavings: {
+        trend: `${savingsPct.toFixed(1)}%`,
+        type: "positive",
+        label: "of spend"
+      }
+    };
+  }, [trendsData, summaryData]);
+
+  // Chart datasets compiled dynamically from trendsData
+  const chartDatasets = useMemo(() => {
+    if (!trendsData || trendsData.length === 0) {
+      return { Monthly: [], Weekly: [], Daily: [] };
+    }
+
+    // Daily: Last 7 days from daily trends
+    const daily = trendsData.slice(-7).map((t) => {
+      const d = new Date(t.date);
+      const label = d.toLocaleDateString("en-US", { weekday: "short" });
+      return { label, value: Math.round(t.spend) };
+    });
+
+    // Weekly: Group last 28 days of trends into 4 weeks (7 days each)
+    const weekly = [];
+    for (let i = 0; i < 4; i++) {
+      const startIndex = Math.max(0, trendsData.length - (4 - i) * 7);
+      const endIndex = trendsData.length - (3 - i) * 7;
+      const weekSlice = trendsData.slice(startIndex, endIndex);
+      const weekSum = weekSlice.reduce((sum, t) => sum + t.spend, 0);
+      weekly.push({ label: `Week ${i + 1}`, value: Math.round(weekSum) });
+    }
+
+    // Monthly: Group by calendar month name
+    const monthlyMap = {};
+    trendsData.forEach((t) => {
+      const d = new Date(t.date);
+      const monthName = d.toLocaleDateString("en-US", { month: "short" });
+      monthlyMap[monthName] = (monthlyMap[monthName] || 0) + t.spend;
+    });
+    const monthly = Object.keys(monthlyMap).map((month) => ({
+      label: month,
+      value: Math.round(monthlyMap[month]),
+    }));
+
+    return { Monthly: monthly, Weekly: weekly, Daily: daily };
+  }, [trendsData]);
+
+  const currentChartData = useMemo(() => {
+    return chartDatasets[chartTimeframe] || [];
+  }, [chartDatasets, chartTimeframe]);
+
+  const maxChartValue = useMemo(() => {
+    if (currentChartData.length === 0) return 100;
+    return Math.max(...currentChartData.map((d) => d.value)) * 1.1 || 100;
+  }, [currentChartData]);
+
+  // Donut data compiled dynamically from servicesData
+  const donutData = useMemo(() => {
+    if (!servicesData || servicesData.length === 0) {
+      return [
+        { name: "Compute (EC2)", value: 0, colorHex: "#792CA2" },
+        { name: "Storage (S3)", value: 0, colorHex: "#9A4DCC" },
+        { name: "Database (RDS)", value: 0, colorHex: "#1F215D" },
+      ];
+    }
+
+    const total = servicesData.reduce((sum, item) => sum + item.value, 0);
+
+    const nameMap = {
+      EC2: "Compute (EC2)",
+      S3: "Storage (S3)",
+      RDS: "Database (RDS)",
+    };
+
+    const colorMap = {
+      EC2: "#792CA2",
+      S3: "#9A4DCC",
+      RDS: "#1F215D",
+    };
+
+    return servicesData.map((item) => {
+      const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
+      return {
+        name: nameMap[item.service] || item.service,
+        value: percentage,
+        rawCost: item.value,
+        colorHex: colorMap[item.service] || "#DCCBFF",
+      };
+    });
+  }, [servicesData]);
 
   const donutTotal = useMemo(() => {
     return donutData.reduce((acc, curr) => acc + curr.value, 0);
@@ -237,183 +341,41 @@ export default function DashboardPage() {
   const donutRadius = 38;
   const donutCircumference = 2 * Math.PI * donutRadius;
 
-  // Alerts array with criteria-severity levels (Only 3 items shown in dashboard)
-  const alerts = [
-    {
-      id: "a1",
-      title: "Underutilized EC2 Instance",
-      desc: "Instance i-09f482d8c3 has average CPU < 5%",
-      savings: 180,
-      severity: "Critical",
-      category: "Compute",
-      status: "Active",
-    },
-    {
-      id: "a2",
-      title: "Unattached EBS Volume found",
-      desc: "Volume vol-028a49c has been unattached for 15 days",
-      savings: 45,
-      severity: "High",
-      category: "Storage",
-      status: "Active",
-    },
-    {
-      id: "a3",
-      title: "Idle Elastic IP detected",
-      desc: "EIP 54.210.12.89 is unassociated with any instance",
-      savings: 15,
-      severity: "Low",
-      category: "Networking",
-      status: "Acknowledged",
-    },
-  ];
+  // Alerts array formatted for view layout
+  const formattedAlerts = useMemo(() => {
+    if (!alertsData || alertsData.length === 0) return [];
 
-  const expandedAlerts = [
-    {
-      id: "a1",
-      title: "Underutilized EC2 Instance",
-      desc: "Instance i-09f482d8c3 has average CPU < 5%",
-      savings: 180,
-      severity: "Critical",
-      category: "Compute",
-      status: "Active",
-    },
-    {
-      id: "a2",
-      title: "Unattached EBS Volume found",
-      desc: "Volume vol-028a49c has been unattached for 15 days",
-      savings: 45,
-      severity: "High",
-      category: "Storage",
-      status: "Active",
-    },
-    {
-      id: "a3",
-      title: "Idle Elastic IP detected",
-      desc: "EIP 54.210.12.89 is unassociated with any instance",
-      savings: 15,
-      severity: "Low",
-      category: "Networking",
-      status: "Acknowledged",
-    },
-    {
-      id: "a4",
-      title: "Unused Redshift Cluster",
-      desc: "Cluster dw-staging has had no connections for 30 days",
-      savings: 350,
-      severity: "Critical",
-      category: "Database",
-      status: "Active",
-    },
-    {
-      id: "a5",
-      title: "Unused Route53 Hosted Zone",
-      desc: "Hosted zone sandbox.dev has had no queries for 3 months",
-      savings: 10,
-      severity: "Low",
-      category: "Networking",
-      status: "Resolved",
-    },
-    {
-      id: "a6",
-      title: "Idle Load Balancer",
-      desc: "ELB app-lb-dev has had no traffic for 10 days",
-      savings: 25,
-      severity: "Medium",
-      category: "Networking",
-      status: "Active",
-    },
-  ];
+    return alertsData.map((a, idx) => {
+      let title = "";
+      if (a.type === "Idle") title = "Underutilized Instance";
+      else if (a.type === "Oversized") title = "Oversized Instance";
+      else if (a.type === "UnattachedStorage") title = "Unattached Storage";
+      else title = `${a.type} Alert`;
 
-  // Resources list with regions (Only 3 items shown in dashboard)
-  const resources = [
-    {
-      id: "1",
-      name: "i-09f482d8c3",
-      service: "EC2",
-      cost: 1420.5,
-      status: "Running",
-      region: "us-east-1",
-      environment: "Production",
-    },
-    {
-      id: "2",
-      name: "s3-archive-media",
-      service: "S3",
-      cost: 980.2,
-      status: "Active",
-      region: "us-west-2",
-      environment: "Production",
-    },
-    {
-      id: "3",
-      name: "db-prod-replica",
-      service: "RDS",
-      cost: 850.0,
-      status: "Running",
-      region: "eu-west-1",
-      environment: "Staging",
-    },
-  ];
+      return {
+        id: `${a.resourceId}-${idx}`,
+        title,
+        desc: `${a.message} (Potential savings: $${Math.round(a.potentialSavings)}/mo)`,
+        severity: a.severity,
+        category: a.type === "UnattachedStorage" ? "Storage" : a.type === "Idle" || a.type === "Oversized" ? "Compute" : "Networking",
+        status: "Active",
+      };
+    });
+  }, [alertsData]);
 
-  const expandedResources = [
-    {
-      id: "1",
-      name: "i-09f482d8c3",
-      service: "EC2",
-      cost: 1420.5,
-      status: "Running",
-      region: "us-east-1",
-      environment: "Production",
-    },
-    {
-      id: "2",
-      name: "s3-archive-media",
-      service: "S3",
-      cost: 980.2,
-      status: "Active",
-      region: "us-west-2",
-      environment: "Production",
-    },
-    {
-      id: "3",
-      name: "i-04f811a2d4",
-      service: "EC2",
-      cost: 620.0,
-      status: "Stopped",
-      region: "us-east-1",
-      environment: "Development",
-    },
-    {
-      id: "4",
-      name: "s3-backup-logs",
-      service: "S3",
-      cost: 95.1,
-      status: "Active",
-      region: "ap-southeast-1",
-      environment: "Staging",
-    },
-    {
-      id: "5",
-      name: "i-09ab723cd8",
-      service: "EC2",
-      cost: 310.0,
-      status: "Running",
-      region: "us-east-1",
-      environment: "Development",
-    },
-    {
-      id: "6",
-      name: "s3-billing-exports",
-      service: "S3",
-      cost: 45.0,
-      status: "Active",
-      region: "us-east-1",
-      environment: "Management",
-    },
-  ];
+  const alerts = useMemo(() => formattedAlerts.slice(0, 3), [formattedAlerts]);
+  const expandedAlerts = formattedAlerts;
 
-  if (status === "loading" || (status === "unauthenticated" && !isSigningOut)) {
+  // Top Cost Resources
+  const resources = useMemo(() => {
+    if (!resourcesData || resourcesData.length === 0) return [];
+    const sorted = [...resourcesData].sort((a, b) => b.cost - a.cost);
+    return sorted.slice(0, 3);
+  }, [resourcesData]);
+
+  const expandedResources = resourcesData;
+
+  if (status === "loading" || (status === "unauthenticated" && !isSigningOut) || (isLoading && !summaryData)) {
     return (
       <div className="min-h-screen bg-[#F9F7F7] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -490,7 +452,7 @@ export default function DashboardPage() {
               <WelcomeBanner userName={userName} />
 
               {/* KPI CARDS */}
-              <KPICards />
+              <KPICards summaryData={summaryData} kpiTrends={kpiTrends} isLoading={isLoading} />
 
               {/* ANALYTICS SECTION */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -502,6 +464,7 @@ export default function DashboardPage() {
                   maxChartValue={maxChartValue}
                   hoveredBar={hoveredBar}
                   setHoveredBar={setHoveredBar}
+                  isLoading={isLoading}
                 />
 
                 {/* Cost Distribution Card */}
@@ -516,6 +479,8 @@ export default function DashboardPage() {
                   setDonutHoveredSegment={setDonutHoveredSegment}
                   donutSelectedSegment={donutSelectedSegment}
                   setDonutSelectedSegment={setDonutSelectedSegment}
+                  donutTotalSpend={summaryData?.totalSpend || 0}
+                  isLoading={isLoading}
                 />
               </div>
 
@@ -527,12 +492,14 @@ export default function DashboardPage() {
                   copiedId={copiedId}
                   handleCopy={handleCopy}
                   setIsResourcesModalOpen={setIsResourcesModalOpen}
+                  isLoading={isLoading}
                 />
 
                 {/* Optimization Alerts */}
                 <AlertsTable
                   alerts={alerts}
                   setIsAlertsModalOpen={setIsAlertsModalOpen}
+                  isLoading={isLoading}
                 />
               </div>
             </div>

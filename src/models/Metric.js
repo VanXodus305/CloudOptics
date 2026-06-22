@@ -41,6 +41,8 @@ const MetricSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+MetricSchema.index({ resourceId: 1, timestamp: 1 });
+
 export const Metric =
   mongoose.models.Metric || mongoose.model("Metric", MetricSchema);
 

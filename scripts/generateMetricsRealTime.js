@@ -78,6 +78,9 @@ function generateRealisticMetrics(resource) {
     }
   }
 
+  const noise = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
+  const costIncurred = Math.round(resource.costPerHour * noise * 1000) / 1000;
+
   return {
     resourceId: resource.resourceId,
     timestamp: new Date(),
@@ -86,7 +89,7 @@ function generateRealisticMetrics(resource) {
     storageSizeGB,
     readOperations: readOps,
     writeOperations: writeOps,
-    costIncurred: resource.costPerHour,
+    costIncurred,
   };
 }
 
