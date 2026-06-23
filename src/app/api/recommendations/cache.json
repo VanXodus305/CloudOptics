@@ -1,87 +1,142 @@
 {
-  "timestamp": 1782196900881,
+  "timestamp": 1782206310987,
   "data": {
     "aiSummary": {
-      "overview": "Analysis of the current cloud resource landscape reveals significant potential for cost reduction through resource rightsizing, termination of idle infrastructure, and the implementation of automated scheduling for non-production environments.",
+      "overview": "Cloud infrastructure audit reveals significant potential for monthly cost reduction through instance right-sizing, termination of idle resources, and implementation of lifecycle management policies for unattached storage. Total monthly savings potential is estimated at $694.",
       "keyFindings": [
-        "Significant waste detected due to idle compute and database instances.",
-        "Multiple oversized instances in production and testing environments exceeding resource requirements.",
-        "Unused S3 storage buckets accumulating costs without operational activity."
+        "Multiple high-cost EC2 instances exhibit idle behavior with CPU utilization below 3%.",
+        "Several oversized compute instances in production and development are significantly under-utilizing memory and CPU capacity.",
+        "Unused S3 buckets generate unnecessary costs due to lack of recent read/write operations."
       ],
       "nextSteps": [
-        "Terminate resources identified as idle to immediately capture monthly cost savings.",
-        "Right-size oversized EC2 instances to align with observed CPU and memory utilization patterns.",
-        "Configure automated lifecycle policies or scheduling for non-production resources to optimize usage patterns."
+        "Terminate or stop identified idle instances to immediately eliminate wastage.",
+        "Downsize production and development EC2 instances based on observed performance metrics.",
+        "Implement automated S3 lifecycle policies for buckets showing no activity over the past 7 days."
       ]
     },
-    "totalActionsCount": 6,
-    "totalPotentialSavings": 438,
+    "totalActionsCount": 11,
+    "totalPotentialSavings": 694,
     "recommendations": [
       {
         "id": "rec-01",
-        "title": "Terminate idle RDS instance rds-cp1250-general-ci-3y5khmbq",
-        "description": "Resource shows extremely low CPU utilization (2.40%). Given its status as a testing instance, termination will eliminate unnecessary spend.",
+        "title": "Terminate idle RDS instance rds-cp1250-bin-mzlffkww",
+        "description": "Resource shows consistent idle state with 2.52% CPU utilization. Terminate to reclaim full monthly cost.",
         "category": "allocate",
         "impact": "High",
-        "potentialSavings": 52,
-        "resourceId": "rds-cp1250-general-ci-3y5khmbq",
+        "potentialSavings": 64,
+        "resourceId": "rds-cp1250-bin-mzlffkww",
         "service": "RDS",
-        "actionableSteps": "- Verify no downstream dependencies exist in the testing pipeline. - Execute RDS termination via AWS CLI: aws rds delete-db-instance --db-instance-identifier rds-cp1250-general-ci-3y5khmbq --skip-final-snapshot"
+        "actionableSteps": "* Verify application dependency\n* Take a final snapshot for archival\n* Execute 'aws rds delete-db-instance' via CLI or Console"
       },
       {
         "id": "rec-02",
-        "title": "Terminate idle RDS instance rds-cp1250-bin-mzlffkww",
-        "description": "RDS instance is consistently idle with CPU utilization at 2.52%.",
+        "title": "Terminate idle EC2 instance i-b2BfAaF9e7eCeAF2c",
+        "description": "Resource is idle with average CPU utilization of 2.47%. Termination is advised.",
         "category": "allocate",
         "impact": "High",
-        "potentialSavings": 65,
-        "resourceId": "rds-cp1250-bin-mzlffkww",
-        "service": "RDS",
-        "actionableSteps": "- Assess the necessity of the testing database environment. - Terminate the instance using the RDS console or CLI."
+        "potentialSavings": 63,
+        "resourceId": "i-b2BfAaF9e7eCeAF2c",
+        "service": "EC2",
+        "actionableSteps": "* Stop instance to confirm no impact\n* Terminate instance via AWS Management Console"
       },
       {
         "id": "rec-03",
-        "title": "Downsize oversized EC2 instance i-C701577D7D6DdCfAA",
-        "description": "The current t3.2xlarge instance is significantly over-provisioned with max CPU at 12% and memory at 17%. Downgrading to a smaller instance class will reduce costs while maintaining performance.",
-        "category": "sizing",
-        "impact": "Medium",
-        "potentialSavings": 90,
-        "resourceId": "i-C701577D7D6DdCfAA",
-        "service": "EC2",
-        "actionableSteps": "- Stop the instance. - Modify the instance type to a smaller tier (e.g., t3.large). - Start the instance."
+        "title": "Terminate idle RDS instance rds-cp1250-general-ci-3y5khmbq",
+        "description": "High-severity idle alert detected; CPU utilization is 2.39%.",
+        "category": "allocate",
+        "impact": "High",
+        "potentialSavings": 51,
+        "resourceId": "rds-cp1250-general-ci-3y5khmbq",
+        "service": "RDS",
+        "actionableSteps": "* Confirm environment status\n* Delete RDS instance"
       },
       {
         "id": "rec-04",
-        "title": "Right-size oversized EC2 instance i-ff2B9EC27CDcC4b7f",
-        "description": "Production testing instance is underutilized with max 12% CPU. Migration to a smaller instance type is recommended.",
-        "category": "sizing",
-        "impact": "Medium",
-        "potentialSavings": 89,
-        "resourceId": "i-ff2B9EC27CDcC4b7f",
-        "service": "EC2",
-        "actionableSteps": "- Perform instance type modification to t3.medium via AWS EC2 console."
+        "title": "Terminate idle RDS instance rds-ascii-bin-v1dyafoj",
+        "description": "Instance is idle with average CPU utilization of 2.35%.",
+        "category": "allocate",
+        "impact": "High",
+        "potentialSavings": 52,
+        "resourceId": "rds-ascii-bin-v1dyafoj",
+        "service": "RDS",
+        "actionableSteps": "* Stop and terminate RDS instance"
       },
       {
         "id": "rec-05",
-        "title": "Implement automated scheduling for instance i-b2BfAaF9e7eCeAF2c",
-        "description": "Development instance exhibits high idle time. Implementing a stop/start schedule for non-working hours will yield substantial savings.",
-        "category": "usage",
+        "title": "Right-size oversized EC2 instance i-C701577D7D6DdCfAA",
+        "description": "Instance utilizes less than 17% memory and 12% CPU. Downsizing recommended.",
+        "category": "sizing",
         "impact": "Medium",
-        "potentialSavings": 64,
-        "resourceId": "i-b2BfAaF9e7eCeAF2c",
+        "potentialSavings": 89,
+        "resourceId": "i-C701577D7D6DdCfAA",
         "service": "EC2",
-        "actionableSteps": "- Use AWS Instance Scheduler to stop the instance between 8 PM and 7 AM daily."
+        "actionableSteps": "* Stop instance\n* Change instance type from t3.2xlarge to t3.large\n* Start instance"
       },
       {
         "id": "rec-06",
-        "title": "Clean up unattached S3 bucket uniform-cappelletti-9786",
-        "description": "Bucket exhibits zero operations over 7 days, indicating it is unused and contributing to storage overhead.",
+        "title": "Right-size oversized EC2 instance i-ff2B9EC27CDcC4b7f",
+        "description": "Instance utilization metrics indicate significant over-provisioning.",
+        "category": "sizing",
+        "impact": "Medium",
+        "potentialSavings": 88,
+        "resourceId": "i-ff2B9EC27CDcC4b7f",
+        "service": "EC2",
+        "actionableSteps": "* Modify instance type to t3.large"
+      },
+      {
+        "id": "rec-07",
+        "title": "Right-size oversized EC2 instance i-e4e7a8acEC75d82dF",
+        "description": "Resource is oversized with low CPU and memory utilization.",
+        "category": "sizing",
+        "impact": "Medium",
+        "potentialSavings": 88,
+        "resourceId": "i-e4e7a8acEC75d82dF",
+        "service": "EC2",
+        "actionableSteps": "* Modify instance type to t3.large"
+      },
+      {
+        "id": "rec-08",
+        "title": "Terminate idle EC2 instance i-AA41f3a4e36a6B24C",
+        "description": "Resource shows persistent idle status.",
         "category": "allocate",
-        "impact": "Low",
+        "impact": "Medium",
+        "potentialSavings": 39,
+        "resourceId": "i-AA41f3a4e36a6B24C",
+        "service": "EC2",
+        "actionableSteps": "* Terminate instance"
+      },
+      {
+        "id": "rec-09",
+        "title": "Clean up unattached S3 storage uniform-cappelletti-9786",
+        "description": "Bucket exhibits zero activity over 7 days.",
+        "category": "allocate",
+        "impact": "Medium",
         "potentialSavings": 18,
         "resourceId": "uniform-cappelletti-9786",
         "service": "S3",
-        "actionableSteps": "- Backup any essential objects to an archive. - Delete the bucket contents. - Delete the bucket through the S3 Management Console."
+        "actionableSteps": "* Back up bucket contents\n* Empty bucket and delete"
+      },
+      {
+        "id": "rec-10",
+        "title": "Clean up unattached S3 storage informal-yak-2798",
+        "description": "Bucket shows zero activity over 7 days.",
+        "category": "allocate",
+        "impact": "Medium",
+        "potentialSavings": 18,
+        "resourceId": "informal-yak-2798",
+        "service": "S3",
+        "actionableSteps": "* Delete unused bucket"
+      },
+      {
+        "id": "rec-11",
+        "title": "Implement scheduling for development EC2 i-6FDAC61FfeBd8FC56",
+        "description": "Development environment instance should be stopped during non-working hours.",
+        "category": "usage",
+        "impact": "Low",
+        "potentialSavings": 34,
+        "resourceId": "i-6FDAC61FfeBd8FC56",
+        "service": "EC2",
+        "actionableSteps": "* Use AWS Instance Scheduler\n* Set schedule to stop outside 09:00-17:00 M-F"
       }
     ]
   }

@@ -55,10 +55,7 @@ export default function TotalInsights({ totalActions = 0, totalSavings = 0, isLo
             <p className="text-xs text-gray-400 mt-0.5">Discovered across all resources</p>
           </div>
         </div>
-        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm">
-          <ArrowTrendingUpIcon className="w-3 h-3" />
-          <span>New</span>
-        </div>
+        
       </div>
 
       <div className="relative z-10 mt-6">

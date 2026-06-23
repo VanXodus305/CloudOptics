@@ -1,15 +1,36 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircleIcon, DocumentMagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, DocumentMagnifyingGlassIcon, DocumentDuplicateIcon, CheckIcon, ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export default function RecommendationsList({ recommendations = [], activeCategory, isLoading = false }) {
   const impactPriority = { High: 3, Medium: 2, Low: 1 };
+  const [copiedId, setCopiedId] = useState(null);
+  const [expandedSteps, setExpandedSteps] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const toggleSteps = (id) => {
+    setExpandedSteps((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleCopy = (idText, recId) => {
+    navigator.clipboard.writeText(idText);
+    setCopiedId(recId);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const filteredRecs = recommendations
     .filter((rec) => {
-      if (activeCategory === "all") return true;
-      return rec.category === activeCategory;
+      if (activeCategory !== "all" && rec.category !== activeCategory) return false;
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase();
+        const matchesTitle = rec.title?.toLowerCase().includes(query);
+        const matchesDesc = rec.description?.toLowerCase().includes(query);
+        const matchesService = rec.service?.toLowerCase().includes(query);
+        const matchesId = rec.resourceId?.toLowerCase().includes(query);
+        return matchesTitle || matchesDesc || matchesService || matchesId;
+      }
+      return true;
     })
     .sort((a, b) => {
       const priorityA = impactPriority[a.impact] || 0;
@@ -24,11 +45,11 @@ export default function RecommendationsList({ recommendations = [], activeCatego
     <AnimatePresence mode="wait">
       <motion.div
         key={activeCategory + "-" + isLoading}
-        initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.4, type: "spring", stiffness: 200, damping: 20 }}
-        className="bg-white/40 backdrop-blur-3xl border-t border-white/60 p-6 md:p-8 flex-grow rounded-b-3xl shadow-2xl relative overflow-hidden flex flex-col min-h-[400px]"
+        className="bg-white/40 backdrop-blur-3xl border-t border-white/60 p-6 md:p-8 flex-grow rounded-b-3xl shadow-2xl relative overflow-hidden flex flex-col min-h-[400px] will-change-transform"
       >
         {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-[#792CA2]/10 via-[#111844]/5 to-transparent rounded-full blur-[80px] pointer-events-none" />
@@ -65,16 +86,48 @@ export default function RecommendationsList({ recommendations = [], activeCatego
           </div>
         ) : (
           <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col gap-4">
+            {/* Search and Impact Summary Container */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2 px-1">
+              <div className="relative w-full md:w-96 shadow-sm rounded-xl">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search recommendations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-white/60 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#792CA2]/50 focus:border-transparent sm:text-sm transition-all"
+                />
+              </div>
+
+              {/* Impact Summary Indicator */}
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                <span className="text-[11px] font-black text-[#111844] uppercase tracking-widest">Impact Summary:</span>
+              <div className="flex gap-2">
+                <span className="bg-red-50 text-red-600 border border-red-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                  High: {filteredRecs.filter(r => r.impact === 'High').length}
+                </span>
+                <span className="bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                  Medium: {filteredRecs.filter(r => r.impact === 'Medium').length}
+                </span>
+                <span className="bg-green-50 text-green-600 border border-green-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                  Low: {filteredRecs.filter(r => r.impact === 'Low').length}
+                </span>
+              </div>
+            </div>
+            </div>
+
             {filteredRecs.map((rec) => {
               return (
                 <div
                   key={rec.id}
-                  className={`bg-white/80 hover:bg-white backdrop-blur-md rounded-2xl p-5 md:p-6 shadow-md border-l-4 hover:shadow-xl hover:-translate-y-0.5 transition-all flex flex-col md:flex-row gap-4 justify-between items-start md:items-center ${
+                  className={`bg-white/90 hover:bg-white rounded-2xl p-5 md:p-6 shadow-md border-l-4 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-out will-change-transform flex flex-col md:flex-row gap-4 justify-between items-start md:items-center ${
                     rec.impact === "High"
                       ? "border-l-red-500"
                       : rec.impact === "Medium"
                       ? "border-l-amber-500"
-                      : "border-l-blue-500"
+                      : "border-l-green-500"
                   }`}
                 >
                   <div className="flex gap-4 items-start flex-grow w-full md:w-auto">
@@ -90,12 +143,23 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                             ? "bg-red-50 text-red-600 border border-red-100"
                             : rec.impact === "Medium"
                             ? "bg-amber-50 text-amber-600 border border-amber-100"
-                            : "bg-blue-50 text-blue-600 border border-blue-100"
+                            : "bg-green-50 text-green-600 border border-green-100"
                         }`}>
-                          {rec.impact} Impact
+                          {rec.impact} 
                         </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-gray-50 border border-gray-150 text-gray-500 font-mono">
+                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-gray-50 border border-gray-150 text-gray-500 font-mono">
                           ID: {rec.resourceId}
+                          <button
+                            onClick={() => handleCopy(rec.resourceId, rec.id)}
+                            className="text-gray-400 hover:text-[#792CA2] transition-colors focus:outline-none"
+                            title="Copy ID"
+                          >
+                            {copiedId === rec.id ? (
+                              <CheckIcon className="w-3 h-3 text-green-500" />
+                            ) : (
+                              <DocumentDuplicateIcon className="w-3 h-3" />
+                            )}
+                          </button>
                         </span>
                       </div>
 
@@ -103,11 +167,35 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                       <p className="text-xs md:text-sm text-gray-500 font-medium leading-relaxed max-w-2xl mt-0.5">{rec.description}</p>
                       
                       {rec.actionableSteps && (
-                        <div className="mt-3 bg-gray-50/70 border border-gray-100 rounded-xl p-3 text-[11px] md:text-xs text-gray-600 space-y-1 font-mono">
-                          <p className="font-bold text-gray-400 uppercase tracking-wider text-[9px] mb-1.5 font-sans">Actionable Steps:</p>
-                          {rec.actionableSteps.split("\n").map((step, idx) => (
-                            <p key={idx} className="leading-tight">{step}</p>
-                          ))}
+                        <div className="mt-3 bg-[#792CA2]/5 border border-[#792CA2]/20 rounded-xl overflow-hidden transition-all duration-300">
+                          <button 
+                            onClick={() => toggleSteps(rec.id)}
+                            className="w-full flex items-center justify-between p-3 focus:outline-none hover:bg-[#792CA2]/10 transition-colors"
+                          >
+                            <span className="font-bold text-[#792CA2] uppercase tracking-wider text-[10px] font-sans">
+                              Actionable Steps
+                            </span>
+                            <ChevronDownIcon className={`w-4 h-4 text-[#792CA2] transition-transform duration-300 ${expandedSteps[rec.id] ? "rotate-180" : ""}`} />
+                          </button>
+                          
+                          <AnimatePresence>
+                            {expandedSteps[rec.id] && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="px-3 pb-3 text-[11px] md:text-xs text-gray-700 font-sans"
+                              >
+                                <ol className="list-decimal pl-5 space-y-1.5 font-mono">
+                                  {rec.actionableSteps.split(/(?:\n|\*)/).map((step, idx) => {
+                                    const cleanStep = step.replace(/^[\*\s]+/, '').replace(/^\d+[\.\)]\s*/, '').trim();
+                                    if (!cleanStep) return null;
+                                    return <li key={idx} className="leading-relaxed pl-1">{cleanStep}</li>;
+                                  })}
+                                </ol>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       )}
                     </div>
