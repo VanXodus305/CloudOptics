@@ -6,8 +6,9 @@ import { calculateAlerts } from "../../../lib/alerts-helper";
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs/promises";
 import path from "path";
+import os from "os";
 
-const CACHE_FILE = path.join(process.cwd(), "src/app/api/recommendations", "cache.json");
+const CACHE_FILE = path.join(os.tmpdir(), "cloudoptics_recommendations_cache.json");
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour time-to-live
 
 // Global in-memory cache variable (persists during process lifetime)
@@ -67,8 +68,12 @@ export async function GET(request) {
       };
       memoryCache = cachePayload;
       
-      await fs.mkdir(path.dirname(CACHE_FILE), { recursive: true });
-      await fs.writeFile(CACHE_FILE, JSON.stringify(cachePayload, null, 2), "utf-8");
+      try {
+        await fs.mkdir(path.dirname(CACHE_FILE), { recursive: true });
+        await fs.writeFile(CACHE_FILE, JSON.stringify(cachePayload, null, 2), "utf-8");
+      } catch (writeError) {
+        console.warn("Failed to write empty response to persistent cache file:", writeError.message);
+      }
       
       return Response.json(emptyResponse);
     }
@@ -212,11 +217,12 @@ CRITICAL INSTRUCTIONS FOR THE RESPONSE:
 
     memoryCache = cachePayload;
 
-    // Ensure parent directory of cache file exists
-    await fs.mkdir(path.dirname(CACHE_FILE), { recursive: true });
-    
-    // Save to cache file
-    await fs.writeFile(CACHE_FILE, JSON.stringify(cachePayload, null, 2), "utf-8");
+    try {
+      await fs.mkdir(path.dirname(CACHE_FILE), { recursive: true });
+      await fs.writeFile(CACHE_FILE, JSON.stringify(cachePayload, null, 2), "utf-8");
+    } catch (writeError) {
+      console.warn("Failed to write to persistent cache file:", writeError.message);
+    }
 
     return Response.json(result);
   } catch (error) {
