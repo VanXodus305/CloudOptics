@@ -38,7 +38,7 @@ export async function GET(request) {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     // 2. Fetch metric aggregates for utilization and resources
-    const [utilizationStats, costTrends] = await Promise.all([
+    const [utilizationStats, costTrends, utilizationTrends] = await Promise.all([
       Metric.aggregate([
         {
           $match: {
@@ -47,13 +47,16 @@ export async function GET(request) {
           },
         },
         {
+          $sort: { timestamp: -1 }
+        },
+        {
           $group: {
             _id: "$resourceId",
-            avgCpu: { $avg: "$cpuUtilization" },
-            avgMemory: { $avg: "$memoryUtilization" },
-            avgStorage: { $avg: "$storageSizeGB" },
-            avgReadOps: { $avg: "$readOperations" },
-            avgWriteOps: { $avg: "$writeOperations" },
+            avgCpu: { $first: "$cpuUtilization" },
+            avgMemory: { $first: "$memoryUtilization" },
+            avgStorage: { $first: "$storageSizeGB" },
+            avgReadOps: { $first: "$readOperations" },
+            avgWriteOps: { $first: "$writeOperations" },
             totalCost: { $sum: "$costIncurred" },
           },
         },
@@ -93,6 +96,45 @@ export async function GET(request) {
             hour: "$_id.hour",
             service: "$_id.service",
             cost: 1,
+            readOps: 1,
+            writeOps: 1,
+          },
+        },
+      ]),
+      Metric.aggregate([
+        {
+          $match: {
+            resourceId: { $in: resourceIds },
+            timestamp: { $gte: thirtyDaysAgo },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              resourceId: "$resourceId",
+              year: { $year: "$timestamp" },
+              month: { $month: "$timestamp" },
+              day: { $dayOfMonth: "$timestamp" },
+              hour: { $hour: "$timestamp" },
+            },
+            cpu: { $avg: "$cpuUtilization" },
+            memory: { $avg: "$memoryUtilization" },
+            storage: { $avg: "$storageSizeGB" },
+            readOps: { $avg: "$readOperations" },
+            writeOps: { $avg: "$writeOperations" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            resourceId: "$_id.resourceId",
+            year: "$_id.year",
+            month: "$_id.month",
+            day: "$_id.day",
+            hour: "$_id.hour",
+            cpu: 1,
+            memory: 1,
+            storage: 1,
             readOps: 1,
             writeOps: 1,
           },
@@ -148,6 +190,7 @@ export async function GET(request) {
     return Response.json({
       resources: formattedResources,
       costTrends,
+      utilizationTrends,
       serviceCounts,
     });
   } catch (error) {

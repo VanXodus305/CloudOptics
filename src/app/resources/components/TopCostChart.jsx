@@ -23,7 +23,7 @@ export default function MostlyUsedChart({
   const [timeFilter, setTimeFilter] = useState("Hourly");
 
   const [resourceFilterOpen, setResourceFilterOpen] = useState(false);
-  const [resourceFilter, setResourceFilter] = useState("EC2");
+  const [resourceFilter, setResourceFilter] = useState("All");
   const [showDetails, setShowDetails] = useState(false);
   const [drilldownTime, setDrilldownTime] = useState(null);
 
@@ -56,11 +56,19 @@ export default function MostlyUsedChart({
     if (timeFilter === "Select Time" || resourceFilter === "Select Resource") return [];
 
     // Filter trends by resource type
-    const filteredTrends = costTrends.filter((t) => t.service === resourceFilter);
+    const filteredTrends = resourceFilter === "All" ? costTrends : costTrends.filter((t) => t.service === resourceFilter);
 
     if (timeFilter === "Hourly") {
-      // Last 24 hours of data points
-      const sorted = [...filteredTrends].sort((a, b) => {
+      // Group by hour
+      const hourlyMap = {};
+      filteredTrends.forEach((t) => {
+        const key = `${t.year}-${t.month}-${t.day}-${t.hour}`;
+        if (!hourlyMap[key]) {
+          hourlyMap[key] = { year: t.year, month: t.month, day: t.day, hour: t.hour, cost: 0 };
+        }
+        hourlyMap[key].cost += t.cost;
+      });
+      const sorted = Object.values(hourlyMap).sort((a, b) => {
         const dateA = new Date(a.year, a.month - 1, a.day, a.hour);
         const dateB = new Date(b.year, b.month - 1, b.day, b.hour);
         return dateA - dateB;
@@ -137,12 +145,12 @@ export default function MostlyUsedChart({
 
   const data = getChartData();
   const timeOptions = ["Hourly", "Daily", "Weekly", "Monthly"];
-  const resourceOptions = ["EC2", "S3", "RDS"];
+  const resourceOptions = ["All", "EC2", "S3", "RDS"];
 
   // Actual drilldown resources list
   const drilldownPieData = drilldownTime
     ? resources
-        .filter((r) => r.service === resourceFilter)
+        .filter((r) => resourceFilter === "All" || r.service === resourceFilter)
         .map((r) => ({
           name: r.resourceId,
           value: Math.round(r.totalCost || r.projectedMonthlyCost),

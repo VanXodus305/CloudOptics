@@ -201,7 +201,7 @@ export default function CostResourceChart({
           ) : (
             <div className="flex flex-col items-start">
               <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
-                Resources Mostly Used
+                Resources Average Cost
               </span>
               <span className="text-[11px] text-gray-400 font-medium mt-0.5 tracking-normal">
                 Click chart bar for details

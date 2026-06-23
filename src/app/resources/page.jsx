@@ -128,8 +128,8 @@ export default function ResourcesPage() {
     if (status !== "authenticated") return;
 
     let active = true;
-    async function fetchData() {
-      setIsDataLoading(true);
+    async function fetchData(isBackground = false) {
+      if (!isBackground) setIsDataLoading(true);
       try {
         const res = await fetch(`/api/resources/dashboard?environment=${selectedEnvironment}`);
         if (!res.ok) throw new Error("Failed to fetch dashboard data");
@@ -140,15 +140,22 @@ export default function ResourcesPage() {
       } catch (err) {
         console.error(err);
       } finally {
-        if (active) {
+        if (active && !isBackground) {
           setIsDataLoading(false);
         }
       }
     }
 
-    fetchData();
+    fetchData(false);
+    
+    // Poll every 10 seconds for real-time updates
+    const intervalId = setInterval(() => {
+      fetchData(true);
+    }, 10000);
+
     return () => {
       active = false;
+      clearInterval(intervalId);
     };
   }, [status, selectedEnvironment]);
 
@@ -390,6 +397,7 @@ export default function ResourcesPage() {
               <UtilizationChart
                 environment={selectedEnvironment}
                 resources={dashboardData?.resources || []}
+                utilizationTrends={dashboardData?.utilizationTrends || []}
                 isLoading={isDataLoading}
               />
             </motion.div>
