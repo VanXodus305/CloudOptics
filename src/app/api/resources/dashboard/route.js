@@ -33,30 +33,36 @@ export async function GET(request) {
     const s3Ids = resources.filter((r) => r.serviceType === "S3").map((r) => r.resourceId);
     const rdsIds = resources.filter((r) => r.serviceType === "RDS").map((r) => r.resourceId);
 
-    // 30 days ago
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    // Find the latest timestamp in the DB to use as anchor for query windows
+    const latestMetric = await Metric.findOne()
+      .sort({ timestamp: -1 })
+      .select("timestamp")
+      .lean();
+    const latestTimestamp = latestMetric ? new Date(latestMetric.timestamp) : new Date();
+
+    const twentyFourHoursBeforeLatest = new Date(latestTimestamp);
+    twentyFourHoursBeforeLatest.setHours(twentyFourHoursBeforeLatest.getHours() - 24);
+
+    const thirtyDaysBeforeLatest = new Date(latestTimestamp);
+    thirtyDaysBeforeLatest.setDate(thirtyDaysBeforeLatest.getDate() - 30);
 
     // 2. Fetch metric aggregates for utilization and resources
-    const [utilizationStats, costTrends, utilizationTrends] = await Promise.all([
+    const [utilizationStats, costTrendsDaily, costTrendsHourly] = await Promise.all([
       Metric.aggregate([
         {
           $match: {
             resourceId: { $in: resourceIds },
-            timestamp: { $gte: thirtyDaysAgo },
+            timestamp: { $gte: thirtyDaysBeforeLatest, $lte: latestTimestamp },
           },
-        },
-        {
-          $sort: { timestamp: -1 }
         },
         {
           $group: {
             _id: "$resourceId",
-            avgCpu: { $first: "$cpuUtilization" },
-            avgMemory: { $first: "$memoryUtilization" },
-            avgStorage: { $first: "$storageSizeGB" },
-            avgReadOps: { $first: "$readOperations" },
-            avgWriteOps: { $first: "$writeOperations" },
+            avgCpu: { $avg: "$cpuUtilization" },
+            avgMemory: { $avg: "$memoryUtilization" },
+            avgStorage: { $avg: "$storageSizeGB" },
+            avgReadOps: { $avg: "$readOperations" },
+            avgWriteOps: { $avg: "$writeOperations" },
             totalCost: { $sum: "$costIncurred" },
           },
         },
@@ -65,7 +71,45 @@ export async function GET(request) {
         {
           $match: {
             resourceId: { $in: resourceIds },
-            timestamp: { $gte: thirtyDaysAgo },
+            timestamp: { $gte: thirtyDaysBeforeLatest, $lte: latestTimestamp },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$timestamp" },
+              month: { $month: "$timestamp" },
+              day: { $dayOfMonth: "$timestamp" },
+              service: {
+                $cond: [
+                  { $in: ["$resourceId", ec2Ids] }, "EC2",
+                  { $cond: [{ $in: ["$resourceId", s3Ids] }, "S3", "RDS"] }
+                ]
+              }
+            },
+            cost: { $sum: "$costIncurred" },
+            readOps: { $sum: "$readOperations" },
+            writeOps: { $sum: "$writeOperations" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            year: "$_id.year",
+            month: "$_id.month",
+            day: "$_id.day",
+            service: "$_id.service",
+            cost: 1,
+            readOps: 1,
+            writeOps: 1,
+          },
+        },
+      ]),
+      Metric.aggregate([
+        {
+          $match: {
+            resourceId: { $in: resourceIds },
+            timestamp: { $gte: twentyFourHoursBeforeLatest, $lte: latestTimestamp },
           },
         },
         {
@@ -96,45 +140,6 @@ export async function GET(request) {
             hour: "$_id.hour",
             service: "$_id.service",
             cost: 1,
-            readOps: 1,
-            writeOps: 1,
-          },
-        },
-      ]),
-      Metric.aggregate([
-        {
-          $match: {
-            resourceId: { $in: resourceIds },
-            timestamp: { $gte: thirtyDaysAgo },
-          },
-        },
-        {
-          $group: {
-            _id: {
-              resourceId: "$resourceId",
-              year: { $year: "$timestamp" },
-              month: { $month: "$timestamp" },
-              day: { $dayOfMonth: "$timestamp" },
-              hour: { $hour: "$timestamp" },
-            },
-            cpu: { $avg: "$cpuUtilization" },
-            memory: { $avg: "$memoryUtilization" },
-            storage: { $avg: "$storageSizeGB" },
-            readOps: { $avg: "$readOperations" },
-            writeOps: { $avg: "$writeOperations" },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            resourceId: "$_id.resourceId",
-            year: "$_id.year",
-            month: "$_id.month",
-            day: "$_id.day",
-            hour: "$_id.hour",
-            cpu: 1,
-            memory: 1,
-            storage: 1,
             readOps: 1,
             writeOps: 1,
           },
@@ -189,10 +194,13 @@ export async function GET(request) {
 
     return Response.json({
       resources: formattedResources,
-      costTrends,
-      utilizationTrends,
+      costTrends: {
+        daily: costTrendsDaily,
+        hourly: costTrendsHourly,
+      },
       serviceCounts,
     });
+
   } catch (error) {
     console.error("Error fetching resources dashboard:", error);
     return Response.json(

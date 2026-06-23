@@ -15,7 +15,8 @@ import {
 
 export default function MostlyUsedChart({
   environment = "Production",
-  costTrends = [],
+  costTrendsDaily = [],
+  costTrendsHourly = [],
   resources = [],
   isLoading = false,
 }) {
@@ -56,7 +57,9 @@ export default function MostlyUsedChart({
     if (timeFilter === "Select Time" || resourceFilter === "Select Resource") return [];
 
     // Filter trends by resource type
-    const filteredTrends = resourceFilter === "All" ? costTrends : costTrends.filter((t) => t.service === resourceFilter);
+    const trendsToUse = timeFilter === "Hourly" ? costTrendsHourly : costTrendsDaily;
+    const filteredTrends = resourceFilter === "All" ? trendsToUse : trendsToUse.filter((t) => t.service === resourceFilter);
+
 
     if (timeFilter === "Hourly") {
       // Group by hour

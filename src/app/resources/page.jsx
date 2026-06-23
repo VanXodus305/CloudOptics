@@ -148,10 +148,10 @@ export default function ResourcesPage() {
 
     fetchData(false);
     
-    // Poll every 10 seconds for real-time updates
+    // Poll every 30 seconds for real-time updates
     const intervalId = setInterval(() => {
       fetchData(true);
-    }, 10000);
+    }, 30000);
 
     return () => {
       active = false;
@@ -351,7 +351,8 @@ export default function ResourcesPage() {
             >
               <TopCostChart
                 environment={selectedEnvironment}
-                costTrends={dashboardData?.costTrends || []}
+                costTrendsDaily={dashboardData?.costTrends?.daily || []}
+                costTrendsHourly={dashboardData?.costTrends?.hourly || []}
                 resources={dashboardData?.resources || []}
                 isLoading={isDataLoading}
               />
@@ -381,7 +382,8 @@ export default function ResourcesPage() {
                 <CostResourceChart
                   environment={selectedEnvironment}
                   resources={dashboardData?.resources || []}
-                  costTrends={dashboardData?.costTrends || []}
+                  costTrendsDaily={dashboardData?.costTrends?.daily || []}
+                  costTrendsHourly={dashboardData?.costTrends?.hourly || []}
                   isLoading={isDataLoading}
                 />
               </motion.div>
@@ -397,7 +399,6 @@ export default function ResourcesPage() {
               <UtilizationChart
                 environment={selectedEnvironment}
                 resources={dashboardData?.resources || []}
-                utilizationTrends={dashboardData?.utilizationTrends || []}
                 isLoading={isDataLoading}
               />
             </motion.div>

@@ -19,7 +19,6 @@ import {
 export default function UtilizationChart({
   environment = "Production",
   resources = [],
-  utilizationTrends = [],
   isLoading = false,
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
@@ -34,6 +33,9 @@ export default function UtilizationChart({
   const [drilldownMetric, setDrilldownMetric] = useState(null);
   const [showAllInstances, setShowAllInstances] = useState(false);
 
+  const [activeTrends, setActiveTrends] = useState({ hourly: [], daily: [] });
+  const [isTrendsLoading, setIsTrendsLoading] = useState(false);
+
   const coordsRef = useRef({});
   const filterRef = useRef(null);
 
@@ -41,6 +43,38 @@ export default function UtilizationChart({
     setDrilldownServer(null);
     setDrilldownMetric(null);
   }, [environment, serviceFilter]);
+
+  useEffect(() => {
+    if (!drilldownServer) {
+      setActiveTrends({ hourly: [], daily: [] });
+      return;
+    }
+
+    let active = true;
+    async function fetchTrends() {
+      setIsTrendsLoading(true);
+      try {
+        const res = await fetch(`/api/resources/trends?resourceId=${drilldownServer}`);
+        if (!res.ok) throw new Error("Failed to fetch resource trends");
+        const json = await res.json();
+        if (active) {
+          setActiveTrends(json);
+        }
+      } catch (err) {
+        console.error("Failed to fetch resource trends:", err);
+      } finally {
+        if (active) {
+          setIsTrendsLoading(false);
+        }
+      }
+    }
+
+    fetchTrends();
+
+    return () => {
+      active = false;
+    };
+  }, [drilldownServer]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -133,8 +167,8 @@ export default function UtilizationChart({
   const getTrendData = () => {
     if (!drilldownServer || !drilldownMetric) return [];
     
-    // Filter trends for this specific server
-    const serverTrends = utilizationTrends.filter(t => t.resourceId === drilldownServer);
+    // Use on-demand fetched trend data grouped by the appropriate frequency
+    const serverTrends = timeFilter === "Hourly" ? activeTrends.hourly : activeTrends.daily;
     
     const getMetricValue = (t) => {
       if (drilldownMetric === "CPU") return t.cpu || 0;
@@ -267,7 +301,7 @@ export default function UtilizationChart({
         }
       `}</style>
       {/* Subtle loading overlay */}
-      {isLoading && (
+      {(isLoading || isTrendsLoading) && (
         <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
         </div>

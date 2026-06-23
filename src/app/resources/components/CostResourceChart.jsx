@@ -18,7 +18,8 @@ import {
 export default function CostResourceChart({
   environment = "Production",
   resources = [],
-  costTrends = [],
+  costTrendsDaily = [],
+  costTrendsHourly = [],
   isLoading = false,
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
@@ -81,7 +82,9 @@ export default function CostResourceChart({
   const getTrendData = () => {
     if (!drilldownResource) return [];
 
-    const filteredTrends = costTrends.filter((t) => t.service === drilldownResource);
+    const trendsToUse = timeFilter === "Hourly" ? costTrendsHourly : costTrendsDaily;
+    const filteredTrends = trendsToUse.filter((t) => t.service === drilldownResource);
+
 
     if (timeFilter === "Hourly") {
       // Last 24 hours of data
