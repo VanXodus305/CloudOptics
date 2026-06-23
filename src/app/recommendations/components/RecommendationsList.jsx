@@ -19,9 +19,13 @@ export default function RecommendationsList({ recommendations = [], activeCatego
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const filteredRecs = recommendations
+  const categoryRecs = recommendations.filter((rec) => {
+    if (activeCategory === "all") return true;
+    return rec.category === activeCategory;
+  });
+
+  const filteredRecs = categoryRecs
     .filter((rec) => {
-      if (activeCategory !== "all" && rec.category !== activeCategory) return false;
       if (searchQuery.trim() !== "") {
         const query = searchQuery.toLowerCase();
         const matchesTitle = rec.title?.toLowerCase().includes(query);
@@ -68,7 +72,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
               </div>
             ))}
           </div>
-        ) : filteredRecs.length === 0 ? (
+        ) : categoryRecs.length === 0 ? (
           <div className="relative z-10 flex flex-col items-center justify-center flex-grow max-w-md text-center mx-auto">
             <div className="w-24 h-24 bg-gradient-to-br from-white to-gray-50 rounded-full shadow-xl flex items-center justify-center mb-6 border border-white/80 relative">
               <DocumentMagnifyingGlassIcon className="w-12 h-12 text-[#792CA2]" />
@@ -118,7 +122,13 @@ export default function RecommendationsList({ recommendations = [], activeCatego
             </div>
             </div>
 
-            {filteredRecs.map((rec) => {
+            {filteredRecs.length === 0 ? (
+              <div className="relative z-10 flex flex-col items-center justify-center py-12 text-center bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100">
+                <DocumentMagnifyingGlassIcon className="w-12 h-12 text-gray-300 mb-4" />
+                <h3 className="text-lg font-bold text-gray-700 mb-1">No results found</h3>
+                <p className="text-gray-500 text-sm">We couldn't find anything matching "{searchQuery}".</p>
+              </div>
+            ) : filteredRecs.map((rec) => {
               return (
                 <div
                   key={rec.id}
