@@ -29,10 +29,38 @@ export default function RecommendationsPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [currentDate, setCurrentDate] = useState("");
   
-  // State for recommendations category
+  // State for recommendations data & category
   const [activeCategory, setActiveCategory] = useState("all");
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [error, setError] = useState(null);
 
   const profileRef = useRef(null);
+
+  const fetchRecommendations = async (regenerate = false) => {
+    if (regenerate) {
+      setIsRegenerating(true);
+    } else {
+      setIsLoading(true);
+    }
+    setError(null);
+    try {
+      const url = regenerate ? "/api/recommendations?regenerate=true" : "/api/recommendations";
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Failed to fetch recommendations");
+      }
+      const json = await res.json();
+      setData(json);
+    } catch (err) {
+      console.error("Error loading recommendations:", err);
+      setError(err.message || "Failed to load recommendations");
+    } finally {
+      setIsLoading(false);
+      setIsRegenerating(false);
+    }
+  };
 
   useEffect(() => {
     setCurrentDate(
@@ -44,6 +72,13 @@ export default function RecommendationsPage() {
       })
     );
   }, []);
+
+  // Fetch initial recommendations when authenticated
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchRecommendations();
+    }
+  }, [status]);
 
   // Close dropdowns on click-away
   useEffect(() => {
@@ -141,10 +176,30 @@ export default function RecommendationsPage() {
         {/* MAIN CONTENT AREA */}
         <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 md:p-8">
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pt-4">
+            {error && (
+              <div className="mb-6 p-4 bg-red-100 border border-red-200 text-red-700 rounded-2xl text-xs font-semibold flex justify-between items-center shadow-sm">
+                <span>Error generating AI insights: {error}</span>
+                <button onClick={() => fetchRecommendations(false)} className="px-3 py-1 bg-red-200 hover:bg-red-300 rounded-lg transition-all">Retry</button>
+              </div>
+            )}
+
             {/* Top Row: Insights & AI Summary */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TotalInsights />
-              <AiSummary />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              <div className="lg:col-span-4 flex flex-col">
+                <TotalInsights 
+                  totalActions={data?.totalActionsCount} 
+                  totalSavings={data?.totalPotentialSavings} 
+                  isLoading={isLoading} 
+                />
+              </div>
+              <div className="lg:col-span-8 flex flex-col">
+                <AiSummary 
+                  aiSummary={data?.aiSummary} 
+                  isLoading={isLoading} 
+                  isRegenerating={isRegenerating} 
+                  onRegenerate={() => fetchRecommendations(true)} 
+                />
+              </div>
             </div>
 
             {/* Bottom Section: Tabs & List */}
@@ -154,7 +209,11 @@ export default function RecommendationsPage() {
               </div>
               
               <div className="flex flex-col flex-grow w-full">
-                <RecommendationsList activeCategory={activeCategory} />
+                <RecommendationsList 
+                  recommendations={data?.recommendations || []} 
+                  activeCategory={activeCategory} 
+                  isLoading={isLoading || isRegenerating} 
+                />
               </div>
             </div>
           </div>

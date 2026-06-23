@@ -1,0 +1,88 @@
+{
+  "timestamp": 1782196900881,
+  "data": {
+    "aiSummary": {
+      "overview": "Analysis of the current cloud resource landscape reveals significant potential for cost reduction through resource rightsizing, termination of idle infrastructure, and the implementation of automated scheduling for non-production environments.",
+      "keyFindings": [
+        "Significant waste detected due to idle compute and database instances.",
+        "Multiple oversized instances in production and testing environments exceeding resource requirements.",
+        "Unused S3 storage buckets accumulating costs without operational activity."
+      ],
+      "nextSteps": [
+        "Terminate resources identified as idle to immediately capture monthly cost savings.",
+        "Right-size oversized EC2 instances to align with observed CPU and memory utilization patterns.",
+        "Configure automated lifecycle policies or scheduling for non-production resources to optimize usage patterns."
+      ]
+    },
+    "totalActionsCount": 6,
+    "totalPotentialSavings": 438,
+    "recommendations": [
+      {
+        "id": "rec-01",
+        "title": "Terminate idle RDS instance rds-cp1250-general-ci-3y5khmbq",
+        "description": "Resource shows extremely low CPU utilization (2.40%). Given its status as a testing instance, termination will eliminate unnecessary spend.",
+        "category": "allocate",
+        "impact": "High",
+        "potentialSavings": 52,
+        "resourceId": "rds-cp1250-general-ci-3y5khmbq",
+        "service": "RDS",
+        "actionableSteps": "- Verify no downstream dependencies exist in the testing pipeline. - Execute RDS termination via AWS CLI: aws rds delete-db-instance --db-instance-identifier rds-cp1250-general-ci-3y5khmbq --skip-final-snapshot"
+      },
+      {
+        "id": "rec-02",
+        "title": "Terminate idle RDS instance rds-cp1250-bin-mzlffkww",
+        "description": "RDS instance is consistently idle with CPU utilization at 2.52%.",
+        "category": "allocate",
+        "impact": "High",
+        "potentialSavings": 65,
+        "resourceId": "rds-cp1250-bin-mzlffkww",
+        "service": "RDS",
+        "actionableSteps": "- Assess the necessity of the testing database environment. - Terminate the instance using the RDS console or CLI."
+      },
+      {
+        "id": "rec-03",
+        "title": "Downsize oversized EC2 instance i-C701577D7D6DdCfAA",
+        "description": "The current t3.2xlarge instance is significantly over-provisioned with max CPU at 12% and memory at 17%. Downgrading to a smaller instance class will reduce costs while maintaining performance.",
+        "category": "sizing",
+        "impact": "Medium",
+        "potentialSavings": 90,
+        "resourceId": "i-C701577D7D6DdCfAA",
+        "service": "EC2",
+        "actionableSteps": "- Stop the instance. - Modify the instance type to a smaller tier (e.g., t3.large). - Start the instance."
+      },
+      {
+        "id": "rec-04",
+        "title": "Right-size oversized EC2 instance i-ff2B9EC27CDcC4b7f",
+        "description": "Production testing instance is underutilized with max 12% CPU. Migration to a smaller instance type is recommended.",
+        "category": "sizing",
+        "impact": "Medium",
+        "potentialSavings": 89,
+        "resourceId": "i-ff2B9EC27CDcC4b7f",
+        "service": "EC2",
+        "actionableSteps": "- Perform instance type modification to t3.medium via AWS EC2 console."
+      },
+      {
+        "id": "rec-05",
+        "title": "Implement automated scheduling for instance i-b2BfAaF9e7eCeAF2c",
+        "description": "Development instance exhibits high idle time. Implementing a stop/start schedule for non-working hours will yield substantial savings.",
+        "category": "usage",
+        "impact": "Medium",
+        "potentialSavings": 64,
+        "resourceId": "i-b2BfAaF9e7eCeAF2c",
+        "service": "EC2",
+        "actionableSteps": "- Use AWS Instance Scheduler to stop the instance between 8 PM and 7 AM daily."
+      },
+      {
+        "id": "rec-06",
+        "title": "Clean up unattached S3 bucket uniform-cappelletti-9786",
+        "description": "Bucket exhibits zero operations over 7 days, indicating it is unused and contributing to storage overhead.",
+        "category": "allocate",
+        "impact": "Low",
+        "potentialSavings": 18,
+        "resourceId": "uniform-cappelletti-9786",
+        "service": "S3",
+        "actionableSteps": "- Backup any essential objects to an archive. - Delete the bucket contents. - Delete the bucket through the S3 Management Console."
+      }
+    ]
+  }
+}
