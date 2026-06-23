@@ -28,7 +28,7 @@ export default function RecommendationsPage() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [currentDate, setCurrentDate] = useState("");
-  
+
   // State for recommendations data & category
   const [activeCategory, setActiveCategory] = useState("all");
   const [data, setData] = useState(null);
@@ -167,14 +167,14 @@ export default function RecommendationsPage() {
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
           isLiveSimulation={false}
-          setIsLiveSimulation={() => {}}
+          setIsLiveSimulation={() => { }}
           handleSignOut={handleSignOut}
-          setIsResourcesModalOpen={() => {}}
-          setIsAlertsModalOpen={() => {}}
+          setIsResourcesModalOpen={() => { }}
+          setIsAlertsModalOpen={() => { }}
         />
 
         {/* MAIN CONTENT AREA */}
-        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 md:p-8">
+        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 pb-24 md:p-8 md:pb-8">
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pt-4">
             {error && (
               <div className="mb-6 p-4 bg-red-100 border border-red-200 text-red-700 rounded-2xl text-xs font-semibold flex justify-between items-center shadow-sm">
@@ -186,38 +186,38 @@ export default function RecommendationsPage() {
             {/* Top Row: Insights & AI Summary */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               <div className="lg:col-span-4 flex flex-col">
-                <TotalInsights 
-                  totalActions={data?.totalActionsCount} 
-                  totalSavings={data?.totalPotentialSavings} 
-                  isLoading={isLoading} 
+                <TotalInsights
+                  totalActions={data?.totalActionsCount}
+                  totalSavings={data?.totalPotentialSavings}
+                  isLoading={isLoading}
                 />
               </div>
               <div className="lg:col-span-8 flex flex-col">
-                <AiSummary 
-                  aiSummary={data?.aiSummary} 
-                  isLoading={isLoading} 
-                  isRegenerating={isRegenerating} 
-                  onRegenerate={() => fetchRecommendations(true)} 
+                <AiSummary
+                  aiSummary={data?.aiSummary}
+                  isLoading={isLoading}
+                  isRegenerating={isRegenerating}
+                  onRegenerate={() => fetchRecommendations(true)}
                 />
               </div>
             </div>
 
             {/* Bottom Section: Tabs & List */}
             <div className="flex flex-col flex-grow mt-6 gap-6">
-              <div className="flex items-center justify-center relative z-50">
+              <div className="flex items-center justify-center relative">
                 <CategoryTabs activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
               </div>
-              
+
               <div className="flex flex-col flex-grow w-full">
-                <RecommendationsList 
-                  recommendations={data?.recommendations || []} 
-                  activeCategory={activeCategory} 
-                  isLoading={isLoading || isRegenerating} 
+                <RecommendationsList
+                  recommendations={data?.recommendations || []}
+                  activeCategory={activeCategory}
+                  isLoading={isLoading || isRegenerating}
                 />
               </div>
             </div>
           </div>
-          
+
           <div className="mt-8 hidden md:block -mx-4 md:-mx-8 -mb-4 md:-mb-8">
             <Footer reduced={true} />
           </div>

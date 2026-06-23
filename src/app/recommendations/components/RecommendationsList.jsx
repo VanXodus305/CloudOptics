@@ -196,12 +196,21 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                                 exit={{ height: 0, opacity: 0 }}
                                 className="px-3 pb-3 text-[11px] md:text-xs text-gray-700 font-sans"
                               >
-                                <ol className="list-decimal pl-5 space-y-1.5 font-mono">
-                                  {rec.actionableSteps.split(/(?:\n|\*)/).map((step, idx) => {
-                                    const cleanStep = step.replace(/^[\*\s]+/, '').replace(/^\d+[\.\)]\s*/, '').trim();
-                                    if (!cleanStep) return null;
-                                    return <li key={idx} className="leading-relaxed pl-1">{cleanStep}</li>;
-                                  })}
+                                <ol className="list-decimal pl-5 space-y-2 font-mono">
+                                  {(() => {
+                                    let raw = rec.actionableSteps || "";
+                                    if (!/\n|\*|(?:\s|^)\d+\.\s/.test(raw)) {
+                                      raw = raw.replace(/\.\s+/g, '.\n');
+                                    }
+                                    const parts = raw.split(/(?:\n|\*|(?:\s|^)\d+\.\s)/);
+                                    return parts.map((step, idx) => {
+                                      const cleanStep = step.replace(/^[\*\-\s]+/, '').replace(/^\d+[\.\)]\s*/, '').trim();
+                                      if (!cleanStep) return null;
+                                      // Ensure each step ends with a period for consistency
+                                      const finalStep = cleanStep.endsWith('.') ? cleanStep : cleanStep + '.';
+                                      return <li key={idx} className="leading-relaxed pl-1 text-gray-600">{finalStep}</li>;
+                                    });
+                                  })()}
                                 </ol>
                               </motion.div>
                             )}
