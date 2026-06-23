@@ -118,8 +118,24 @@ export default function MostlyUsedChart({
         const endIndex = sortedKeys.length - (3 - i) * 7;
         const weekSliceKeys = sortedKeys.slice(startIndex, endIndex);
         const weekSum = weekSliceKeys.reduce((sum, k) => sum + dailyCosts[k], 0);
+        
+        let weekLabel = `Week ${i + 1}`;
+        if (weekSliceKeys.length > 0) {
+          const firstDay = weekSliceKeys[0];
+          const lastDay = weekSliceKeys[weekSliceKeys.length - 1];
+          const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          
+          const [y1, m1, d1] = firstDay.split("-");
+          const startStr = `${months[parseInt(m1, 10) - 1]} ${parseInt(d1, 10)}`;
+          
+          const [y2, m2, d2] = lastDay.split("-");
+          const endStr = `${months[parseInt(m2, 10) - 1]} ${parseInt(d2, 10)}`;
+          
+          weekLabel = `${startStr} - ${endStr}`;
+        }
+
         weekly.push({
-          name: `Week ${i + 1}`,
+          name: weekLabel,
           cost: Math.round(weekSum * 100) / 100,
         });
       }
@@ -167,6 +183,16 @@ export default function MostlyUsedChart({
 
   return (
     <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 h-[400px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+      <style>{`
+        .tick-text {
+          font-size: 8px;
+        }
+        @media (min-width: 768px) {
+          .tick-text {
+            font-size: 10px;
+          }
+        }
+      `}</style>
       {/* Subtle loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
@@ -346,7 +372,7 @@ export default function MostlyUsedChart({
               style={{ outline: "none" }}
               key={`${environment}-${timeFilter}-${resourceFilter}`}
               data={data}
-              margin={{ top: 30, right: 30, left: 30, bottom: 20 }}
+              margin={{ top: 30, right: 45, left: 45, bottom: 20 }}
               onClick={(e) => {
                 if (e && e.activeLabel) setDrilldownTime(e.activeLabel);
               }}
@@ -357,9 +383,15 @@ export default function MostlyUsedChart({
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#6B7280", fontSize: 10 }}
                 interval={timeFilter === "Hourly" ? 2 : 0}
                 dy={10}
+                tick={({ x, y, payload }) => (
+                  <g transform={`translate(${x},${y})`}>
+                    <text x={0} y={0} dy={10} textAnchor="middle" fill="#6B7280" className="tick-text">
+                      {payload.value}
+                    </text>
+                  </g>
+                )}
               >
                 <Label
                   value="Time ➔"

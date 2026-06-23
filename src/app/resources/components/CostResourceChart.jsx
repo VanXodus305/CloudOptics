@@ -135,8 +135,24 @@ export default function CostResourceChart({
         const endIndex = sortedKeys.length - (3 - i) * 7;
         const weekSliceKeys = sortedKeys.slice(startIndex, endIndex);
         const weekSum = weekSliceKeys.reduce((sum, k) => sum + dailyCosts[k], 0);
+        
+        let weekLabel = `Week ${i + 1}`;
+        if (weekSliceKeys.length > 0) {
+          const firstDay = weekSliceKeys[0];
+          const lastDay = weekSliceKeys[weekSliceKeys.length - 1];
+          const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          
+          const [y1, m1, d1] = firstDay.split("-");
+          const startStr = `${months[parseInt(m1, 10) - 1]} ${parseInt(d1, 10)}`;
+          
+          const [y2, m2, d2] = lastDay.split("-");
+          const endStr = `${months[parseInt(m2, 10) - 1]} ${parseInt(d2, 10)}`;
+          
+          weekLabel = `${startStr} - ${endStr}`;
+        }
+
         weekly.push({
-          time: `Week ${i + 1}`,
+          time: weekLabel,
           value: Math.round(weekSum * 100) / 100,
         });
       }
@@ -174,6 +190,16 @@ export default function CostResourceChart({
 
   return (
     <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 h-[380px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+      <style>{`
+        .tick-text {
+          font-size: 8px;
+        }
+        @media (min-width: 768px) {
+          .tick-text {
+            font-size: 10px;
+          }
+        }
+      `}</style>
       {/* Subtle loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
@@ -290,7 +316,7 @@ export default function CostResourceChart({
                 Cost ($) ➔
               </div>
               <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
-                <AreaChart style={{ outline: "none" }} data={drilldownTrendData} margin={{ top: 20, right: 10, left: 15, bottom: 35 }}>
+                <AreaChart style={{ outline: "none" }} data={drilldownTrendData} margin={{ top: 20, right: 45, left: 45, bottom: 35 }}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#792CA2" stopOpacity={0.3} />
@@ -298,7 +324,27 @@ export default function CostResourceChart({
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 10 }} interval={timeFilter === "Hourly" ? 2 : 0} dy={10} />
+                  <XAxis 
+                    dataKey="time" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    interval={timeFilter === "Hourly" ? 2 : 0} 
+                    dy={10}
+                    tick={({ x, y, payload }) => (
+                      <g transform={`translate(${x},${y})`}>
+                        <text x={0} y={0} dy={10} textAnchor="middle" fill="#6B7280" className="tick-text">
+                          {payload.value}
+                        </text>
+                      </g>
+                    )}
+                  >
+                    <Label
+                      value="Time ➔"
+                      offset={-15}
+                      position="insideBottom"
+                      className="fill-[#111844] font-bold text-[10px] md:text-[13px]"
+                    />
+                  </XAxis>
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 10 }} dx={-10} />
                   <Tooltip
                     cursor={{ fill: "rgba(121, 44, 162, 0.05)" }}
