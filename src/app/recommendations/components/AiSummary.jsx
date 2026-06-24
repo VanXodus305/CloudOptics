@@ -3,7 +3,14 @@ import React from "react";
 import { motion } from "framer-motion";
 import { SparklesIcon, ArrowPathIcon, ExclamationTriangleIcon, BoltIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 
-export default function AiSummary({ aiSummary = null, isLoading = false, isRegenerating = false, onRegenerate = () => {} }) {
+export default function AiSummary({ 
+  aiSummary = null, 
+  isLoading = false, 
+  isRegenerating = false, 
+  onRegenerate = () => {},
+  totalActions = 0,
+  totalSavings = 0
+}) {
   const isObject = aiSummary && typeof aiSummary === "object";
   const overview = isObject ? aiSummary.overview : (typeof aiSummary === "string" ? aiSummary : "");
   const keyFindings = isObject ? aiSummary.keyFindings : [];
@@ -28,7 +35,7 @@ export default function AiSummary({ aiSummary = null, isLoading = false, isRegen
         <div className="absolute inset-0 bg-gradient-to-br from-[#792CA2]/5 to-[#9A4DCC]/10 rounded-3xl blur-xl" />
 
         {/* Main Box */}
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex-grow flex flex-col gap-5 relative z-0">
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex-grow flex flex-col gap-4 sm:gap-5 relative z-0">
           <div className="flex justify-between items-center w-full border-b border-gray-100 pb-4">
             <div className="bg-gray-100/80 rounded-lg px-4 py-1.5 shadow-inner border border-gray-200/60 font-bold text-[#111844] text-sm flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -43,6 +50,50 @@ export default function AiSummary({ aiSummary = null, isLoading = false, isRegen
               Regenerate
             </button>
           </div>
+
+          {/* Highlights Banner */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Actions Card */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-purple-500/10 to-indigo-500/5 dark:from-purple-950/20 dark:to-indigo-950/10 p-3 rounded-2xl border border-[#792CA2]/15 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#792CA2] to-[#9A4DCC] flex items-center justify-center text-white shadow-md shadow-[#792CA2]/20 flex-shrink-0">
+                <SparklesIcon className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Actions</p>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="text-xl font-black text-[#111844] tracking-tight">
+                    {isLoading || isRegenerating ? (
+                      <span className="w-6 h-5 block bg-gray-200/50 animate-pulse rounded" />
+                    ) : (
+                      totalActions || 0
+                    )}
+                  </span>
+                  <span className="text-[10px] font-semibold text-gray-500">actions found</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Savings Card */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 to-teal-500/5 dark:from-emerald-950/20 dark:to-teal-950/10 p-3 rounded-2xl border border-emerald-500/20 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 flex-shrink-0">
+                <span className="text-base font-black font-mono text-white">$</span>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Potential Savings</p>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="text-xl font-black text-emerald-600 tracking-tight">
+                    {isLoading || isRegenerating ? (
+                      <span className="w-12 h-5 block bg-gray-200/50 animate-pulse rounded" />
+                    ) : (
+                      `$${Math.round(totalSavings || 0).toLocaleString()}`
+                    )}
+                  </span>
+                  <span className="text-[10px] font-semibold text-gray-500">/ mo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           
           <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 md:p-6 shadow-sm border border-white flex-grow min-h-[120px] relative overflow-hidden flex flex-col justify-center">
             {/* Inner glowing element */}

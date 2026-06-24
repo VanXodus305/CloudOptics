@@ -71,8 +71,9 @@ export default function CategoryTabs({ activeCategory, setActiveCategory }) {
       </div>
 
       {/* Desktop Tabs */}
-      <div className="hidden md:flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="hidden md:flex md:justify-center gap-6 overflow-x-auto pb-4 scrollbar-hide">
         {categories.map((cat, idx) => {
+
           const isActive = activeCategory === cat.id;
 
           return (

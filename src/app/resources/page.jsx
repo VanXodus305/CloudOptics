@@ -232,7 +232,6 @@ export default function ResourcesPage() {
         handleSignOut={handleSignOut}
         profileRef={profileRef}
         session={session}
-        hideReportButton={true}
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">

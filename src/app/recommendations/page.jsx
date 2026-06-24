@@ -11,7 +11,7 @@ import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
 
 // Recommendations Components
-import TotalInsights from "./components/TotalInsights";
+import RecommendationChat from "./components/RecommendationChat";
 import AiSummary from "./components/AiSummary";
 import CategoryTabs from "./components/CategoryTabs";
 import RecommendationsList from "./components/RecommendationsList";
@@ -158,7 +158,6 @@ export default function RecommendationsPage() {
         handleSignOut={handleSignOut}
         profileRef={profileRef}
         session={session}
-        hideReportButton={true}
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">
@@ -183,22 +182,20 @@ export default function RecommendationsPage() {
               </div>
             )}
 
-            {/* Top Row: Insights & AI Summary */}
+            {/* Top Row: AI Summary & Chatbot */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-              <div className="lg:col-span-4 flex flex-col">
-                <TotalInsights
-                  totalActions={data?.totalActionsCount}
-                  totalSavings={data?.totalPotentialSavings}
-                  isLoading={isLoading}
-                />
-              </div>
-              <div className="lg:col-span-8 flex flex-col">
+              <div className="lg:col-span-7 flex flex-col">
                 <AiSummary
                   aiSummary={data?.aiSummary}
                   isLoading={isLoading}
                   isRegenerating={isRegenerating}
                   onRegenerate={() => fetchRecommendations(true)}
+                  totalActions={data?.totalActionsCount}
+                  totalSavings={data?.totalPotentialSavings}
                 />
+              </div>
+              <div className="lg:col-span-5 flex flex-col">
+                <RecommendationChat />
               </div>
             </div>
 

@@ -118,7 +118,6 @@ export default function AlertsPage() {
         handleSignOut={handleSignOut}
         profileRef={profileRef}
         session={session}
-        hideReportButton={true}
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">
