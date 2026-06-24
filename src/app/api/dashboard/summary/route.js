@@ -2,7 +2,7 @@ import { connectDB } from "../../../../lib/mongodb";
 import { Resource } from "../../../../models/Resource";
 import { Metric } from "../../../../models/Metric";
 import { verifySession } from "../../../../lib/auth-helper";
-import { calculateAlerts } from "../../../../lib/alerts-helper";
+import { syncAndFetchAlerts } from "../../../../lib/alerts-helper";
 
 export async function GET(request) {
   try {
@@ -53,7 +53,7 @@ export async function GET(request) {
     const rdsIds = resources.filter((r) => r.serviceType === "RDS").map((r) => r.resourceId);
 
     // Fetch spendStats and alerts in parallel
-    const [spendStats, activeAlertsList] = await Promise.all([
+    const [spendStats, alertsList] = await Promise.all([
       Metric.aggregate([
         {
           $match: {
@@ -83,9 +83,10 @@ export async function GET(request) {
           },
         },
       ]),
-      calculateAlerts(environment, resources)
+      syncAndFetchAlerts(environment)
     ]);
 
+    const activeAlertsList = alertsList.filter((a) => a.status === "unresolved" || a.status === "in progress");
     const activeAlerts = activeAlertsList.length;
     const totalSavings = activeAlertsList.reduce((sum, a) => sum + a.potentialSavings, 0);
 

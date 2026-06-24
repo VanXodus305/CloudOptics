@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { BellAlertIcon } from "@heroicons/react/24/outline";
 
 // Shared Components
 import ParticleBackground from "../dashboard/components/ParticleBackground";
@@ -135,6 +136,12 @@ export default function AlertsPage() {
         <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 md:p-8">
           
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pt-4 gap-6">
+            <div className="flex items-center gap-2 px-2 mt-2">
+              <div className="bg-[#792CA2]/10 p-1.5 rounded-lg border border-[#792CA2]/20">
+                <BellAlertIcon className="w-5 h-5 text-[#792CA2]" />
+              </div>
+              <h1 className="text-xl font-extrabold text-[#111844] tracking-tight">Active Optimization Alerts</h1>
+            </div>
             <ActiveAlerts />
             <AlertHistory />
           </div>

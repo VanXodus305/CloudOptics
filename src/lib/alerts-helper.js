@@ -1,5 +1,6 @@
 import { Metric } from "../models/Metric.js";
 import { Resource } from "../models/Resource.js";
+import { Alert } from "../models/Alert.js";
 
 export async function calculateAlerts(environmentFilter = null, preloadedResources = null) {
   const alerts = [];
@@ -112,4 +113,64 @@ export async function calculateAlerts(environmentFilter = null, preloadedResourc
   }
 
   return alerts;
+}
+
+export async function syncAndFetchAlerts(environmentFilter = null) {
+  // 1. Calculate active alerts on-the-fly globally
+  const activeAlerts = await calculateAlerts();
+  
+  // 2. Query all existing alerts from database
+  const existingAlerts = await Alert.find({}).lean();
+  const existingMap = {};
+  existingAlerts.forEach((a) => {
+    existingMap[`${a.resourceId}_${a.type}`] = a;
+  });
+
+  const activeKeys = new Set();
+
+  // 3. Sync active alerts to database
+  for (const alertData of activeAlerts) {
+    const key = `${alertData.resourceId}_${alertData.type}`;
+    activeKeys.add(key);
+
+    const existing = existingMap[key];
+    if (!existing) {
+      // Create new unresolved alert
+      await Alert.create({
+        resourceId: alertData.resourceId,
+        type: alertData.type,
+        severity: alertData.severity,
+        message: alertData.message,
+        potentialSavings: alertData.potentialSavings,
+        currentCost: alertData.currentCost,
+        environment: alertData.environment,
+        status: "unresolved"
+      });
+    } else {
+      // Update stats on existing alert, preserve status
+      await Alert.findByIdAndUpdate(existing._id, {
+        potentialSavings: alertData.potentialSavings,
+        currentCost: alertData.currentCost,
+        message: alertData.message,
+        severity: alertData.severity
+      });
+    }
+  }
+
+  // 4. Auto-resolve alerts not detected in the current aggregate run
+  for (const existing of existingAlerts) {
+    const key = `${existing.resourceId}_${existing.type}`;
+    if (!activeKeys.has(key)) {
+      if (existing.status !== "resolved") {
+        await Alert.findByIdAndUpdate(existing._id, { status: "resolved" });
+      }
+    }
+  }
+
+  // 5. Query and return matching alerts
+  const query = {};
+  if (environmentFilter && ["Production", "Development", "Testing"].includes(environmentFilter)) {
+    query.environment = environmentFilter;
+  }
+  return await Alert.find(query).sort({ updatedAt: -1 }).lean();
 }
