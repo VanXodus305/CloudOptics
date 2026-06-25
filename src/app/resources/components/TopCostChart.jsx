@@ -13,7 +13,7 @@ import {
   Label,
 } from "recharts";
 
-export default function MostlyUsedChart({
+export default function TopCostChart({
   environment = "Production",
   costTrendsDaily = [],
   costTrendsHourly = [],

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const COLORS = ['#792CA2', '#9A4DCC', '#1F215D', '#111844', '#DCCBFF'];
 
-export default function TimeResourceChart({ environment = "Production", serviceCounts = [], resources = [], isLoading = false }) {
+export default function MostlyUsedChart({ environment = "Production", serviceCounts = [], resources = [], isLoading = false }) {
   const [drilldownService, setDrilldownService] = useState(null);
   const [hoveredSegment, setHoveredSegment] = useState(null);
   const [selectedSegment, setSelectedSegment] = useState(null);

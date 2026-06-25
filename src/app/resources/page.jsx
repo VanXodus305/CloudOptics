@@ -129,8 +129,8 @@ export default function ResourcesPage() {
     if (status !== "authenticated") return;
 
     let active = true;
-    async function fetchData(isBackground = false) {
-      if (!isBackground) setIsDataLoading(true);
+    async function fetchData() {
+      setIsDataLoading(true);
       try {
         const res = await fetch(`/api/resources/dashboard?environment=${selectedEnvironment}`);
         if (!res.ok) throw new Error("Failed to fetch dashboard data");
@@ -141,22 +141,16 @@ export default function ResourcesPage() {
       } catch (err) {
         console.error(err);
       } finally {
-        if (active && !isBackground) {
+        if (active) {
           setIsDataLoading(false);
         }
       }
     }
 
-    fetchData(false);
-    
-    // Poll every 30 seconds for real-time updates
-    const intervalId = setInterval(() => {
-      fetchData(true);
-    }, 30000);
+    fetchData();
 
     return () => {
       active = false;
-      clearInterval(intervalId);
     };
   }, [status, selectedEnvironment]);
 
