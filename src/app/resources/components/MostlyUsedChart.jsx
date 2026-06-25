@@ -54,7 +54,11 @@ export default function TimeResourceChart({ environment = "Production", serviceC
           {drilldownService ? (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => { setDrilldownService(null); setSelectedSegment(null); }}
+                onClick={() => {
+                  setDrilldownService(null);
+                  setSelectedSegment(null);
+                  setHoveredSegment(null);
+                }}
                 className="text-gray-400 hover:text-[#792CA2] transition-colors"
                 title="Back to Chart"
               >
@@ -82,33 +86,33 @@ export default function TimeResourceChart({ environment = "Production", serviceC
       <div className="flex-grow w-full relative overflow-hidden">
         {drilldownService ? (
           <div className="overflow-y-auto h-full pr-2 pb-2 custom-scrollbar">
-            <table className="w-full text-left text-[11px]">
+            <table className="w-full text-left text-[11px] table-fixed">
               <thead className="bg-[#F9F7F7] sticky top-0 z-10 text-gray-600">
                 <tr>
-                  <th className="p-2 font-semibold rounded-tl-lg">Resource ID</th>
-                  <th className="p-2 font-semibold">Region</th>
-                  <th className="p-2 font-semibold">Status</th>
-                  <th className="p-2 font-semibold">Cost/Hr</th>
-                  <th className="p-2 font-semibold rounded-tr-lg">Environment</th>
+                  <th className="px-2 py-1.5 font-semibold rounded-tl-lg w-[38%]">Resource ID</th>
+                  <th className="px-2 py-1.5 font-semibold w-[22%]">Region</th>
+                  <th className="px-2 py-1.5 font-semibold w-[20%]">Status</th>
+                  <th className="px-2 py-1.5 font-semibold w-[20%]">Cost/Hr</th>
+                  <th className="px-2 py-1.5 font-semibold rounded-tr-lg hidden sm:table-cell lg:hidden xl:table-cell w-[20%]">Environment</th>
                 </tr>
               </thead>
               <tbody>
                 {drilldownResources.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="p-4 text-center text-gray-400 font-medium">No resources found</td>
+                    <td colSpan={5} className="px-2 py-4 text-center text-gray-400 font-medium">No resources found</td>
                   </tr>
                 ) : (
                   drilldownResources.map((res, i) => (
                     <tr key={i} className="border-b border-gray-50 hover:bg-[#792CA2]/5 transition-colors">
-                      <td className="p-2 font-medium text-[#792CA2]">{res.resourceId}</td>
-                      <td className="p-2 text-gray-500">{res.region}</td>
-                      <td className="p-2">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${res.status === 'Running' || res.status === 'running' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      <td className="px-2 py-1.5 font-medium text-[#792CA2] break-all whitespace-normal">{res.resourceId}</td>
+                      <td className="px-2 py-1.5 text-gray-500 truncate">{res.region}</td>
+                      <td className="px-2 py-1.5">
+                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold ${res.status === 'Running' || res.status === 'running' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                           {res.status}
                         </span>
                       </td>
-                      <td className="p-2 text-gray-500">${typeof res.costPerHour === 'number' ? res.costPerHour.toFixed(3) : res.costPerHour}/hr</td>
-                      <td className="p-2 text-gray-500">{res.environment}</td>
+                      <td className="px-2 py-1.5 text-gray-500">${typeof res.costPerHour === 'number' ? res.costPerHour.toFixed(3) : res.costPerHour}/hr</td>
+                      <td className="px-2 py-1.5 text-gray-500 hidden sm:table-cell lg:hidden xl:table-cell truncate">{res.environment}</td>
                     </tr>
                   ))
                 )}
@@ -116,9 +120,9 @@ export default function TimeResourceChart({ environment = "Production", serviceC
             </table>
           </div>
         ) : (
-          <div className="flex items-center justify-around gap-2 h-full">
+          <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-around gap-6 sm:gap-2 h-full py-2">
             {/* Custom SVG Donut */}
-            <div className="relative w-56 h-56 flex-shrink-0 flex items-center justify-center">
+            <div className="relative w-40 h-40 sm:w-44 sm:h-44 md:w-48 md:h-48 flex-shrink-0 flex items-center justify-center">
               <svg
                 className="w-full h-full transform -rotate-90"
                 viewBox="0 0 100 100"
@@ -129,7 +133,7 @@ export default function TimeResourceChart({ environment = "Production", serviceC
                 <circle cx="50" cy="50" r={donutRadius - 7} fill="transparent" stroke="rgba(121, 44, 162, 0.18)" strokeWidth="0.75" strokeDasharray="2 2" />
                 {/* Track ring */}
                 <circle cx="50" cy="50" r={donutRadius} fill="transparent" stroke="rgba(200,200,200,0.25)" strokeWidth={10} />
-
+                
                 {(() => {
                   let accumPercent = 0;
                   return data.map((item, idx) => {
@@ -173,16 +177,16 @@ export default function TimeResourceChart({ environment = "Production", serviceC
               {/* Center label */}
               <div className="absolute flex flex-col items-center text-center pointer-events-none">
                 <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">
-                  {selectedSegment !== null ? data[selectedSegment].name : "Total"}
+                  {selectedSegment !== null && data[selectedSegment] ? data[selectedSegment].name : "Total"}
                 </span>
                 <span className="text-base font-black text-[#111844] font-mono mt-0.5">
-                  {selectedSegment !== null ? `${data[selectedSegment].value}%` : total.toLocaleString()}
+                  {selectedSegment !== null && data[selectedSegment] ? `${data[selectedSegment].value}%` : total.toLocaleString()}
                 </span>
               </div>
             </div>
 
             {/* Side legend */}
-            <div className="flex flex-col gap-1.5 flex-1 max-w-[155px]">
+            <div className="flex flex-col gap-1.5 w-full sm:flex-1 sm:max-w-[155px]">
               {data.map((item, idx) => {
                 const isHovered = hoveredSegment === idx;
                 const isSelected = selectedSegment === idx;
@@ -204,7 +208,7 @@ export default function TimeResourceChart({ environment = "Production", serviceC
                   >
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.colorHex }} />
-                      <span className="text-[10px] text-gray-600 font-semibold truncate max-w-[80px]">{item.name}</span>
+                      <span className="text-[10px] text-gray-600 font-semibold truncate max-w-[120px] sm:max-w-[80px]">{item.name}</span>
                     </div>
                     <span className="text-xs font-extrabold text-[#111844]">{item.value}%</span>
                   </div>
@@ -212,7 +216,7 @@ export default function TimeResourceChart({ environment = "Production", serviceC
               })}
             </div>
           </div>
-        )}
+        ) }
       </div>
     </div>
   );

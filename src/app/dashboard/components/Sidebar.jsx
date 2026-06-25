@@ -100,13 +100,13 @@ export default function Sidebar({
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
       onMouseEnter={() => !isMobile && !isSidebarExpanded && setIsHovered(true)}
       onMouseLeave={() => !isMobile && setIsHovered(false)}
-      className={`bg-[#111844] text-white flex z-40 border-[#1F215D]/20 ${
+      className={`bg-[#111844] text-white flex border-[#1F215D]/20 ${
         isMobile
-          ? "fixed bottom-0 left-0 right-0 flex-row h-14 px-2 border-t justify-between items-center shadow-[0_-4px_20px_rgba(0,0,0,0.15)]"
-          : `flex-shrink-0 h-full py-5 flex-col overflow-y-auto border-r rounded-tr-2xl ${
+          ? "fixed bottom-0 left-0 right-0 flex-row h-14 px-2 border-t justify-between items-center shadow-[0_-4px_20px_rgba(0,0,0,0.15)] z-[150]"
+          : `flex-shrink-0 h-full py-5 flex-col overflow-y-auto border-r rounded-tr-2xl z-40 ${
               shouldBeExpanded ? "px-5" : "px-3"
             }`
-      }`}
+      }` }
     >
       {!isMobile && (
         <div className={`flex items-center mb-8 ${shouldBeExpanded ? "gap-3" : "justify-center"}`}>

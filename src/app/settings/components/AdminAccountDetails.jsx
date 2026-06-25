@@ -56,7 +56,9 @@ export default function AdminAccountDetails() {
             </div>
             <div>
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Role & Permissions</p>
-              <p className="text-sm font-bold text-[#111844] mt-0.5">Super Administrator</p>
+              <p className="text-sm font-bold text-[#111844] mt-0.5">
+                {session?.user?.role === "Viewer" ? "Viewer Account" : "Super Administrator"}
+              </p>
             </div>
           </div>
         </div>

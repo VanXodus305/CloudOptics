@@ -10,6 +10,7 @@ import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
+import RestrictedOverlay from "../components/common/RestrictedOverlay";
 
 // Alerts Components
 import ActiveAlerts from "./components/ActiveAlerts";
@@ -133,8 +134,10 @@ export default function AlertsPage() {
           setIsAlertsModalOpen={() => {}}
         />
 
-        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 md:p-8">
-          
+        <div className={`flex-grow flex flex-col h-full overflow-x-hidden relative p-4 md:p-8 ${session?.user?.role === "Viewer" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
+          {session?.user?.role === "Viewer" && (
+            <RestrictedOverlay pageName="Alert Center" />
+          )}
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pt-4 gap-6">
             <div className="flex items-center gap-2 px-2 mt-2">
               <div className="bg-[#792CA2]/10 p-1.5 rounded-lg border border-[#792CA2]/20">

@@ -68,13 +68,17 @@ function generateS3BucketName() {
   )}`.toLowerCase();
 }
 
-function generateResourceMetrics(resource) {
+function generateResourceMetrics(resource, timestamp = new Date()) {
   const serviceType = resource.serviceType;
   const anomalyType = resource.anomalyType || "none";
+  
+  const hour = timestamp.getHours();
+  // Diurnal curve peaking at 2 PM: ranges from 0.5 to 1.5
+  const diurnalFactor = 1.0 + 0.5 * Math.sin(((hour - 8) / 24) * 2 * Math.PI);
 
   if (serviceType === "EC2") {
-    let cpu = faker.number.int({ min: 10, max: 80 });
-    let mem = faker.number.int({ min: 15, max: 75 });
+    let cpu = faker.number.int({ min: 15, max: 65 });
+    let mem = faker.number.int({ min: 20, max: 70 });
     
     if (anomalyType === "idle") {
       cpu = faker.number.int({ min: 1, max: 4 });
@@ -82,18 +86,21 @@ function generateResourceMetrics(resource) {
     } else if (anomalyType === "oversized") {
       cpu = faker.number.int({ min: 4, max: 12 });
       mem = faker.number.int({ min: 5, max: 17 });
+    } else {
+      cpu = Math.max(1, Math.min(100, Math.round(cpu * diurnalFactor)));
+      mem = Math.max(1, Math.min(100, Math.round(mem * (diurnalFactor * 0.4 + 0.6))));
     }
 
     return {
       cpuUtilization: cpu,
       memoryUtilization: mem,
       storageSizeGB: 0,
-      readOperations: faker.number.int({ min: 100, max: 5000 }),
-      writeOperations: faker.number.int({ min: 50, max: 3000 }),
+      readOperations: Math.round(faker.number.int({ min: 100, max: 5000 }) * diurnalFactor),
+      writeOperations: Math.round(faker.number.int({ min: 50, max: 3000 }) * diurnalFactor),
     };
   } else if (serviceType === "RDS") {
-    let cpu = faker.number.int({ min: 15, max: 70 });
-    let mem = faker.number.int({ min: 20, max: 70 });
+    let cpu = faker.number.int({ min: 20, max: 60 });
+    let mem = faker.number.int({ min: 25, max: 65 });
 
     if (anomalyType === "idle") {
       cpu = faker.number.int({ min: 1, max: 4 });
@@ -101,14 +108,17 @@ function generateResourceMetrics(resource) {
     } else if (anomalyType === "oversized") {
       cpu = faker.number.int({ min: 4, max: 12 });
       mem = faker.number.int({ min: 10, max: 18 });
+    } else {
+      cpu = Math.max(1, Math.min(100, Math.round(cpu * diurnalFactor)));
+      mem = Math.max(1, Math.min(100, Math.round(mem * (diurnalFactor * 0.4 + 0.6))));
     }
 
     return {
       cpuUtilization: cpu,
       memoryUtilization: mem,
       storageSizeGB: faker.number.int({ min: 10, max: 500 }),
-      readOperations: faker.number.int({ min: 500, max: 10000 }),
-      writeOperations: faker.number.int({ min: 200, max: 5000 }),
+      readOperations: Math.round(faker.number.int({ min: 500, max: 10000 }) * diurnalFactor),
+      writeOperations: Math.round(faker.number.int({ min: 200, max: 5000 }) * diurnalFactor),
     };
   } else if (serviceType === "S3") {
     let readOps = faker.number.int({ min: 100, max: 50000 });
@@ -117,6 +127,9 @@ function generateResourceMetrics(resource) {
     if (anomalyType === "unattached") {
       readOps = 0;
       writeOps = 0;
+    } else {
+      readOps = Math.round(readOps * diurnalFactor);
+      writeOps = Math.round(writeOps * diurnalFactor);
     }
 
     return {
@@ -286,10 +299,16 @@ async function seedDatabase() {
       const dayDiff = Math.floor((timestamp.getTime() - thirtyDaysAgoMs) / (24 * 60 * 60 * 1000));
       const dailyMult = dailyMultipliers[dayDiff] !== undefined ? dailyMultipliers[dayDiff] : 1.0;
 
+      const dayOfWeek = timestamp.getDay();
+      const weekendFactor = (dayOfWeek === 0 || dayOfWeek === 6) ? 0.35 + Math.random() * 0.15 : 0.85 + Math.random() * 0.3;
+
+      const hour = timestamp.getHours();
+      const diurnalFactor = 1.0 + 0.55 * Math.sin(((hour - 8) / 24) * 2 * Math.PI);
+
       for (const resource of resources) {
-        const metrics = generateResourceMetrics(resource);
-        const hourlyNoise = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
-        const costIncurred = Math.round(resource.costPerHour * dailyMult * hourlyNoise * 1000) / 1000;
+        const metrics = generateResourceMetrics(resource, timestamp);
+        const hourlyNoise = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
+        const costIncurred = Math.round(resource.costPerHour * dailyMult * weekendFactor * diurnalFactor * hourlyNoise * 1000) / 1000;
 
         allMetrics.push({
           resourceId: resource.resourceId,

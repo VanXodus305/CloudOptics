@@ -9,6 +9,7 @@ import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
+import RestrictedOverlay from "../components/common/RestrictedOverlay";
 
 // Settings Components
 import AdminAccountDetails from "./components/AdminAccountDetails";
@@ -135,8 +136,10 @@ export default function SettingsPage() {
         />
 
         {/* MAIN CONTENT AREA */}
-        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 md:p-8">
-          
+        <div className={`flex-grow flex flex-col h-full overflow-x-hidden relative p-4 md:p-8 ${session?.user?.role === "Viewer" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
+          {session?.user?.role === "Viewer" && (
+            <RestrictedOverlay pageName="Settings" />
+          )}
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pb-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow pt-4">
               

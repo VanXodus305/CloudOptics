@@ -10,6 +10,7 @@ import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
+import RestrictedOverlay from "../components/common/RestrictedOverlay";
 
 // Resources Components
 import MostlyUsedChart from "./components/MostlyUsedChart";
@@ -247,161 +248,166 @@ export default function ResourcesPage() {
         />
 
         {/* MAIN CONTENT AREA */}
-        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 pb-24 md:p-8">
-
-          {/* ── HERO HEADER ── */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 relative z-50 max-w-[1600px] mx-auto w-full">
-            <motion.div
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className="flex items-center gap-4"
-            >
-              {/* Animated Icon Badge */}
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 6 }}
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                className="p-3.5 bg-gradient-to-br from-[#792CA2] to-[#9A4DCC] rounded-2xl shadow-xl shadow-[#792CA2]/30 flex items-center justify-center"
-              >
-                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </motion.div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">
-                  Resource Center
-                </h1>
-                <p className="text-sm text-gray-400 font-medium mt-0.5">
-                  Real-time analytics · <span className="text-[#792CA2] font-semibold">{selectedEnvironment === "All" ? "All Environments" : `${selectedEnvironment} Environment`}</span>
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Environment Filter */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="relative w-full sm:w-auto"
-              ref={filterRef}
-            >
-              {/* Desktop Dropdown */}
-              <div className="hidden sm:block">
-                <button
-                  onClick={() => setIsTopFilterOpen(!isTopFilterOpen)}
-                  className="bg-white/90 backdrop-blur-sm text-[#792CA2] px-5 py-2.5 rounded-2xl shadow-lg shadow-[#792CA2]/10 hover:shadow-xl hover:shadow-[#792CA2]/20 transition-all duration-300 flex items-center gap-2.5 border border-[#792CA2]/15 font-semibold text-sm hover:-translate-y-0.5"
+        <div className={`flex-grow flex flex-col h-full overflow-x-hidden relative p-4 pb-24 md:p-8 ${session?.user?.role === "Viewer" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
+          {session?.user?.role === "Viewer" && (
+            <RestrictedOverlay pageName="Resource Center" />
+          )}
+              {/* ── HERO HEADER ── */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 relative z-50 max-w-[1600px] mx-auto w-full">
+                <motion.div
+                  initial={{ opacity: 0, y: -16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="flex items-center gap-4"
                 >
-                  <span className="w-2 h-2 rounded-full bg-[#792CA2] animate-pulse" />
-                  {selectedEnvironment}
-                  <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isTopFilterOpen ? "rotate-180" : ""}`} />
-                </button>
-                <AnimatePresence>
-                  {isTopFilterOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100/80 z-[999] py-2 overflow-hidden"
-                    >
-                      {ENVIRONMENTS.map((env) => (
-                        <button
-                          key={env}
-                          onClick={() => { setSelectedEnvironment(env); setIsTopFilterOpen(false); }}
-                          className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedEnvironment === env ? "text-[#792CA2] bg-[#792CA2]/8" : "text-gray-600 hover:bg-[#792CA2]/6 hover:text-[#792CA2]"}`}
-                        >
-                          <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedEnvironment === env ? "bg-[#792CA2]" : "bg-gray-300"}`} />
-                          {env}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Mobile Horizontal Scroll Buttons */}
-              <div className="flex sm:hidden overflow-x-auto gap-2 pb-2 scrollbar-hide snap-x w-full">
-                {ENVIRONMENTS.map((env) => (
-                  <button
-                    key={env}
-                    onClick={() => setSelectedEnvironment(env)}
-                    className={`snap-start flex-shrink-0 whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                      selectedEnvironment === env 
-                        ? "bg-[#792CA2] text-white shadow-md shadow-[#792CA2]/30" 
-                        : "bg-white/80 text-gray-600 border border-gray-200 hover:bg-gray-50"
-                    }`}
+                  {/* Animated Icon Badge */}
+                  <motion.div
+                    whileHover={{ scale: 1.1, rotate: 6 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                    className="p-3.5 bg-gradient-to-br from-[#792CA2] to-[#9A4DCC] rounded-2xl shadow-xl shadow-[#792CA2]/30 flex items-center justify-center"
                   >
-                    {env}
-                  </button>
-                ))}
+                    <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </motion.div>
+                  <div>
+                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">
+                      Resource Center
+                    </h1>
+                    <p className="text-sm text-gray-400 font-medium mt-0.5">
+                      Real-time analytics · <span className="text-[#792CA2] font-semibold">{selectedEnvironment === "All" ? "All Environments" : `${selectedEnvironment} Environment`}</span>
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Environment Filter */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="relative w-full sm:w-auto"
+                  ref={filterRef}
+                >
+                  {/* Desktop Dropdown */}
+                  <div className="hidden sm:block">
+                    <button
+                      onClick={() => setIsTopFilterOpen(!isTopFilterOpen)}
+                      className="bg-white/90 backdrop-blur-sm text-[#792CA2] px-5 py-2.5 rounded-2xl shadow-lg shadow-[#792CA2]/10 hover:shadow-xl hover:shadow-[#792CA2]/20 transition-all duration-300 flex items-center gap-2.5 border border-[#792CA2]/15 font-semibold text-sm hover:-translate-y-0.5"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-[#792CA2] animate-pulse" />
+                      {selectedEnvironment}
+                      <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isTopFilterOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    <AnimatePresence>
+                      {isTopFilterOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100/80 z-[999] py-2 overflow-hidden"
+                        >
+                          {ENVIRONMENTS.map((env) => (
+                            <button
+                              key={env}
+                              onClick={() => { setSelectedEnvironment(env); setIsTopFilterOpen(false); }}
+                              className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedEnvironment === env ? "text-[#792CA2] bg-[#792CA2]/8" : "text-gray-600 hover:bg-[#792CA2]/6 hover:text-[#792CA2]"}`}
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedEnvironment === env ? "bg-[#792CA2]" : "bg-gray-300"}`} />
+                              {env}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Mobile Horizontal Scroll Buttons */}
+                  <div className="flex sm:hidden overflow-x-auto gap-2 pb-2 scrollbar-hide snap-x w-full">
+                    {ENVIRONMENTS.map((env) => (
+                      <button
+                        key={env}
+                        onClick={() => setSelectedEnvironment(env)}
+                        className={`snap-start flex-shrink-0 whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                          selectedEnvironment === env 
+                            ? "bg-[#792CA2] text-white shadow-md shadow-[#792CA2]/30" 
+                            : "bg-white/80 text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        }`}
+                      >
+                        {env}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
 
-          {/* ── CHARTS GRID ── */}
-          <div className="flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
+              {/* ── CHARTS GRID ── */}
+              <div className="flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
 
-             {/* Top Chart — full width */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-            >
-              <TopCostChart
-                environment={selectedEnvironment}
-                costTrendsDaily={dashboardData?.costTrends?.daily || []}
-                costTrendsHourly={dashboardData?.costTrends?.hourly || []}
-                resources={dashboardData?.resources || []}
-                isLoading={isDataLoading}
-              />
-            </motion.div>
+                {/* Top Chart — full width */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+                >
+                  <TopCostChart
+                    environment={selectedEnvironment}
+                    costTrendsDaily={dashboardData?.costTrends?.daily || []}
+                    costTrendsHourly={dashboardData?.costTrends?.hourly || []}
+                    resources={dashboardData?.resources || []}
+                    isLoading={isDataLoading}
+                  />
+                </motion.div>
 
-            {/* Middle Grid — 2 columns */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              >
-                <MostlyUsedChart
-                  environment={selectedEnvironment}
-                  serviceCounts={dashboardData?.serviceCounts || []}
-                  resources={dashboardData?.resources || []}
-                  isLoading={isDataLoading}
-                />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-              >
-                <CostResourceChart
-                  environment={selectedEnvironment}
-                  resources={dashboardData?.resources || []}
-                  costTrendsDaily={dashboardData?.costTrends?.daily || []}
-                  costTrendsHourly={dashboardData?.costTrends?.hourly || []}
-                  isLoading={isDataLoading}
-                />
-              </motion.div>
-            </div>
+                {/* Middle Grid — 2 columns */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                    className="lg:col-span-5 flex flex-col h-full"
+                  >
+                    <MostlyUsedChart
+                      environment={selectedEnvironment}
+                      serviceCounts={dashboardData?.serviceCounts || []}
+                      resources={dashboardData?.resources || []}
+                      isLoading={isDataLoading}
+                    />
+                  </motion.div>
 
-            {/* Bottom Chart — full width */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            >
-              <UtilizationChart
-                environment={selectedEnvironment}
-                resources={dashboardData?.resources || []}
-                isLoading={isDataLoading}
-              />
-            </motion.div>
-          </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+                    className="lg:col-span-7 flex flex-col h-full"
+                  >
+                    <CostResourceChart
+                      environment={selectedEnvironment}
+                      resources={dashboardData?.resources || []}
+                      costTrendsDaily={dashboardData?.costTrends?.daily || []}
+                      costTrendsHourly={dashboardData?.costTrends?.hourly || []}
+                      isLoading={isDataLoading}
+                    />
+                  </motion.div>
+                </div>
+
+                {/* Bottom Chart — full width */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+                >
+                  <UtilizationChart
+                    environment={selectedEnvironment}
+                    resources={dashboardData?.resources || []}
+                    isLoading={isDataLoading}
+                  />
+                </motion.div>
+              </div>
 
           <div className="mt-12 hidden md:block -mx-4 md:-mx-8 -mb-4 md:-mb-8">
             <Footer reduced={true} />

@@ -9,6 +9,7 @@ import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
+import RestrictedOverlay from "../components/common/RestrictedOverlay";
 
 // Recommendations Components
 import RecommendationChat from "./components/RecommendationChat";
@@ -173,7 +174,10 @@ export default function RecommendationsPage() {
         />
 
         {/* MAIN CONTENT AREA */}
-        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative p-4 pb-24 md:p-8 md:pb-8">
+        <div className={`flex-grow flex flex-col h-full overflow-x-hidden relative p-4 pb-24 md:p-8 md:pb-8 ${session?.user?.role === "Viewer" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
+          {session?.user?.role === "Viewer" && (
+            <RestrictedOverlay pageName="AI Recommendations" />
+          )}
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pt-4">
             {error && (
               <div className="mb-6 p-4 bg-red-100 border border-red-200 text-red-700 rounded-2xl text-xs font-semibold flex justify-between items-center shadow-sm">
