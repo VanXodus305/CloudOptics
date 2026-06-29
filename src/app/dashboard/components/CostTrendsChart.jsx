@@ -27,7 +27,7 @@ export default function CostTrendsChart({
       )}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h3 className="text-base font-bold text-[#111844] dark:text-[#F9F7F7]">
+          <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
             {chartTimeframe} Cost Trends
           </h3>
         </div>

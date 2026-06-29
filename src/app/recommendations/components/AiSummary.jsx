@@ -27,7 +27,7 @@ export default function AiSummary({
         <div className="bg-[#792CA2]/10 p-1.5 rounded-lg border border-[#792CA2]/20">
           <SparklesIcon className="w-5 h-5 text-[#792CA2]" />
         </div>
-        <h2 className="text-xl font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">AI-Recommended Summary</h2>
+        <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">AI-Recommended Summary</h2>
       </div>
       
       <div className="relative mt-2 flex-grow flex flex-col">

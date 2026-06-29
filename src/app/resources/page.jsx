@@ -295,10 +295,10 @@ export default function ResourcesPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                   </motion.div>
-                  <div>
-                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">
-                      Resource Center
-                    </h1>
+                    <div>
+                      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
+                        Resource Center
+                      </h1>
                     <p className="text-sm text-gray-400 font-medium mt-0.5">
                       Real-time analytics · <span className="text-[#792CA2] font-semibold">{selectedEnvironment === "All" ? "All Environments" : `${selectedEnvironment} Environment`}</span>
                     </p>

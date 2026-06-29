@@ -137,7 +137,7 @@ export default function AdminAccountDetails() {
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#9A4DCC]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="w-full flex justify-between items-center mb-8 relative z-10">
-          <h2 className="text-xl font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
+          <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
             {isViewer ? "User Profile details" : "Admin Account details"}
           </h2>
           <button 

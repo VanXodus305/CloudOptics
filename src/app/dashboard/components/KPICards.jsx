@@ -9,7 +9,7 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
       title: "Total Spend",
       value: summaryData?.totalSpend ?? 0,
       prefix: "$",
-      border: "border-t-[#982598]",
+      borderClass: "border-t-[#982598] dark:border-t-[#982598]",
       trend: kpiTrends?.totalSpend?.trend ?? "0.0%",
       trendType: kpiTrends?.totalSpend?.type ?? "neutral",
       trendLabel: kpiTrends?.totalSpend?.label ?? "vs last week",
@@ -19,7 +19,7 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
       title: "Compute Spend",
       value: summaryData?.computeSpend ?? 0,
       prefix: "$",
-      border: "border-t-[#9A4DCC]",
+      borderClass: "border-t-[#9A4DCC] dark:border-t-[#9A4DCC]",
       trend: kpiTrends?.computeSpend?.trend ?? "0.0%",
       trendType: kpiTrends?.computeSpend?.type ?? "neutral",
       trendLabel: kpiTrends?.computeSpend?.label ?? "vs last week",
@@ -29,7 +29,7 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
       title: "Storage Spend",
       value: summaryData?.storageSpend ?? 0,
       prefix: "$",
-      border: "border-t-[#792CA2]",
+      borderClass: "border-t-[#792CA2] dark:border-t-[#792CA2]",
       trend: kpiTrends?.storageSpend?.trend ?? "0.0%",
       trendType: kpiTrends?.storageSpend?.type ?? "neutral",
       trendLabel: kpiTrends?.storageSpend?.label ?? "vs last week",
@@ -39,7 +39,7 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
       title: "Total Savings",
       value: summaryData?.totalSavings ?? 0,
       prefix: "$",
-      border: "border-t-[#1F215D]",
+      borderClass: "border-t-[#1F215D] dark:border-t-[#1F215D]",
       trend: kpiTrends?.totalSavings?.trend ?? "0.0%",
       trendType: kpiTrends?.totalSavings?.type ?? "positive",
       trendLabel: kpiTrends?.totalSavings?.label ?? "of spend",
@@ -66,7 +66,7 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
             boxShadow: "0 15px 35px rgba(121, 44, 162, 0.12)",
             transition: { duration: 0.15, ease: "easeOut" },
           }}
-          className={`relative bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-lg border border-white/60 dark:border-white/5 border-t-4 ${card.border} flex flex-col justify-between min-h-[110px] md:min-h-[160px]`}
+          className={`relative bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-lg border border-white/60 dark:border-white/10 border-t-4 ${card.borderClass} flex flex-col justify-between min-h-[110px] md:min-h-[160px]`}
         >
           {/* Subtle loading overlay */}
           {isLoading && (
@@ -84,9 +84,9 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
               <div className="flex flex-col items-center">
                 <span
                   className={`text-[8px] md:text-[9.5px] px-1.5 py-0.5 rounded-full font-bold select-none ${
-                    card.trend.startsWith("-")
+                    card.trendType === "negative"
                       ? "bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30"
-                      : card.trend.startsWith("+")
+                      : card.trendType === "positive"
                       ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30"
                       : "bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-slate-700"
                   }`}

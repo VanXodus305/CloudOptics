@@ -151,16 +151,31 @@ export default function AlertsPage() {
             <RestrictedOverlay pageName="Alert Center" />
           )}
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pt-4 gap-6">
-            <div className="flex items-center gap-3 px-2 mt-2">
+            {/* Page Header */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="flex items-center gap-3 sm:gap-4 mb-2"
+            >
               <motion.div 
-                whileHover={{ scale: 1.1, rotate: [0, -15, 15, -15, 0] }}
-                transition={{ duration: 0.5 }}
-                className="bg-gradient-to-br from-[#792CA2]/20 to-[#9A4DCC]/10 p-2 rounded-xl border border-[#792CA2]/30 shadow-[0_0_15px_rgba(121,44,162,0.15)] flex items-center justify-center cursor-default"
+                whileHover={{ scale: 1.1, rotate: 6 }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="p-3.5 bg-gradient-to-br from-[#792CA2] to-[#9A4DCC] rounded-2xl shadow-xl shadow-[#792CA2]/30 flex items-center justify-center"
               >
-                <BellAlertIcon className="w-6 h-6 text-[#792CA2] drop-shadow-sm" />
+                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
               </motion.div>
-              <h1 className="text-2xl font-extrabold text-[#111844] tracking-tight drop-shadow-sm">Active Optimization Alerts</h1>
-            </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
+                  Alerts Center
+                </h1>
+                <p className="text-sm text-gray-400 dark:text-gray-500 font-medium mt-0.5">
+                  Monitor, investigate, and resolve active incidents in real-time
+                </p>
+              </div>
+            </motion.div>
             <ActiveAlerts />
             <AlertHistory />
           </div>

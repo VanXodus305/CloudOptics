@@ -41,7 +41,7 @@ export default function CostDistributionChart({
 
       <div className="flex flex-row justify-between items-center sm:items-start gap-2 mb-4 flex-wrap">
         <div>
-          <h3 className="text-sm sm:text-base font-bold text-[#111844] dark:text-[#F9F7F7]">
+          <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
             Cost Distribution
           </h3>
           <span className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold mt-0.5 sm:mt-1 block">

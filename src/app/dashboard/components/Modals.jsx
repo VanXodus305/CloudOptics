@@ -37,7 +37,7 @@ export default function Modals({
               {/* Sticky header */}
               <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100 dark:border-white/5 flex-shrink-0">
                 <div>
-                  <h3 className="text-lg font-bold text-[#111844] dark:text-[#F9F7F7]">
+                  <h3 className="text-lg md:text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
                     All Cost Resources
                   </h3>
                 </div>
@@ -149,7 +149,7 @@ export default function Modals({
               {/* Sticky header */}
               <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100 dark:border-white/5 flex-shrink-0">
                 <div>
-                  <h3 className="text-lg font-bold text-[#111844] dark:text-[#F9F7F7]">
+                  <h3 className="text-lg md:text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
                     All Optimization Alerts
                   </h3>
                 </div>

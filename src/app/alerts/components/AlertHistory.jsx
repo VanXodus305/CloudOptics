@@ -9,6 +9,15 @@ export default function AlertHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedEnv, setSelectedEnv] = useState(null);
   const [activeTooltip, setActiveTooltip] = useState(null);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const checkDark = () => setIsDark(document.documentElement.classList.contains('dark'));
+    checkDark();
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   const fetchAlerts = async () => {
     setIsLoading(true);
@@ -47,7 +56,7 @@ export default function AlertHistory() {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_10px_25px_rgba(0,0,0,0.05)] px-4 py-2 text-center -translate-x-1/2 -translate-y-full flex flex-col items-center justify-center pointer-events-none min-w-max">
+        <div className="bg-white dark:bg-[#111844] rounded-2xl border border-gray-100 dark:border-white/10 shadow-[0_10px_25px_rgba(0,0,0,0.05)] dark:shadow-xl px-4 py-2 text-center -translate-x-1/2 -translate-y-full flex flex-col items-center justify-center pointer-events-none min-w-max">
           <p className="text-[11px] font-black" style={{ color: payload[0].fill }}>
             {payload[0].name.replace(' ($)', '')} : ${payload[0].value}
           </p>
@@ -72,45 +81,45 @@ export default function AlertHistory() {
           >
             <ClockIcon className="w-5 h-5 text-white" strokeWidth={2.5} />
           </motion.div>
-          <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">Alert History & Stats</h3>
+          <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">Alert History & Stats</h3>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={fetchAlerts}
-          className="w-full sm:w-auto justify-center p-1.5 px-3 bg-white border border-gray-200 text-gray-500 hover:text-[#792CA2] hover:border-[#792CA2]/30 rounded-lg shadow-sm transition-all flex items-center gap-1.5 text-xs font-bold"
+          className="w-full sm:w-auto justify-center p-1.5 px-3 bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-[#792CA2] dark:hover:text-[#DCCBFF] hover:border-[#792CA2]/30 dark:hover:border-white/30 rounded-lg shadow-sm transition-all flex items-center gap-1.5 text-xs font-bold"
         >
           <ArrowPathIcon className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
           Refresh History
         </motion.button>
       </div>
 
-      <div className="bg-white/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex flex-col relative z-0 min-h-[250px]">
+      <div className="bg-white/50 dark:bg-[#0F122B]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/10 flex flex-col relative z-0 min-h-[250px]">
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white/80 border border-gray-150 p-4 rounded-2xl shadow-sm text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Alerts</p>
-            <p className="text-2xl font-black text-[#111844] mt-1">{totalAlerts}</p>
+          <div className="bg-white/80 dark:bg-white/5 border border-gray-150 dark:border-white/10 p-4 rounded-2xl shadow-sm text-center">
+            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Total Alerts</p>
+            <p className="text-2xl font-black text-[#111844] dark:text-white mt-1">{totalAlerts}</p>
           </div>
-          <div className="bg-rose-500/5 border border-rose-500/10 p-4 rounded-2xl shadow-sm text-center">
-            <p className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Unresolved</p>
-            <p className="text-2xl font-black text-rose-600 mt-1">{unresolvedAlerts}</p>
+          <div className="bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/10 dark:border-rose-500/20 p-4 rounded-2xl shadow-sm text-center">
+            <p className="text-[10px] font-bold text-rose-500 dark:text-rose-400 uppercase tracking-wider">Unresolved</p>
+            <p className="text-2xl font-black text-rose-600 dark:text-rose-500 mt-1">{unresolvedAlerts}</p>
           </div>
-          <div className="bg-amber-500/5 border border-amber-500/10 p-4 rounded-2xl shadow-sm text-center">
-            <p className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">In Progress</p>
-            <p className="text-2xl font-black text-amber-600 mt-1">{inProgressAlerts}</p>
+          <div className="bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/10 dark:border-amber-500/20 p-4 rounded-2xl shadow-sm text-center">
+            <p className="text-[10px] font-bold text-amber-500 dark:text-amber-400 uppercase tracking-wider">In Progress</p>
+            <p className="text-2xl font-black text-amber-600 dark:text-amber-500 mt-1">{inProgressAlerts}</p>
           </div>
-          <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-2xl shadow-sm text-center">
-            <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Resolved</p>
-            <p className="text-2xl font-black text-emerald-600 mt-1">{resolvedAlerts}</p>
+          <div className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 dark:border-emerald-500/20 p-4 rounded-2xl shadow-sm text-center">
+            <p className="text-[10px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">Resolved</p>
+            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-500 mt-1">{resolvedAlerts}</p>
           </div>
         </div>
 
-        <div className="bg-white/80 rounded-2xl p-6 border border-white shadow-inner flex-grow flex flex-col">
+        <div className="bg-white/80 dark:bg-transparent rounded-2xl p-6 border border-white dark:border-white/10 shadow-inner dark:shadow-none flex-grow flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <ChartBarIcon className="w-4 h-4 text-[#792CA2]" />
-              <h4 className="text-sm font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] uppercase">Optimization Impact Analysis</h4>
+              <ChartBarIcon className="w-4 h-4 text-[#792CA2] dark:text-[#DCCBFF]" />
+              <h4 className="text-sm font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] uppercase">Optimization Impact Analysis</h4>
             </div>
           </div>
           
@@ -124,16 +133,16 @@ export default function AlertHistory() {
             </div>
           ) : selectedEnv ? (
             <div className="flex-grow flex flex-col w-full h-[300px] mt-4 overflow-y-auto pr-2 custom-scrollbar">
-              <div className="flex items-center gap-3 mb-4 sticky top-0 bg-white/90 backdrop-blur-md z-10 py-2 border-b border-gray-100">
+              <div className="flex items-center gap-3 mb-4 sticky top-0 bg-white/90 dark:bg-[#111844]/90 backdrop-blur-md z-10 py-2 border-b border-gray-100 dark:border-white/10">
                 <motion.button 
                   whileHover={{ scale: 1.05, x: -2 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setSelectedEnv(null)} 
-                  className="p-1 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1 text-gray-500 font-bold text-xs"
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-md transition-colors flex items-center gap-1 text-gray-500 dark:text-gray-300 font-bold text-xs"
                 >
                   <ArrowLeftIcon className="w-4 h-4" /> Back to Chart
                 </motion.button>
-                <h5 className="text-[11px] font-black text-[#111844] uppercase tracking-wider ml-auto">{selectedEnv} Environment Alerts</h5>
+                <h5 className="text-[11px] font-black text-[#111844] dark:text-white uppercase tracking-wider ml-auto">{selectedEnv} Environment Alerts</h5>
               </div>
               <div className="flex flex-col gap-3">
                 {alerts.filter(a => a.environment === selectedEnv).map((alert, index) => (
@@ -143,7 +152,7 @@ export default function AlertHistory() {
                     whileHover={{ scale: 1.02, x: 4 }}
                     transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 20 }}
                     key={alert._id} 
-                    className="group bg-white border border-gray-150 p-4 rounded-xl shadow-sm hover:shadow-md hover:border-[#792CA2]/40 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 cursor-default relative overflow-hidden"
+                    className="group bg-white dark:bg-[#111844]/50 border border-gray-150 dark:border-white/10 p-4 rounded-xl shadow-sm hover:shadow-md hover:border-[#792CA2]/40 dark:hover:border-white/30 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 cursor-default relative overflow-hidden"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b opacity-0 group-hover:opacity-100 transition-opacity duration-300 from-[#792CA2] to-[#2B3074]" />
                     <div className="flex items-center gap-4">
@@ -162,11 +171,11 @@ export default function AlertHistory() {
                             }`}>
                             {alert.severity}
                           </span>
-                          <span className="text-gray-400 font-bold text-[10px] bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                          <span className="text-gray-400 font-bold text-[10px] bg-gray-50 dark:bg-white/5 px-2 py-0.5 rounded border border-gray-100 dark:border-white/10">
                             {new Date(alert.updatedAt).toLocaleDateString()}
                           </span>
                         </div>
-                        <span className="font-extrabold text-gray-700 text-xs leading-snug line-clamp-1 group-hover:text-[#111844] transition-colors">{alert.message}</span>
+                        <span className="font-extrabold text-gray-700 dark:text-gray-300 text-xs leading-snug line-clamp-1 group-hover:text-[#111844] dark:group-hover:text-white transition-colors">{alert.message}</span>
                       </div>
                     </div>
                     <div className="flex flex-col items-start sm:items-end gap-2 ml-14 sm:ml-0">
@@ -185,7 +194,7 @@ export default function AlertHistory() {
             <div className="w-full h-[300px] mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255,255,255,0.05)" : "#f4f4f5"} />
                   <XAxis 
                     dataKey="name" 
                     axisLine={false} 
@@ -201,7 +210,7 @@ export default function AlertHistory() {
                   />
                   <Tooltip 
                     shared={false}
-                    cursor={{ fill: '#f9fafb' }}
+                    cursor={{ fill: isDark ? 'rgba(255,255,255,0.05)' : '#f9fafb' }}
                     content={<CustomTooltip />}
                     position={activeTooltip ? { x: activeTooltip.x, y: activeTooltip.y - 4 } : undefined}
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
@@ -209,7 +218,7 @@ export default function AlertHistory() {
                   <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 700, paddingTop: '15px' }} />
                   <Bar 
                     dataKey="Current Cost ($)" 
-                    fill="#111844" 
+                    fill={isDark ? "#93C5FD" : "#111844"} 
                     radius={[6, 6, 0, 0]} 
                     maxBarSize={40} 
                     onClick={(data) => setSelectedEnv(data.name)} 
@@ -219,7 +228,7 @@ export default function AlertHistory() {
                   />
                   <Bar 
                     dataKey="Potential Savings ($)" 
-                    fill="#792CA2" 
+                    fill={isDark ? "#C084FC" : "#792CA2"} 
                     radius={[6, 6, 0, 0]} 
                     maxBarSize={40} 
                     onClick={(data) => setSelectedEnv(data.name)} 
