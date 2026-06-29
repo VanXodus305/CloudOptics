@@ -26,24 +26,24 @@ export default function Modals({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 text-[#111844]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 text-[#111844] dark:text-[#F9F7F7]"
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full border border-gray-100 max-h-[85vh] overflow-hidden flex flex-col"
+              className="bg-[#ffffff] dark:bg-[#0F122B] rounded-3xl shadow-2xl max-w-4xl w-full border border-gray-100 dark:border-white/5 max-h-[85vh] overflow-hidden flex flex-col"
             >
               {/* Sticky header */}
-              <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100 flex-shrink-0">
+              <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100 dark:border-white/5 flex-shrink-0">
                 <div>
-                  <h3 className="text-lg font-bold text-[#111844]">
+                  <h3 className="text-lg font-bold text-[#111844] dark:text-[#F9F7F7]">
                     All Cost Resources
                   </h3>
                 </div>
                 <button
                   onClick={() => setIsResourcesModalOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
@@ -54,7 +54,7 @@ export default function Modals({
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-100 text-[10px] text-gray-400 uppercase font-black">
+                      <tr className="border-b border-gray-100 dark:border-white/5 text-[10px] text-gray-400 uppercase font-black">
                         <th className="pb-3">Resource ID</th>
                         <th className="pb-3">Region</th>
                         <th className="pb-3">Service</th>
@@ -67,14 +67,14 @@ export default function Modals({
                       {expandedResources.map((r) => (
                         <tr
                           key={r.id}
-                          className="border-b border-gray-50 hover:bg-gray-50/50 transition-all text-xs"
+                          className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition-all text-xs"
                         >
-                          <td className="py-3 font-semibold text-gray-800">
+                          <td className="py-3 font-semibold text-gray-850 dark:text-[#F9F7F7]">
                             <div className="flex items-center gap-1.5">
                               <span>{r.name}</span>
                               <button
                                 onClick={() => handleCopy(r.name)}
-                                className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                                 title="Copy ID"
                               >
                                 {copiedId === r.name ? (
@@ -85,9 +85,9 @@ export default function Modals({
                               </button>
                             </div>
                           </td>
-                          <td className="py-3 text-gray-500">{r.region}</td>
+                          <td className="py-3 text-gray-500 dark:text-gray-400">{r.region}</td>
                           <td className="py-3">
-                            <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-purple-50 text-purple-600 border border-purple-100/50">
+                            <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-[#C084FC] border border-purple-100/50 dark:border-purple-900/30">
                               {r.service}
                             </span>
                           </td>
@@ -95,10 +95,10 @@ export default function Modals({
                             <span
                               className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
                                 r.status === "Running"
-                                  ? "bg-green-50 text-green-600 border border-green-100"
+                                  ? "bg-green-50 dark:bg-emerald-950/20 text-green-600 dark:text-emerald-450 border border-green-100 dark:border-emerald-900/30"
                                   : r.status === "Active"
-                                  ? "bg-red-50 text-red-600 border border-red-100"
-                                  : "bg-black-50 text-black-600 border border-black-100"
+                                  ? "bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30"
+                                  : "bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-350 border border-gray-150 dark:border-slate-700"
                               }`}
                             >
                               {r.status}
@@ -108,16 +108,16 @@ export default function Modals({
                             <span
                               className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
                                 r.environment === "Production"
-                                  ? "bg-black-50 text-white-600 border border-white-100"
+                                  ? "bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-455 border border-rose-100 dark:border-rose-900/30"
                                   : r.environment === "Staging"
-                                  ? "bg-black-50 text-white-600 border border-white-100"
-                                  : "bg-black-50 text-white-600 border border-white-100"
+                                  ? "bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/30"
+                                  : "bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-350 border border-gray-200 dark:border-slate-700"
                               }`}
                             >
                               {r.environment}
                             </span>
                           </td>
-                          <td className="py-3 text-right font-bold text-gray-700">
+                          <td className="py-3 text-right font-bold text-gray-700 dark:text-slate-200">
                             ${r.cost.toFixed(2)}
                           </td>
                         </tr>
@@ -138,24 +138,24 @@ export default function Modals({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 text-[#111844]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 text-[#111844] dark:text-[#F9F7F7]"
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full border border-gray-100 max-h-[85vh] overflow-hidden flex flex-col"
+              className="bg-[#ffffff] dark:bg-[#0F122B] rounded-3xl shadow-2xl max-w-4xl w-full border border-gray-100 dark:border-white/5 max-h-[85vh] overflow-hidden flex flex-col"
             >
               {/* Sticky header */}
-              <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100 flex-shrink-0">
+              <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100 dark:border-white/5 flex-shrink-0">
                 <div>
-                  <h3 className="text-lg font-bold text-[#111844]">
+                  <h3 className="text-lg font-bold text-[#111844] dark:text-[#F9F7F7]">
                     All Optimization Alerts
                   </h3>
                 </div>
                 <button
                   onClick={() => setIsAlertsModalOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
@@ -166,7 +166,7 @@ export default function Modals({
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-100 text-[10px] text-gray-400 uppercase font-black">
+                      <tr className="border-b border-gray-100 dark:border-white/5 text-[10px] text-gray-400 uppercase font-black">
                         <th className="pb-3">Alert Title</th>
                         <th className="pb-3">Severity</th>
                         <th className="pb-3">Category</th>
@@ -177,14 +177,14 @@ export default function Modals({
                       {expandedAlerts.map((a) => (
                         <tr
                           key={a.id}
-                          className="border-b border-gray-50 hover:bg-gray-50/50 transition-all text-xs"
+                          className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition-all text-xs"
                         >
                           <td className="py-3">
                             <div>
-                              <h4 className="font-extrabold text-gray-800">
+                              <h4 className="font-extrabold text-gray-800 dark:text-[#F9F7F7]">
                                 {a.title}
                               </h4>
-                              <p className="text-[10px] text-gray-400 mt-0.5">
+                              <p className="text-[10px] text-gray-400 dark:text-gray-450 mt-0.5">
                                 {a.desc}
                               </p>
                             </div>
@@ -193,28 +193,28 @@ export default function Modals({
                             <span
                               className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
                                 a.severity === "Critical"
-                                  ? "bg-red-50 text-red-700 border border-red-100"
+                                  ? "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30"
                                   : a.severity === "High"
-                                  ? "bg-orange-50 text-orange-700 border-orange-100"
+                                  ? "bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30"
                                   : a.severity === "Medium"
-                                  ? "bg-yellow-50 text-yellow-700 border border-yellow-100"
-                                  : "bg-green-50 text-green-700 border border-green-100"
+                                  ? "bg-yellow-50 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-900/30"
+                                  : "bg-green-50 dark:bg-emerald-950/20 text-green-700 dark:text-emerald-400 border border-green-100 dark:border-emerald-900/30"
                               }`}
                             >
                               {a.severity}
                             </span>
                           </td>
-                          <td className="py-3 font-medium text-gray-600">
+                          <td className="py-3 font-medium text-gray-600 dark:text-slate-300">
                             {a.category}
                           </td>
                           <td className="py-3">
                             <span
                               className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
                                 a.status === "Active"
-                                  ? "bg-red-50 text-red-600 border border-red-100"
+                                  ? "bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30"
                                   : a.status === "Acknowledged"
-                                  ? "bg-blue-50 text-blue-600 border border-blue-100"
-                                  : "bg-green-50 text-green-600 border border-green-100"
+                                  ? "bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/30"
+                                  : "bg-green-50 dark:bg-emerald-950/20 text-green-600 dark:text-emerald-450 border border-green-100 dark:border-emerald-900/30"
                               }`}
                             >
                               {a.status}

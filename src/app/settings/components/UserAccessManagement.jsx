@@ -149,7 +149,7 @@ export default function UserAccessManagement() {
       transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.2 }}
       className="relative flex flex-col h-full"
     >
-      <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl rounded-tl-none p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/5 flex flex-col flex-grow relative z-0 min-h-[500px]">
+      <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/5 flex flex-col flex-grow relative z-0 min-h-[500px]">
         {/* Glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -166,36 +166,44 @@ export default function UserAccessManagement() {
           </div>
           <button
             onClick={() => setShowInviteModal(true)}
-            className="bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm hover:scale-105 active:scale-95 transition-all"
+            className="hidden sm:block bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm hover:scale-105 active:scale-95 transition-all"
           >
             Invite User
           </button>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative mb-4 z-10">
-          <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by name or email ID..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/80 dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700 pl-10 pr-4 py-2.5 rounded-xl text-xs font-bold text-[#111844] dark:text-[#F9F7F7] focus:outline-none focus:ring-1 focus:ring-[#792CA2]/30 shadow-inner"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <XMarkIcon className="w-4 h-4" />
-            </button>
-          )}
+        {/* Search Bar + Mobile Invite User Button */}
+        <div className="flex items-center gap-2 mb-4 z-10">
+          <div className="relative flex-grow">
+            <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by name or email ID..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-white/80 dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700 pl-10 pr-4 py-2.5 rounded-xl text-xs font-bold text-[#111844] dark:text-[#F9F7F7] focus:outline-none focus:ring-1 focus:ring-[#792CA2]/30 shadow-inner"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <XMarkIcon className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className="sm:hidden bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] px-4 py-2.5 rounded-xl text-xs font-bold text-white shadow-sm hover:scale-105 active:scale-95 transition-all whitespace-nowrap flex-shrink-0"
+          >
+            Invite User
+          </button>
         </div>
 
         {/* Content Body split in two columns */}
         <div className="flex flex-col lg:flex-row gap-6 relative z-10 flex-grow">
           {/* User List Panel */}
-          <div className="flex-1 flex flex-col gap-2 max-h-[380px] overflow-y-auto no-scrollbar">
+          <div className="flex-1 flex flex-col gap-2 max-h-[380px] overflow-y-auto no-scrollbar p-1">
             {loading && members.length === 0 ? (
               <div className="flex items-center justify-center p-8 flex-grow">
                 <div className="w-6 h-6 border-2 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -405,7 +413,7 @@ export default function UserAccessManagement() {
                 <h3 className="text-lg font-black text-[#111844] dark:text-[#F9F7F7] tracking-tight">Invite Team Member</h3>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-6 font-semibold">
-                Pre-authorize an email address with a specialized system role. An invitation message will be sent via Brevo.
+                Pre-authorize an email address with a specialized system role. An invitation message will be sent.
               </p>
 
               {inviteSuccess ? (

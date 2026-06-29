@@ -53,39 +53,39 @@ export default function RecommendationsList({ recommendations = [], activeCatego
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.4, type: "spring", stiffness: 200, damping: 20 }}
-        className="bg-white/40 backdrop-blur-3xl border-t border-white/60 p-6 md:p-8 flex-grow rounded-b-3xl shadow-2xl relative overflow-hidden flex flex-col min-h-[400px] will-change-transform"
+        className="bg-white/40 dark:bg-[#0F122B]/40 backdrop-blur-3xl border-t border-white/60 dark:border-white/5 p-6 md:p-8 flex-grow rounded-b-3xl shadow-2xl relative overflow-hidden flex flex-col min-h-[400px] will-change-transform"
       >
         {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-[#792CA2]/10 via-[#111844]/5 to-transparent rounded-full blur-[80px] pointer-events-none" />
         
         {isLoading ? (
-          <div className="relative z-10 w-full max-w-4xl mx-auto bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-white/50 shadow-lg flex flex-col gap-4 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-2" />
+          <div className="relative z-10 w-full max-w-4xl mx-auto bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 border border-white/50 dark:border-white/5 shadow-lg flex flex-col gap-4 animate-pulse">
+            <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/4 mb-2" />
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 w-full bg-gray-150/50 rounded-2xl flex items-center px-4 border border-gray-100">
-                <div className="w-10 h-10 bg-gray-200 rounded-xl mr-4 flex-shrink-0"></div>
+              <div key={i} className="h-20 w-full bg-gray-150/50 dark:bg-slate-800/40 rounded-2xl flex items-center px-4 border border-gray-100 dark:border-slate-800">
+                <div className="w-10 h-10 bg-gray-200 dark:bg-slate-700 rounded-xl mr-4 flex-shrink-0"></div>
                 <div className="space-y-2 flex-grow">
-                  <div className="h-3 bg-gray-200 rounded w-1/3"></div>
-                  <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/3"></div>
+                  <div className="h-2 bg-gray-200 dark:bg-slate-700 rounded w-2/3"></div>
                 </div>
-                <div className="h-4 bg-gray-200 rounded w-16 ml-auto flex-shrink-0"></div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-16 ml-auto flex-shrink-0"></div>
               </div>
             ))}
           </div>
         ) : categoryRecs.length === 0 ? (
           <div className="relative z-10 flex flex-col items-center justify-center flex-grow max-w-md text-center mx-auto">
-            <div className="w-24 h-24 bg-gradient-to-br from-white to-gray-50 rounded-full shadow-xl flex items-center justify-center mb-6 border border-white/80 relative">
-              <DocumentMagnifyingGlassIcon className="w-12 h-12 text-[#792CA2]" />
-              <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-1.5 border-4 border-[#F9F7F7]">
+            <div className="w-24 h-24 bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 rounded-full shadow-xl flex items-center justify-center mb-6 border border-white/80 dark:border-slate-800 relative">
+              <DocumentMagnifyingGlassIcon className="w-12 h-12 text-[#792CA2] dark:text-[#C084FC]" />
+              <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-1.5 border-4 border-[#F9F7F7] dark:border-[#080A1A]">
                 <CheckCircleIcon className="w-4 h-4 text-white" />
               </div>
             </div>
             
-            <h3 className="text-2xl font-black text-[#111844] mb-3">
+            <h3 className="text-2xl font-black text-[#111844] dark:text-[#F9F7F7] mb-3">
               System Optimized
             </h3>
-            <p className="text-gray-500 font-medium text-sm leading-relaxed mb-4">
-              Displaying optimized insights for the <span className="font-bold text-[#792CA2] capitalize">{activeCategory === "all" ? "All Insights" : activeCategory}</span> category. All immediate actions have been cleared.
+            <p className="text-gray-500 dark:text-slate-350 font-medium text-sm leading-relaxed mb-4">
+              Displaying optimized insights for the <span className="font-bold text-[#792CA2] dark:text-[#C084FC] capitalize">{activeCategory === "all" ? "All Insights" : activeCategory}</span> category. All immediate actions have been cleared.
             </p>
           </div>
         ) : (
@@ -101,21 +101,21 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                   placeholder="Search recommendations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-white/60 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#792CA2]/50 focus:border-transparent sm:text-sm transition-all"
+                  className="block w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl leading-5 bg-[#ffffff] dark:bg-slate-800 placeholder-gray-400 focus:outline-none focus:bg-[#ffffff] dark:focus:bg-slate-900 text-[#111844] dark:text-[#F9F7F7] focus:ring-2 focus:ring-[#792CA2]/50 focus:border-transparent sm:text-sm transition-all"
                 />
               </div>
 
               {/* Impact Summary Indicator */}
               <div className="flex flex-wrap items-center justify-end gap-3">
-                <span className="text-[11px] font-black text-[#111844] uppercase tracking-widest">Impact Summary:</span>
+                <span className="text-[11px] font-black text-[#111844] dark:text-[#F9F7F7] uppercase tracking-widest">Impact Summary:</span>
               <div className="flex gap-2">
-                <span className="bg-red-50 text-red-600 border border-red-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                <span className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
                   High: {filteredRecs.filter(r => r.impact === 'High').length}
                 </span>
-                <span className="bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                <span className="bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-450 border border-amber-100 dark:border-amber-900/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
                   Medium: {filteredRecs.filter(r => r.impact === 'Medium').length}
                 </span>
-                <span className="bg-green-50 text-green-600 border border-green-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                <span className="bg-green-50 dark:bg-emerald-950/30 text-green-600 dark:text-emerald-450 border border-green-100 dark:border-emerald-900/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
                   Low: {filteredRecs.filter(r => r.impact === 'Low').length}
                 </span>
               </div>
@@ -123,16 +123,16 @@ export default function RecommendationsList({ recommendations = [], activeCatego
             </div>
 
             {filteredRecs.length === 0 ? (
-              <div className="relative z-10 flex flex-col items-center justify-center py-12 text-center bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100">
-                <DocumentMagnifyingGlassIcon className="w-12 h-12 text-gray-300 mb-4" />
-                <h3 className="text-lg font-bold text-gray-700 mb-1">No results found</h3>
-                <p className="text-gray-500 text-sm">We couldn't find anything matching "{searchQuery}".</p>
+              <div className="relative z-10 flex flex-col items-center justify-center py-12 text-center bg-[#ffffff] dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-800">
+                <DocumentMagnifyingGlassIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-4" />
+                <h3 className="text-lg font-bold text-gray-700 dark:text-[#F9F7F7] mb-1">No results found</h3>
+                <p className="text-gray-500 dark:text-slate-400 text-sm">We couldn't find anything matching "{searchQuery}".</p>
               </div>
             ) : filteredRecs.map((rec) => {
               return (
                 <div
                   key={rec.id}
-                  className={`bg-white/90 hover:bg-white rounded-2xl p-5 md:p-6 shadow-md border-l-4 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-out will-change-transform flex flex-col md:flex-row gap-4 justify-between items-start md:items-center ${
+                  className={`bg-[#ffffff] dark:bg-[#0F122B]/60 hover:bg-[#ffffff] dark:hover:bg-[#0F122B]/80 rounded-2xl p-5 md:p-6 shadow-md dark:shadow-black/20 border-l-4 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-out will-change-transform flex flex-col md:flex-row gap-4 justify-between items-start md:items-center ${
                     rec.impact === "High"
                       ? "border-l-red-500"
                       : rec.impact === "Medium"
@@ -142,22 +142,22 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                 >
                   <div className="flex gap-4 items-start flex-grow w-full md:w-auto">
                     {/* Icon or Service Badge */}
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-50 border border-purple-100 flex flex-col items-center justify-center flex-shrink-0 shadow-sm">
-                      <span className="text-[10px] md:text-xs font-black text-[#792CA2] uppercase">{rec.service}</span>
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/30 flex flex-col items-center justify-center flex-shrink-0 shadow-sm">
+                      <span className="text-[10px] md:text-xs font-black text-[#792CA2] dark:text-[#C084FC] uppercase">{rec.service}</span>
                     </div>
 
                     <div className="space-y-1 flex-grow">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
                           rec.impact === "High"
-                            ? "bg-red-50 text-red-600 border border-red-100"
+                            ? "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30"
                             : rec.impact === "Medium"
-                            ? "bg-amber-50 text-amber-600 border border-amber-100"
-                            : "bg-green-50 text-green-600 border border-green-100"
+                            ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-450 border border-amber-100 dark:border-amber-900/30"
+                            : "bg-green-50 dark:bg-emerald-950/30 text-green-600 dark:text-emerald-400 border border-green-100 dark:border-emerald-900/30"
                         }`}>
                           {rec.impact} 
                         </span>
-                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-gray-50 border border-gray-150 text-gray-500 font-mono">
+                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-gray-50 dark:bg-slate-800 border border-gray-150 dark:border-slate-700 text-gray-500 dark:text-slate-350 font-mono">
                           ID: {rec.resourceId}
                           <button
                             onClick={() => handleCopy(rec.resourceId, rec.id)}
@@ -173,19 +173,19 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                         </span>
                       </div>
 
-                      <h4 className="text-sm md:text-base font-extrabold text-[#111844] tracking-tight mt-1">{rec.title}</h4>
-                      <p className="text-xs md:text-sm text-gray-500 font-medium leading-relaxed max-w-2xl mt-0.5">{rec.description}</p>
+                      <h4 className="text-sm md:text-base font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight mt-1">{rec.title}</h4>
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-slate-300 font-medium leading-relaxed max-w-2xl mt-0.5">{rec.description}</p>
                       
                       {rec.actionableSteps && (
-                        <div className="mt-3 bg-[#792CA2]/5 border border-[#792CA2]/20 rounded-xl overflow-hidden transition-all duration-300">
+                        <div className="mt-3 bg-[#792CA2]/5 dark:bg-[#792CA2]/10 border border-[#792CA2]/20 dark:border-[#792CA2]/30 rounded-xl overflow-hidden transition-all duration-300">
                           <button 
                             onClick={() => toggleSteps(rec.id)}
-                            className="w-full flex items-center justify-between p-3 focus:outline-none hover:bg-[#792CA2]/10 transition-colors"
+                            className="w-full flex items-center justify-between p-3 focus:outline-none hover:bg-[#792CA2]/10 dark:hover:bg-[#792CA2]/20 transition-colors"
                           >
-                            <span className="font-bold text-[#792CA2] uppercase tracking-wider text-[10px] font-sans">
+                            <span className="font-bold text-[#792CA2] dark:text-[#C084FC] uppercase tracking-wider text-[10px] font-sans">
                               Actionable Steps
                             </span>
-                            <ChevronDownIcon className={`w-4 h-4 text-[#792CA2] transition-transform duration-300 ${expandedSteps[rec.id] ? "rotate-180" : ""}`} />
+                            <ChevronDownIcon className={`w-4 h-4 text-[#792CA2] dark:text-[#C084FC] transition-transform duration-300 ${expandedSteps[rec.id] ? "rotate-180" : ""}`} />
                           </button>
                           
                           <AnimatePresence>
@@ -194,7 +194,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                className="px-3 pb-3 text-[11px] md:text-xs text-gray-700 font-sans"
+                                className="px-3 pb-3 text-[11px] md:text-xs text-gray-700 dark:text-slate-200 font-sans"
                               >
                                 <ol className="list-decimal pl-5 space-y-2 font-mono">
                                   {(() => {
@@ -208,7 +208,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                                       if (!cleanStep) return null;
                                       // Ensure each step ends with a period for consistency
                                       const finalStep = cleanStep.endsWith('.') ? cleanStep : cleanStep + '.';
-                                      return <li key={idx} className="leading-relaxed pl-1 text-gray-600">{finalStep}</li>;
+                                      return <li key={idx} className="leading-relaxed pl-1 text-gray-600 dark:text-slate-350">{finalStep}</li>;
                                     });
                                   })()}
                                 </ol>
@@ -220,9 +220,9 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                     </div>
                   </div>
 
-                  <div className="flex md:flex-col items-baseline md:items-end justify-between w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100/80 flex-shrink-0">
+                  <div className="flex md:flex-col items-baseline md:items-end justify-between w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100/80 dark:border-slate-800 flex-shrink-0">
                     <div className="text-left md:text-right">
-                      <span className="text-[9px] font-bold text-gray-400 block uppercase tracking-wider">Est. Savings</span>
+                      <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 block uppercase tracking-wider">Est. Savings</span>
                       <span className="text-lg md:text-xl font-black text-emerald-600">-${Math.round(rec.potentialSavings)}/mo</span>
                     </div>
                   </div>

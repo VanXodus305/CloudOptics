@@ -92,6 +92,37 @@ export default function ResourcesPage() {
   const [dashboardData, setDashboardData] = useState(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
+  // Live Simulation state
+  const [isLiveSimulation, setIsLiveSimulation] = useState(false);
+  useEffect(() => {
+    const saved = localStorage.getItem("isLiveSimulation") === "true";
+    setIsLiveSimulation(saved);
+  }, []);
+
+  const handleSetLiveSimulation = (val) => {
+    setIsLiveSimulation(val);
+    localStorage.setItem("isLiveSimulation", val ? "true" : "false");
+  };
+
+  // Poll for resources simulation updates when active
+  useEffect(() => {
+    if (!isLiveSimulation || status !== "authenticated") return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/resources/dashboard?environment=${selectedEnvironment}`);
+        if (res.ok) {
+          const json = await res.json();
+          setDashboardData(json);
+        }
+      } catch (err) {
+        console.error("Simulation polling error:", err);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isLiveSimulation, status, selectedEnvironment]);
+
   const profileRef = useRef(null);
   const filterRef = useRef(null);
 
@@ -234,8 +265,8 @@ export default function ResourcesPage() {
         <Sidebar
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
-          isLiveSimulation={false}
-          setIsLiveSimulation={() => {}}
+          isLiveSimulation={isLiveSimulation}
+          setIsLiveSimulation={handleSetLiveSimulation}
           handleSignOut={handleSignOut}
           setIsResourcesModalOpen={() => {}}
           setIsAlertsModalOpen={() => {}}
@@ -282,13 +313,12 @@ export default function ResourcesPage() {
                   className="relative w-full sm:w-auto"
                   ref={filterRef}
                 >
-                  {/* Desktop Dropdown */}
                   <div className="hidden sm:block">
                     <button
                       onClick={() => setIsTopFilterOpen(!isTopFilterOpen)}
-                      className="bg-white/90 backdrop-blur-sm text-[#792CA2] px-5 py-2.5 rounded-2xl shadow-lg shadow-[#792CA2]/10 hover:shadow-xl hover:shadow-[#792CA2]/20 transition-all duration-300 flex items-center gap-2.5 border border-[#792CA2]/15 font-semibold text-sm hover:-translate-y-0.5"
+                      className="bg-white/90 dark:bg-[#0F122B]/90 backdrop-blur-sm text-[#792CA2] dark:text-[#C084FC] px-5 py-2.5 rounded-2xl shadow-lg shadow-[#792CA2]/10 hover:shadow-xl hover:shadow-[#792CA2]/20 transition-all duration-300 flex items-center gap-2.5 border border-[#792CA2]/15 dark:border-[#C084FC]/25 font-semibold text-sm hover:-translate-y-0.5"
                     >
-                      <span className="w-2 h-2 rounded-full bg-[#792CA2] animate-pulse" />
+                      <span className="w-2 h-2 rounded-full bg-[#792CA2] dark:bg-[#C084FC] animate-pulse" />
                       {selectedEnvironment}
                       <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isTopFilterOpen ? "rotate-180" : ""}`} />
                     </button>
@@ -299,15 +329,15 @@ export default function ResourcesPage() {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -8, scale: 0.96 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100/80 z-[999] py-2 overflow-hidden"
+                          className="absolute right-0 mt-2 w-52 bg-white/95 dark:!bg-slate-900 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100/80 dark:border-slate-800 z-[999] py-2 overflow-hidden"
                         >
                           {ENVIRONMENTS.map((env) => (
                             <button
                               key={env}
                               onClick={() => { setSelectedEnvironment(env); setIsTopFilterOpen(false); }}
-                              className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedEnvironment === env ? "text-[#792CA2] bg-[#792CA2]/8" : "text-gray-600 hover:bg-[#792CA2]/6 hover:text-[#792CA2]"}`}
+                              className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs font-semibold transition-all ${selectedEnvironment === env ? "text-[#792CA2] dark:text-[#C084FC] bg-[#792CA2]/8 dark:bg-[#C084FC]/15" : "text-gray-650 dark:text-slate-300 hover:bg-[#792CA2]/6 dark:hover:bg-slate-800/60 hover:text-[#792CA2] dark:hover:text-[#C084FC]"}`}
                             >
-                              <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedEnvironment === env ? "bg-[#792CA2]" : "bg-gray-300"}`} />
+                              <span className={`w-1.5 h-1.5 rounded-full transition-colors ${selectedEnvironment === env ? "bg-[#792CA2] dark:bg-[#C084FC]" : "bg-gray-300 dark:bg-gray-600"}`} />
                               {env}
                             </button>
                           ))}

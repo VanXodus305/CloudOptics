@@ -37,6 +37,18 @@ export default function RecommendationsPage() {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [error, setError] = useState(null);
 
+  // Live Simulation state
+  const [isLiveSimulation, setIsLiveSimulation] = useState(false);
+  useEffect(() => {
+    const saved = localStorage.getItem("isLiveSimulation") === "true";
+    setIsLiveSimulation(saved);
+  }, []);
+
+  const handleSetLiveSimulation = (val) => {
+    setIsLiveSimulation(val);
+    localStorage.setItem("isLiveSimulation", val ? "true" : "false");
+  };
+
   const profileRef = useRef(null);
 
   const fetchRecommendations = async (regenerate = false) => {
@@ -166,8 +178,8 @@ export default function RecommendationsPage() {
         <Sidebar
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
-          isLiveSimulation={false}
-          setIsLiveSimulation={() => { }}
+          isLiveSimulation={isLiveSimulation}
+          setIsLiveSimulation={handleSetLiveSimulation}
           handleSignOut={handleSignOut}
           setIsResourcesModalOpen={() => { }}
           setIsAlertsModalOpen={() => { }}

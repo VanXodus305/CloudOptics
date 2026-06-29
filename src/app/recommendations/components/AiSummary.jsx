@@ -27,7 +27,7 @@ export default function AiSummary({
         <div className="bg-[#792CA2]/10 p-1.5 rounded-lg border border-[#792CA2]/20">
           <SparklesIcon className="w-5 h-5 text-[#792CA2]" />
         </div>
-        <h2 className="text-xl font-extrabold text-[#111844] tracking-tight">AI-Recommended Summary</h2>
+        <h2 className="text-xl font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">AI-Recommended Summary</h2>
       </div>
       
       <div className="relative mt-2 flex-grow flex flex-col">
@@ -35,16 +35,16 @@ export default function AiSummary({
         <div className="absolute inset-0 bg-gradient-to-br from-[#792CA2]/5 to-[#9A4DCC]/10 rounded-3xl blur-xl" />
 
         {/* Main Box */}
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex-grow flex flex-col gap-4 sm:gap-5 relative z-0">
-          <div className="flex justify-between items-center w-full border-b border-gray-100 pb-4">
-            <div className="bg-gray-100/80 rounded-lg px-4 py-1.5 shadow-inner border border-gray-200/60 font-bold text-[#111844] text-sm flex items-center gap-2">
+        <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/5 flex-grow flex flex-col gap-4 sm:gap-5 relative z-0">
+          <div className="flex justify-between items-center w-full border-b border-gray-100 dark:border-slate-800 pb-4">
+            <div className="bg-gray-100/80 dark:bg-slate-800 rounded-lg px-4 py-1.5 shadow-inner border border-gray-200/60 dark:border-slate-700 font-bold text-[#111844] dark:text-[#F9F7F7] text-sm flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
               AI Insights
             </div>
             <button 
               onClick={onRegenerate}
               disabled={isRegenerating || isLoading}
-              className="bg-white text-[#792CA2] font-bold px-4 py-1.5 rounded-lg shadow-sm border border-[#792CA2]/20 hover:bg-[#792CA2]/5 hover:border-[#792CA2]/40 transition-all text-xs flex items-center gap-1.5 group disabled:opacity-50"
+              className="bg-[#ffffff] dark:bg-slate-800 text-[#792CA2] dark:text-[#C084FC] font-bold px-4 py-1.5 rounded-lg shadow-sm border border-[#792CA2]/20 dark:border-slate-700 hover:bg-[#792CA2]/5 dark:hover:bg-[#C084FC]/10 hover:border-[#792CA2]/40 dark:hover:border-[#C084FC]/40 transition-all text-xs flex items-center gap-1.5 group disabled:opacity-50"
             >
               <ArrowPathIcon className={`w-4 h-4 ${(isRegenerating || isLoading) ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`} />
               Regenerate
@@ -61,7 +61,7 @@ export default function AiSummary({
               <div>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Actions</p>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="text-xl font-black text-[#111844] tracking-tight">
+                  <span className="text-xl font-black text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                     {isLoading || isRegenerating ? (
                       <span className="w-6 h-5 block bg-gray-200/50 animate-pulse rounded" />
                     ) : (
@@ -81,7 +81,7 @@ export default function AiSummary({
               <div>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Potential Savings</p>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="text-xl font-black text-emerald-600 tracking-tight">
+                  <span className="text-xl font-black text-emerald-600 dark:text-emerald-450 tracking-tight">
                     {isLoading || isRegenerating ? (
                       <span className="w-12 h-5 block bg-gray-200/50 animate-pulse rounded" />
                     ) : (
@@ -95,7 +95,7 @@ export default function AiSummary({
           </div>
 
           
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 md:p-6 shadow-sm border border-white flex-grow min-h-[120px] relative overflow-hidden flex flex-col justify-center">
+          <div className="bg-white/80 dark:bg-[#0F122B]/40 backdrop-blur-md rounded-2xl p-5 md:p-6 shadow-sm border border-white dark:border-white/5 flex-grow min-h-[120px] relative overflow-hidden flex flex-col justify-center">
             {/* Inner glowing element */}
             <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
             
@@ -116,9 +116,9 @@ export default function AiSummary({
             ) : (
               <div className="space-y-5 relative z-10 w-full">
                 {overview ? (
-                  <div className="flex gap-3 items-start bg-purple-50/30 border border-purple-100/50 p-4 rounded-xl">
+                  <div className="flex gap-3 items-start bg-purple-50/30 dark:bg-purple-950/15 border border-purple-100/50 dark:border-purple-900/30 p-4 rounded-xl">
                     <DocumentTextIcon className="w-5 h-5 text-[#792CA2] mt-0.5 flex-shrink-0" />
-                    <p className="text-gray-600 font-medium text-xs md:text-sm leading-relaxed">
+                    <p className="text-gray-650 dark:text-slate-200 font-medium text-xs md:text-sm leading-relaxed">
                       {overview}
                     </p>
                   </div>
@@ -132,13 +132,13 @@ export default function AiSummary({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                     {keyFindings.length > 0 && (
                       <div className="space-y-2">
-                        <h4 className="text-[11px] font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1">
+                        <h4 className="text-[11px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider flex items-center gap-1">
                           <ExclamationTriangleIcon className="w-4 h-4" />
                           Key Findings
                         </h4>
                         <ul className="space-y-1.5">
                           {keyFindings.map((finding, idx) => (
-                            <li key={idx} className="text-gray-500 text-xs font-medium leading-tight flex items-start gap-1.5">
+                            <li key={idx} className="text-gray-500 dark:text-slate-350 text-xs font-medium leading-tight flex items-start gap-1.5">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                               <span>{finding}</span>
                             </li>
@@ -149,13 +149,13 @@ export default function AiSummary({
 
                     {nextSteps.length > 0 && (
                       <div className="space-y-2">
-                        <h4 className="text-[11px] font-bold text-[#792CA2] uppercase tracking-wider flex items-center gap-1">
+                        <h4 className="text-[11px] font-bold text-[#792CA2] dark:text-[#C084FC] uppercase tracking-wider flex items-center gap-1">
                           <BoltIcon className="w-4 h-4" />
                           Recommended Actions
                         </h4>
                         <ul className="space-y-1.5">
                           {nextSteps.map((step, idx) => (
-                            <li key={idx} className="text-gray-500 text-xs font-medium leading-tight flex items-start gap-1.5">
+                            <li key={idx} className="text-gray-500 dark:text-slate-350 text-xs font-medium leading-tight flex items-start gap-1.5">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#792CA2] mt-1.5 flex-shrink-0" />
                               <span>{step}</span>
                             </li>

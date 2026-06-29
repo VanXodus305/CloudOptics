@@ -27,6 +27,18 @@ export default function SettingsPage() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [currentDate, setCurrentDate] = useState("");
+
+  // Live Simulation state
+  const [isLiveSimulation, setIsLiveSimulation] = useState(false);
+  useEffect(() => {
+    const saved = localStorage.getItem("isLiveSimulation") === "true";
+    setIsLiveSimulation(saved);
+  }, []);
+
+  const handleSetLiveSimulation = (val) => {
+    setIsLiveSimulation(val);
+    localStorage.setItem("isLiveSimulation", val ? "true" : "false");
+  };
   
   const profileRef = useRef(null);
 
@@ -128,8 +140,8 @@ export default function SettingsPage() {
         <Sidebar
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
-          isLiveSimulation={false}
-          setIsLiveSimulation={() => {}}
+          isLiveSimulation={isLiveSimulation}
+          setIsLiveSimulation={handleSetLiveSimulation}
           handleSignOut={handleSignOut}
           setIsResourcesModalOpen={() => {}}
           setIsAlertsModalOpen={() => {}}
@@ -137,7 +149,7 @@ export default function SettingsPage() {
 
         {/* MAIN CONTENT AREA */}
         <div className="flex-grow flex flex-col h-full overflow-x-hidden relative p-4 md:p-8 overflow-y-auto">
-          <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pb-8">
+          <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pb-28 md:pb-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow pt-4">
               
               {/* Left Column (Profile details & Options) */}

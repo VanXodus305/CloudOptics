@@ -226,30 +226,31 @@ export default function Sidebar({
       ) : (
         <nav className="flex-grow flex flex-col justify-between pb-12">
           <div className="space-y-4">
-            <Link
-              href="/dashboard"
-              onClick={() => {
-                if (pathname !== "/dashboard") setIsNavigatingTo("Dashboard");
-              }}
-              className={`text-xs font-semibold relative flex items-center transition-all duration-150 ${
-                shouldBeExpanded
-                  ? `w-full text-left px-4 py-3 rounded-xl gap-3 shadow-md border border-transparent ${activeTab === "Dashboard" ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC]" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
-                  : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === "Dashboard" ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
-              }`}
-            >
-              {isNavigatingTo === "Dashboard" ? (
-                <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              ) : (
-                <Squares2X2Icon className="w-5 h-5 flex-shrink-0" />
-              )}
-              {shouldBeExpanded && (
-                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  Dashboard
-                </motion.span>
-              )}
+            <Link href="/dashboard" passHref legacyBehavior>
+              <a
+                onClick={() => {
+                  if (pathname !== "/dashboard") setIsNavigatingTo("Dashboard");
+                }}
+                className={`text-xs font-semibold relative flex items-center transition-all duration-150 ${
+                  shouldBeExpanded
+                    ? `w-full text-left px-4 py-3 rounded-xl gap-3 shadow-md border border-transparent ${activeTab === "Dashboard" ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC]" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
+                    : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === "Dashboard" ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
+                }`}
+              >
+                {isNavigatingTo === "Dashboard" ? (
+                  <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <Squares2X2Icon className="w-5 h-5 flex-shrink-0" />
+                )}
+                {shouldBeExpanded && (
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    Dashboard
+                  </motion.span>
+                )}
+              </a>
             </Link>
 
             {[
@@ -259,35 +260,35 @@ export default function Sidebar({
             ].map((item) => {
               const Icon = item.icon;
               return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => {
-                    if (pathname !== item.href) setIsNavigatingTo(item.name);
-                  }}
-                  className={`text-xs transition-all duration-150 font-medium flex items-center ${
-                    shouldBeExpanded
-                      ? `w-full text-left px-4 py-3 rounded-xl gap-3 border border-transparent ${activeTab === item.name ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC] shadow-md" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
-                      : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === item.name ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
-                  }`}
-                >
-                  {isNavigatingTo === item.name ? (
-                    <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  ) : (
-                    <Icon className="w-5 h-5 flex-shrink-0" />
-                  )}
-                  {shouldBeExpanded && (
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="truncate"
-                    >
-                      {item.name}
-                    </motion.span>
-                  )}
+                <Link key={item.name} href={item.href} passHref legacyBehavior>
+                  <a
+                    onClick={() => {
+                      if (pathname !== item.href) setIsNavigatingTo(item.name);
+                    }}
+                    className={`text-xs transition-all duration-150 font-medium flex items-center ${
+                      shouldBeExpanded
+                        ? `w-full text-left px-4 py-3 rounded-xl gap-3 border border-transparent ${activeTab === item.name ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC] shadow-md" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
+                        : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === item.name ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
+                    }`}
+                  >
+                    {isNavigatingTo === item.name ? (
+                      <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    ) : (
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                    )}
+                    {shouldBeExpanded && (
+                      <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="truncate"
+                      >
+                        {item.name}
+                      </motion.span>
+                    )}
+                  </a>
                 </Link>
               );
             })}
@@ -347,34 +348,35 @@ export default function Sidebar({
           )}
 
           <div className="space-y-4">
-            <Link
-              href="/settings"
-              onClick={() => {
-                if (pathname !== "/settings") setIsNavigatingTo("Settings");
-              }}
-              className={`text-xs font-medium flex items-center transition-all duration-150 ${
-                shouldBeExpanded
-                  ? `w-full text-left px-4 py-3 rounded-xl gap-3 border border-transparent ${activeTab === "Settings" ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC] shadow-md" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
-                  : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === "Settings" ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
-              }`}
-            >
-              {isNavigatingTo === "Settings" ? (
-                <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              ) : (
-                <Cog6ToothIcon className="w-5 h-5 flex-shrink-0" />
-              )}
-              {shouldBeExpanded && (
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="truncate"
-                >
-                  Settings
-                </motion.span>
-              )}
+            <Link href="/settings" passHref legacyBehavior>
+              <a
+                onClick={() => {
+                  if (pathname !== "/settings") setIsNavigatingTo("Settings");
+                }}
+                className={`text-xs font-medium flex items-center transition-all duration-150 ${
+                  shouldBeExpanded
+                    ? `w-full text-left px-4 py-3 rounded-xl gap-3 border border-transparent ${activeTab === "Settings" ? "bg-[#792CA2] text-white hover:bg-[#9A4DCC] shadow-md" : "text-gray-400 hover:text-white hover:bg-[#792CA2]/25"}`
+                    : `w-11 h-11 rounded-xl mx-auto justify-center active:translate-y-[2px] ${activeTab === "Settings" ? "bg-[#792CA2] text-white shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.4)] border border-[#9A4DCC]/30" : "text-gray-400 bg-white/5 border border-gray-700/40 hover:text-white hover:bg-[#792CA2]/15 shadow-[0_4px_0_#0d1235,0_4px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_0_#5c1f7e,0_4px_10px_rgba(121,44,162,0.25)] hover:border-[#9A4DCC]/20"}`
+                }`}
+              >
+                {isNavigatingTo === "Settings" ? (
+                  <svg className="animate-spin w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <Cog6ToothIcon className="w-5 h-5 flex-shrink-0" />
+                )}
+                {shouldBeExpanded && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="truncate"
+                  >
+                    Settings
+                  </motion.span>
+                )}
+              </a>
             </Link>
 
             <button

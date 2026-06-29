@@ -223,13 +223,13 @@ export default function CostResourceChart({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
+              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                 {drilldownResource} Usage Details
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
+              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                 Resources Average Cost
               </span>
               <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">
@@ -247,7 +247,7 @@ export default function CostResourceChart({
               {timeFilter} <ChevronDownIcon className="w-3 h-3 text-gray-500" />
             </button>
             {filterOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-1 overflow-hidden">
+              <div className="absolute right-0 mt-2 w-32 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-20 py-1 overflow-hidden">
                 {["Hourly", "Daily", "Weekly", "Monthly"].map((option) => (
                   <button
                     key={option}
@@ -255,7 +255,7 @@ export default function CostResourceChart({
                       setTimeFilter(option);
                       setFilterOpen(false);
                     }}
-                    className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors"
+                    className="block w-full text-left px-4 py-2 text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/15 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                   >
                     {option}
                   </button>
@@ -273,51 +273,50 @@ export default function CostResourceChart({
                 {
                   label: "Active Instances",
                   value: activeCount,
-                  color: "text-[#792CA2]",
-                  bg: "bg-[#792CA2]/10",
+                  color: "text-[#792CA2] dark:text-[#C084FC]",
+                  bg: "bg-[#792CA2]/10 dark:bg-[#792CA2]/20",
                 },
                 {
                   label: "Avg CPU Load",
                   value: avgLoad.toFixed(1) + "%",
-                  color: "text-[#9A4DCC]",
-                  bg: "bg-[#9A4DCC]/10",
+                  color: "text-[#9A4DCC] dark:text-[#E0A9FF]",
+                  bg: "bg-[#9A4DCC]/10 dark:bg-[#9A4DCC]/20",
                 },
                 {
                   label: "Est. Cost (30d)",
                   value: "$" + Math.round(estCost).toLocaleString(),
-                  color: "text-[#1F215D]",
-                  bg: "bg-[#1F215D]/10",
+                  color: "text-[#1F215D] dark:text-[#93C5FD]",
+                  bg: "bg-[#1F215D]/10 dark:bg-[#1e293b]/60",
                 },
                 {
                   label: "Health",
                   value: healthPercent.toFixed(1) + "%",
-                  color: "text-green-600",
-                  bg: "bg-green-50",
+                  color: "text-green-600 dark:text-green-400",
+                  bg: "bg-green-50 dark:bg-green-950/30",
                 },
               ].map((kpi, idx) => (
                 <div key={idx} className={`rounded-xl p-3 flex flex-col justify-center items-start ${kpi.bg}`}>
-                  <p className="text-[10px] font-semibold text-gray-500 mb-0.5">{kpi.label}</p>
+                  <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{kpi.label}</p>
                   <p className={`text-lg font-bold ${kpi.color}`}>{kpi.value}</p>
                 </div>
               ))}
             </div>
             <div className="flex-grow w-full relative min-h-[120px]">
-              {/* Y-axis label */}
-              <div
-                className="absolute left-[10px] top-[40%]"
-                style={{
-                  writingMode: "vertical-rl",
-                  transform: "rotate(180deg) translateY(50%)",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "#111844",
-                  userSelect: "none",
-                  pointerEvents: "none",
-                  zIndex: 10,
-                }}
-              >
-                Cost ($) ➔
-              </div>
+            {/* Y-axis label */}
+            <div
+              className="absolute left-[10px] top-[40%] text-[#111844] dark:text-[#F9F7F7]"
+              style={{
+                writingMode: "vertical-rl",
+                transform: "rotate(180deg) translateY(50%)",
+                fontSize: 11,
+                fontWeight: 700,
+                userSelect: "none",
+                pointerEvents: "none",
+                zIndex: 10,
+              }}
+            >
+              Cost ($) ➔
+            </div>
               <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
                 <AreaChart style={{ outline: "none" }} data={drilldownTrendData} margin={{ top: 20, right: 45, left: 45, bottom: 35 }}>
                   <defs>
@@ -335,7 +334,7 @@ export default function CostResourceChart({
                     dy={10}
                     tick={({ x, y, payload }) => (
                       <g transform={`translate(${x},${y})`}>
-                        <text x={0} y={0} dy={10} textAnchor="middle" fill="#6B7280" className="tick-text">
+                        <text x={0} y={0} dy={10} textAnchor="middle" fill="currentColor" className="tick-text text-gray-450 dark:text-slate-400">
                           {payload.value}
                         </text>
                       </g>
@@ -345,10 +344,10 @@ export default function CostResourceChart({
                       value="Time ➔"
                       offset={-15}
                       position="insideBottom"
-                      className="fill-[#111844] font-bold text-[10px] md:text-[13px]"
+                      className="fill-[#111844] dark:fill-[#F9F7F7] font-bold text-[10px] md:text-[13px]"
                     />
                   </XAxis>
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 10 }} dx={-10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 10 }} className="text-gray-450 dark:text-slate-400" dx={-10} />
                   <Tooltip
                     cursor={{ fill: "rgba(121, 44, 162, 0.05)" }}
                     offset={0}
@@ -376,13 +375,12 @@ export default function CostResourceChart({
           <div className="relative w-full h-full">
             {/* Y-axis label */}
             <div
-              className="absolute left-[10px] top-[40%]"
+              className="absolute left-[10px] top-[40%] text-[#111844] dark:text-[#F9F7F7]"
               style={{
                 writingMode: "vertical-rl",
                 transform: "rotate(180deg) translateY(50%)",
                 fontSize: 13,
                 fontWeight: 700,
-                color: "#111844",
                 userSelect: "none",
                 pointerEvents: "none",
                 zIndex: 10,
@@ -398,15 +396,15 @@ export default function CostResourceChart({
                 margin={{ top: 30, right: 20, left: 15, bottom: 45 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 11 }} dy={10}>
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 11 }} className="text-gray-450 dark:text-slate-400" dy={10}>
                   <Label
                     value="Resources ➔"
                     offset={-30}
                     position="insideBottom"
-                    style={{ fill: "#111844", fontSize: 13, fontWeight: "bold" }}
+                    className="fill-[#111844] dark:fill-[#F9F7F7] font-bold text-xs md:text-sm"
                   />
                 </XAxis>
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 11 }} dx={-10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 11 }} className="text-gray-450 dark:text-slate-400" dx={-10} />
                 <Tooltip
                   cursor={{ fill: "rgba(121, 44, 162, 0.05)" }}
                   position={{ x: 0, y: 0 }}

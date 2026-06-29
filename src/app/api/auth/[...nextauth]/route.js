@@ -76,6 +76,11 @@ const config = {
         if (member) {
           token.role = member.role;
           token.id = member._id.toString();
+          token.name = member.name;
+          token.revoked = false;
+        } else {
+          token.role = null;
+          token.revoked = true;
         }
       } catch (error) {
         console.error("Error fetching user role:", error);
@@ -86,10 +91,12 @@ const config = {
 
     async session({ session, token }) {
       if (session.user) {
+        session.user.name = token.name;
         session.user.email = token.email;
         session.user.image = token.picture;
         session.user.role = token.role;
         session.user.id = token.id;
+        session.user.revoked = token.revoked;
       }
       return session;
     },

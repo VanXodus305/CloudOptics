@@ -53,14 +53,14 @@ const parseInline = (text) => {
   
   return parts.map((part, idx) => {
     if (part.type === "bold") {
-      return <strong key={idx} className="font-extrabold text-[#111844]">{part.content}</strong>;
+      return <strong key={idx} className="font-extrabold text-[#111844] dark:text-[#F9F7F7]">{part.content}</strong>;
     }
     if (part.type === "italic") {
-      return <em key={idx} className="italic text-gray-800">{part.content}</em>;
+      return <em key={idx} className="italic text-gray-800 dark:text-slate-200">{part.content}</em>;
     }
     if (part.type === "code") {
       return (
-        <code key={idx} className="bg-purple-50 text-[#792CA2] font-mono px-1.5 py-0.5 rounded text-[10px] border border-purple-100/50">
+        <code key={idx} className="bg-purple-50 dark:bg-purple-950/40 text-[#792CA2] dark:text-[#C084FC] font-mono px-1.5 py-0.5 rounded text-[10px] border border-purple-100/50 dark:border-purple-900/30">
           {part.content}
         </code>
       );
@@ -105,10 +105,10 @@ const formatMessage = (text) => {
         const level = headerMatch[1].length;
         const content = headerMatch[2];
         const headingClass = level === 1 
-          ? "text-sm font-extrabold text-[#111844] mt-3 mb-1.5" 
+          ? "text-sm font-extrabold text-[#111844] dark:text-[#F9F7F7] mt-3 mb-1.5" 
           : level === 2 
-            ? "text-xs font-bold text-[#111844] mt-2.5 mb-1" 
-            : "text-[11px] font-bold text-[#111844] mt-2 mb-1";
+            ? "text-xs font-bold text-[#111844] dark:text-[#F9F7F7] mt-2.5 mb-1" 
+            : "text-[11px] font-bold text-[#111844] dark:text-[#F9F7F7] mt-2 mb-1";
         const HeadingTag = `h${Math.min(level, 6)}`;
         return (
           <HeadingTag key={`h-${lineIdx}`} className={headingClass}>
@@ -123,8 +123,8 @@ const formatMessage = (text) => {
         const content = bulletMatch[2];
         return (
           <div key={`li-${lineIdx}`} className="flex items-start gap-1.5 ml-3 my-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#792CA2] mt-1.5 flex-shrink-0" />
-            <span className="text-xs text-gray-600 leading-normal">{parseInline(content)}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#792CA2] dark:bg-[#C084FC] mt-1.5 flex-shrink-0" />
+            <span className="text-xs text-gray-600 dark:text-slate-300 leading-normal">{parseInline(content)}</span>
           </div>
         );
       }
@@ -136,15 +136,15 @@ const formatMessage = (text) => {
         const content = numberMatch[3];
         return (
           <div key={`ol-${lineIdx}`} className="flex items-start gap-1.5 ml-3 my-1">
-            <span className="text-xs font-bold text-[#792CA2] min-w-[12px] text-right mt-0.5 flex-shrink-0">{num}.</span>
-            <span className="text-xs text-gray-600 leading-normal">{parseInline(content)}</span>
+            <span className="text-xs font-bold text-[#792CA2] dark:text-[#C084FC] min-w-[12px] text-right mt-0.5 flex-shrink-0">{num}.</span>
+            <span className="text-xs text-gray-600 dark:text-slate-300 leading-normal">{parseInline(content)}</span>
           </div>
         );
       }
       
       // 4. Default paragraph
       return (
-        <p key={`p-${lineIdx}`} className="my-1.5 text-xs text-gray-600 leading-normal">
+        <p key={`p-${lineIdx}`} className="my-1.5 text-xs text-gray-600 dark:text-slate-300 leading-normal">
           {parseInline(line)}
         </p>
       );
@@ -247,7 +247,7 @@ export default function RecommendationChat() {
         <div className="bg-[#792CA2]/10 p-1.5 rounded-lg border border-[#792CA2]/20">
           <ChatBubbleLeftRightIcon className="w-5 h-5 text-[#792CA2]" />
         </div>
-        <h2 className="text-xl font-extrabold text-[#111844] tracking-tight">AI Cloud Assistant</h2>
+        <h2 className="text-xl font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">AI Cloud Assistant</h2>
       </div>
 
       <div className="relative mt-2 flex-grow flex flex-col min-h-[480px]">
@@ -255,10 +255,10 @@ export default function RecommendationChat() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#792CA2]/5 via-blue-500/5 to-[#9A4DCC]/10 rounded-3xl blur-xl" />
 
         {/* Main Chat Box */}
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex-grow flex flex-col relative z-10 h-full overflow-hidden">
+        <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/5 flex-grow flex flex-col relative z-10 h-full overflow-hidden">
           {/* Status header */}
-          <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 pb-3 mb-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400">
               <SparklesIcon className="w-4 h-4 text-[#792CA2] animate-pulse" />
               AI Powered Optimization Model
             </div>
@@ -268,7 +268,7 @@ export default function RecommendationChat() {
                 role: "model",
                 content: "Chat reset. How else can I assist with your AWS infrastructure?",
               }])}
-              className="text-[10px] font-bold text-gray-400 hover:text-[#792CA2] transition-colors"
+              className="text-[10px] font-bold text-gray-400 dark:text-gray-500 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
             >
               Clear Chat
             </button>
@@ -295,7 +295,7 @@ export default function RecommendationChat() {
                       className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs font-medium leading-relaxed shadow-sm break-words select-text ${
                         isUser
                           ? "bg-[#111844] text-white rounded-tr-none"
-                          : "bg-white/95 text-gray-700 border border-gray-150 rounded-tl-none"
+                          : "bg-[#ffffff] dark:bg-slate-800 text-gray-700 dark:text-[#F9F7F7] border border-gray-150 dark:border-slate-700 rounded-tl-none"
                       }`}
                     >
                       {isUser ? (
@@ -316,7 +316,7 @@ export default function RecommendationChat() {
 
             {isSending && (
               <div className="flex justify-start">
-                <div className="bg-white/95 border border-gray-150 rounded-2xl rounded-tl-none px-4 py-3 flex gap-1 items-center shadow-sm">
+                <div className="bg-[#ffffff] dark:bg-slate-800 border border-gray-150 dark:border-slate-700 rounded-2xl rounded-tl-none px-4 py-3 flex gap-1 items-center shadow-sm">
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
@@ -333,14 +333,14 @@ export default function RecommendationChat() {
           {/* Suggested Prompts Banner */}
           {messages.length === 1 && (
             <div className="mb-3 space-y-1.5">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">Suggested Prompts</p>
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-1">Suggested Prompts</p>
               <div className="flex flex-col gap-1.5">
                 {SUGGESTED_PROMPTS.map((prompt, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSend(prompt)}
                     disabled={isSending}
-                    className="w-full text-left px-3 py-1.5 bg-white/80 hover:bg-[#792CA2]/5 hover:text-[#792CA2] border border-gray-150 hover:border-[#792CA2]/25 text-[11px] font-semibold text-gray-600 rounded-xl transition-all shadow-sm truncate"
+                    className="w-full text-left px-3 py-1.5 bg-[#ffffff] dark:bg-slate-800 hover:bg-[#792CA2]/5 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] border border-gray-150 dark:border-slate-700 hover:border-[#792CA2]/25 dark:hover:border-[#C084FC]/25 text-[11px] font-semibold text-gray-600 dark:text-slate-350 rounded-xl transition-all shadow-sm truncate"
                   >
                     💡 {prompt}
                   </button>
@@ -350,7 +350,7 @@ export default function RecommendationChat() {
           )}
 
           {/* Message Input Box */}
-          <div className="mt-auto pt-2 border-t border-gray-100 flex items-center gap-2">
+          <div className="mt-auto pt-2 border-t border-gray-100 dark:border-slate-800 flex items-center gap-2">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -358,12 +358,12 @@ export default function RecommendationChat() {
               disabled={isSending}
               rows={1}
               placeholder="Ask about costs, idle services..."
-              className="flex-grow bg-[#F9F7F7] border border-gray-200/80 rounded-xl px-4 py-2 text-xs font-medium text-[#111844] placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#792CA2] focus:border-[#792CA2] transition-all resize-none max-h-16"
+              className="flex-grow bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200/80 dark:border-slate-700 rounded-xl px-4 py-2 text-xs font-medium text-[#111844] dark:text-[#F9F7F7] placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#792CA2] focus:border-[#792CA2] transition-all resize-none max-h-16"
             />
             <button
               onClick={() => handleSend()}
               disabled={isSending || !input.trim()}
-              className="bg-gradient-to-r from-[#111844] to-[#1F215D] text-white p-2.5 rounded-xl hover:shadow-md hover:shadow-[#111844]/10 transition-all disabled:opacity-40 disabled:pointer-events-none flex-shrink-0"
+              className="bg-gradient-to-r from-[#111845] to-[#1F215D] dark:from-[#792CA3] dark:to-[#9A4DCC] text-white p-2.5 rounded-xl hover:shadow-md hover:shadow-[#111845]/10 transition-all disabled:opacity-40 disabled:pointer-events-none flex-shrink-0"
             >
               <PaperAirplaneIcon className="w-4 h-4 transform rotate-0" />
             </button>

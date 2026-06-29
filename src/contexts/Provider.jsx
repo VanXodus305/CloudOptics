@@ -1,10 +1,22 @@
 "use client";
 
 import { HeroUIProvider } from "@heroui/react";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession, signOut } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeProvider } from "./ThemeContext";
+
+const SessionWatcher = ({ children }) => {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user?.revoked) {
+      signOut({ callbackUrl: "/" });
+    }
+  }, [session]);
+
+  return children;
+};
 
 const Provider = ({ children }) => {
   const router = useRouter();
@@ -25,7 +37,6 @@ const Provider = ({ children }) => {
       new window.google.translate.TranslateElement(
         {
           pageLanguage: "en",
-          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
           autoDisplay: false,
         },
         "google_translate_element"
@@ -42,9 +53,11 @@ const Provider = ({ children }) => {
 
   return (
     <SessionProvider>
-      <ThemeProvider>
-        <HeroUIProvider navigate={router.push}>{children}</HeroUIProvider>
-      </ThemeProvider>
+      <SessionWatcher>
+        <ThemeProvider>
+          <HeroUIProvider navigate={router.push}>{children}</HeroUIProvider>
+        </ThemeProvider>
+      </SessionWatcher>
     </SessionProvider>
   );
 };

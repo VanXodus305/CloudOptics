@@ -66,13 +66,13 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
+              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                 {drilldownService} Instances
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
+              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                 Resources Count
               </span>
               <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">

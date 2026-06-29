@@ -216,13 +216,13 @@ export default function TopCostChart({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
+              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                 {drilldownTime} Cost Details
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
+              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                 Resources Cost
               </span>
               <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">
@@ -245,7 +245,7 @@ export default function TopCostChart({
                 <span>{resourceFilter}</span> <ChevronDownIcon className="w-3 h-3 text-gray-500" />
               </button>
               {resourceFilterOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-20 py-1 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-36 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-20 py-1 overflow-hidden">
                   {resourceOptions.map((resOption) => (
                     <button
                       key={resOption}
@@ -253,7 +253,7 @@ export default function TopCostChart({
                         setResourceFilter(resOption);
                         setResourceFilterOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
+                      className="block w-full text-left px-4 py-2 text-xs font-semibold text-gray-750 dark:!text-slate-350 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/15 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                     >
                       {resOption}
                     </button>
@@ -274,7 +274,7 @@ export default function TopCostChart({
                 <span>{timeFilter}</span> <ChevronDownIcon className="w-3 h-3 text-gray-500" />
               </button>
               {timeFilterOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-20 py-1 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-36 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-20 py-1 overflow-hidden">
                   {timeOptions.map((timeOption) => (
                     <button
                       key={timeOption}
@@ -282,7 +282,7 @@ export default function TopCostChart({
                         setTimeFilter(timeOption);
                         setTimeFilterOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
+                      className="block w-full text-left px-4 py-2 text-xs font-semibold text-gray-750 dark:!text-slate-350 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/15 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                     >
                       {timeOption}
                     </button>
@@ -301,20 +301,30 @@ export default function TopCostChart({
                 {
                   label: "Total Cost (30d)",
                   value: "$" + Math.round(totalCostVal).toLocaleString(),
-                  color: "text-[#792CA2]",
-                  bg: "bg-[#792CA2]/10",
+                  color: "text-[#792CA2] dark:text-[#C084FC]",
+                  bg: "bg-[#792CA2]/10 dark:bg-[#792CA2]/20",
                 },
-                { label: "Top Spender", value: topSpender, color: "text-[#111844]", bg: "bg-gray-100" },
-                { label: "Lowest Spender", value: lowestSpender, color: "text-[#111844]", bg: "bg-gray-100" },
+                { 
+                  label: "Top Spender", 
+                  value: topSpender, 
+                  color: "text-[#111844] dark:text-[#F9F7F7]", 
+                  bg: "bg-gray-100 dark:bg-slate-800/80" 
+                },
+                { 
+                  label: "Lowest Spender", 
+                  value: lowestSpender, 
+                  color: "text-[#111844] dark:text-[#F9F7F7]", 
+                  bg: "bg-gray-100 dark:bg-slate-800/80" 
+                },
                 {
                   label: "Avg Cost/Resource",
                   value: "$" + Math.round(avgCostVal).toLocaleString(),
-                  color: "text-[#9A4DCC]",
-                  bg: "bg-[#9A4DCC]/10",
+                  color: "text-[#9A4DCC] dark:text-[#E0A9FF]",
+                  bg: "bg-[#9A4DCC]/10 dark:bg-[#9A4DCC]/20",
                 },
               ].map((kpi, idx) => (
                 <div key={idx} className={`rounded-xl p-4 flex flex-col justify-center items-start ${kpi.bg}`}>
-                  <p className="text-xs font-semibold text-gray-500 mb-1">{kpi.label}</p>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{kpi.label}</p>
                   <p className={`text-sm md:text-lg font-bold truncate max-w-full ${kpi.color}`}>{kpi.value}</p>
                 </div>
               ))}
@@ -390,7 +400,7 @@ export default function TopCostChart({
                 dy={10}
                 tick={({ x, y, payload }) => (
                   <g transform={`translate(${x},${y})`}>
-                    <text x={0} y={0} dy={10} textAnchor="middle" fill="#6B7280" className="tick-text">
+                    <text x={0} y={0} dy={10} textAnchor="middle" fill="currentColor" className="tick-text text-gray-450 dark:text-slate-400">
                       {payload.value}
                     </text>
                   </g>
@@ -400,13 +410,14 @@ export default function TopCostChart({
                   value="Time ➔"
                   offset={-15}
                   position="insideBottom"
-                  style={{ fill: "#111844", fontSize: 13, fontWeight: "bold" }}
+                  className="fill-[#111844] dark:fill-[#F9F7F7] font-bold text-xs md:text-sm"
                 />
               </XAxis>
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#6B7280", fontSize: 12 }}
+                tick={{ fill: "currentColor", fontSize: 12 }}
+                className="text-gray-450 dark:text-slate-400"
                 tickFormatter={(value) => `$${value}`}
                 dx={-10}
               >
@@ -415,7 +426,7 @@ export default function TopCostChart({
                   angle={-90}
                   position="insideLeft"
                   offset={-15}
-                  style={{ fill: "#111844", fontSize: 13, fontWeight: "bold" }}
+                  className="fill-[#111844] dark:fill-[#F9F7F7] font-bold text-xs md:text-sm"
                 />
               </YAxis>
               {showDetails && (

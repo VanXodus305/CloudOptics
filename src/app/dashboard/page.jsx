@@ -121,6 +121,16 @@ export default function DashboardPage() {
   // Simulation State
   const [isLiveSimulation, setIsLiveSimulation] = useState(false);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("isLiveSimulation") === "true";
+    setIsLiveSimulation(saved);
+  }, []);
+
+  const handleSetLiveSimulation = (val) => {
+    setIsLiveSimulation(val);
+    localStorage.setItem("isLiveSimulation", val ? "true" : "false");
+  };
+
   // Database-backed states
   const [summaryData, setSummaryData] = useState(null);
   const [trendsData, setTrendsData] = useState([]);
@@ -438,7 +448,7 @@ export default function DashboardPage() {
 
   const expandedResources = resourcesData;
 
-  if (status === "loading" || (status === "unauthenticated" && !isSigningOut) || (isLoading && !summaryData)) {
+  if (status === "loading" || (status === "unauthenticated" && !isSigningOut)) {
     return (
       <div className="min-h-screen bg-[#F9F7F7] dark:bg-[#080A1A] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -502,7 +512,7 @@ export default function DashboardPage() {
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
           isLiveSimulation={isLiveSimulation}
-          setIsLiveSimulation={setIsLiveSimulation}
+          setIsLiveSimulation={handleSetLiveSimulation}
           handleSignOut={handleSignOut}
           setIsResourcesModalOpen={setIsResourcesModalOpen}
           setIsAlertsModalOpen={setIsAlertsModalOpen}

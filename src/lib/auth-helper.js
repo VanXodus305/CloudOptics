@@ -15,5 +15,8 @@ export async function verifySession(request) {
 
   // Fall back to NextAuth authentication
   const session = await auth();
+  if (session && session.user && session.user.revoked) {
+    return null;
+  }
   return session;
 }

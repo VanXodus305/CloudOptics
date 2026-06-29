@@ -28,6 +28,18 @@ export default function AlertsPage() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [currentDate, setCurrentDate] = useState("");
+
+  // Live Simulation state
+  const [isLiveSimulation, setIsLiveSimulation] = useState(false);
+  useEffect(() => {
+    const saved = localStorage.getItem("isLiveSimulation") === "true";
+    setIsLiveSimulation(saved);
+  }, []);
+
+  const handleSetLiveSimulation = (val) => {
+    setIsLiveSimulation(val);
+    localStorage.setItem("isLiveSimulation", val ? "true" : "false");
+  };
   
   const profileRef = useRef(null);
 
@@ -127,14 +139,14 @@ export default function AlertsPage() {
         <Sidebar
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
-          isLiveSimulation={false}
-          setIsLiveSimulation={() => {}}
+          isLiveSimulation={isLiveSimulation}
+          setIsLiveSimulation={handleSetLiveSimulation}
           handleSignOut={handleSignOut}
           setIsResourcesModalOpen={() => {}}
           setIsAlertsModalOpen={() => {}}
         />
 
-        <div className={`flex-grow flex flex-col h-full overflow-x-hidden relative p-4 md:p-8 ${session?.user?.role === "Viewer" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
+        <div className={`flex-grow flex flex-col h-full overflow-x-hidden relative p-4 pb-28 md:p-8 md:pb-8 ${session?.user?.role === "Viewer" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
           {session?.user?.role === "Viewer" && (
             <RestrictedOverlay pageName="Alert Center" />
           )}

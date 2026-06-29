@@ -88,3 +88,78 @@ export async function sendInvitationEmail({ to, role }) {
     throw error;
   }
 }
+
+export async function sendOtpEmail({ to, otp }) {
+  const brevoApiKey = process.env.BREVO_API_KEY;
+
+  const htmlContent = `
+    <div style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #F9F7F7; padding: 40px; color: #111844; margin: 0;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(121, 44, 162, 0.05); border: 1px solid #EAEAEA;">
+        <!-- Header Banner -->
+        <div style="background: linear-gradient(135deg, #111844 0%, #792CA2 100%); padding: 40px 20px; text-align: center; color: white;">
+          <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">CloudOptics</h1>
+          <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.85; font-weight: 500;">Cloud Cost Optimization Vault</p>
+        </div>
+        
+        <!-- Body Content -->
+        <div style="padding: 40px; text-align: center;">
+          <h2 style="margin-top: 0; color: #111844; font-size: 20px; font-weight: 800; letter-spacing: -0.3px;">Verify Your Email Address</h2>
+          <p style="color: #6B7280; font-size: 15px; line-height: 1.6; font-weight: 500;">
+            Use the following One-Time Password (OTP) to complete updating your email address. This OTP is valid for 10 minutes.
+          </p>
+          
+          <div style="margin: 30px 0;">
+            <span style="font-family: monospace; font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #792CA2; background-color: rgba(121,44,162,0.1); padding: 12px 24px; border-radius: 12px; border: 1px dashed #792CA2;">${otp}</span>
+          </div>
+
+          <p style="color: #9CA3AF; font-size: 12px; font-weight: 500;">
+            If you did not initiate this request, please ignore this email or contact support.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (!brevoApiKey || brevoApiKey === "your-brevo-api-key-here" || brevoApiKey.startsWith("your-")) {
+    console.log("=== BREVO SMTP: SIMULATED OTP EMAIL ===");
+    console.log(`To: ${to}`);
+    console.log(`OTP: ${otp}`);
+    console.log("========================================");
+    return { success: true, simulated: true };
+  }
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": brevoApiKey,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "CloudOptics",
+          email: "shrestharoy140@gmail.com",
+        },
+        to: [
+          {
+            email: to,
+          },
+        ],
+        subject: "CloudOptics - Verification Code",
+        htmlContent: htmlContent,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Brevo API returned error ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log("OTP email successfully sent via Brevo:", data.messageId || data);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error sending OTP email via Brevo:", error);
+    throw error;
+  }
+}

@@ -36,10 +36,10 @@ export default function CategoryTabs({ activeCategory, setActiveCategory }) {
         <div className="relative">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-full flex items-center justify-between bg-white border border-gray-200 text-[#111844] font-bold py-3 px-4 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#792CA2]/50 focus:border-[#792CA2]/50 transition-all text-left"
+            className="w-full flex items-center justify-between bg-[#ffffff] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-[#111844] dark:text-[#F9F7F7] font-bold py-3 px-4 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#792CA2]/50 focus:border-[#792CA2]/50 transition-all text-left"
           >
-            <span className="truncate">{activeCategoryObj.label} <span className="font-normal text-gray-500">({activeCategoryObj.section})</span></span>
-            <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform duration-300 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`} />
+            <span className="truncate">{activeCategoryObj.label} <span className="font-normal text-gray-500 dark:text-gray-400">({activeCategoryObj.section})</span></span>
+            <ChevronDownIcon className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform duration-300 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`} />
           </button>
 
           <AnimatePresence>
@@ -49,7 +49,7 @@ export default function CategoryTabs({ activeCategory, setActiveCategory }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute z-[150] w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto"
+                className="absolute z-[150] w-full mt-2 bg-[#ffffff] dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto"
               >
                 {categories.map((cat) => (
                   <button
@@ -58,10 +58,10 @@ export default function CategoryTabs({ activeCategory, setActiveCategory }) {
                       setActiveCategory(cat.id);
                       setIsOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-3 text-sm font-bold transition-colors ${activeCategory === cat.id ? "bg-[#792CA2]/10 text-[#792CA2]" : "text-gray-700 hover:bg-gray-50"
+                    className={`w-full text-left px-4 py-3 text-sm font-bold transition-colors ${activeCategory === cat.id ? "bg-[#792CA2]/10 dark:bg-[#C084FC]/15 text-[#792CA2] dark:text-[#C084FC]" : "text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800"
                       }`}
                   >
-                    {cat.label} <span className={`font-normal ${activeCategory === cat.id ? "text-[#792CA2]/70" : "text-gray-500"}`}>({cat.section})</span>
+                    {cat.label} <span className={`font-normal ${activeCategory === cat.id ? "text-[#792CA2]/70 dark:text-[#C084FC]/70" : "text-gray-500 dark:text-gray-400"}`}>({cat.section})</span>
                   </button>
                 ))}
               </motion.div>
@@ -82,7 +82,7 @@ export default function CategoryTabs({ activeCategory, setActiveCategory }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-t-lg mb-[-1px] z-10 transition-colors duration-300 ${isActive ? "bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white" : "bg-white border border-gray-200 text-gray-400"
+                className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-t-lg mb-[-1px] z-10 transition-colors duration-300 ${isActive ? "bg-gradient-to-r from-[#792CA2] to-[#9A4DCC] text-white" : "bg-[#ffffff] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-gray-500"
                   }`}
               >
                 {cat.section}
@@ -90,14 +90,14 @@ export default function CategoryTabs({ activeCategory, setActiveCategory }) {
               <button
                 onClick={() => setActiveCategory(cat.id)}
                 className={`relative px-6 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 z-20 overflow-hidden ${isActive
-                  ? "text-white shadow-lg shadow-[#792CA2]/20"
-                  : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 hover:text-gray-700"
+                  ? "text-white shadow-lg shadow-[#792CA3]/20"
+                  : "bg-[#ffffff] dark:bg-slate-800/80 text-gray-500 dark:text-slate-355 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-750 dark:hover:text-[#F9F7F7]"
                   }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeCategoryBg"
-                    className="absolute inset-0 bg-gradient-to-r from-[#111844] to-[#1F215D] rounded-xl"
+                    className="absolute inset-0 bg-gradient-to-r from-[#111845] to-[#1F215D] rounded-xl"
                     initial={false}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   />

@@ -326,13 +326,13 @@ export default function UtilizationChart({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
+              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                 {drilldownMetric ? `${drilldownServer} - ${drilldownMetric} Trend` : `${drilldownServer} Details`}
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
+              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                 Utilization Metrics
               </span>
               <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">
@@ -351,7 +351,7 @@ export default function UtilizationChart({
                 {timeFilter} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
               </button>
               {timeFilterOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-[999] py-1 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-36 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-[999] py-1 overflow-hidden">
                   {["Hourly", "Daily", "Weekly", "Monthly"].map((option) => (
                     <button
                       key={option}
@@ -359,7 +359,7 @@ export default function UtilizationChart({
                         setTimeFilter(option);
                         setTimeFilterOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
+                      className="block w-full text-left px-4 py-2 text-xs font-semibold text-gray-705 dark:!text-slate-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/15 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                     >
                       {option}
                     </button>
@@ -377,7 +377,7 @@ export default function UtilizationChart({
                   {serviceFilter} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
                 </button>
                 {serviceFilterOpen && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-[999] py-1 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-32 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-[999] py-1 overflow-hidden">
                     {["All", "EC2", "RDS", "S3"].map((option) => (
                       <button
                         key={option}
@@ -385,7 +385,7 @@ export default function UtilizationChart({
                           setServiceFilter(option);
                           setServiceFilterOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
+                        className="block w-full text-left px-4 py-2 text-xs font-semibold text-gray-705 dark:!text-slate-350 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/15 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                       >
                         {option}
                       </button>
@@ -401,7 +401,7 @@ export default function UtilizationChart({
                   {selectedMetric} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
                 </button>
                 {filterOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-[999] py-1 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-48 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-[999] py-1 overflow-hidden">
                     {["CPU Utilization", "Memory Utilization", "Storage", "Network"].map((metric) => (
                       <button
                         key={metric}
@@ -409,7 +409,7 @@ export default function UtilizationChart({
                           setSelectedMetric(metric);
                           setFilterOpen(false);
                         }}
-                        className={`block w-full text-left px-4 py-2 text-xs font-medium hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors ${selectedMetric === metric ? "bg-[#792CA2]/5 dark:bg-[#792CA2]/10 text-[#792CA2] dark:text-[#C084FC]" : "text-gray-700 dark:text-gray-300"}`}
+                        className={`block w-full text-left px-4 py-2 text-xs font-semibold hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/15 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors ${selectedMetric === metric ? "bg-[#792CA2]/5 dark:bg-[#792CA2]/15 text-[#792CA2] dark:!text-[#C084FC]" : "text-gray-750 dark:!text-slate-300"}`}
                       >
                         {metric}
                       </button>
@@ -424,7 +424,7 @@ export default function UtilizationChart({
       
       {drilldownServer && drilldownMetric ? (
         <div className="flex-grow w-full relative flex flex-col">
-          <div className="absolute left-[10px] top-1/2" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 13, fontWeight: "bold", color: "#111844", userSelect: "none", pointerEvents: "none", zIndex: 10 }}>
+          <div className="absolute left-[10px] top-1/2 text-[#111844] dark:text-[#F9F7F7]" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 13, fontWeight: "bold", userSelect: "none", pointerEvents: "none", zIndex: 10 }}>
             {drilldownMetric} (%) ➔
           </div>
           <ResponsiveContainer width="100%" height={380} className="focus:outline-none">
@@ -452,13 +452,14 @@ export default function UtilizationChart({
                   value="Time ➔"
                   offset={-15}
                   position="insideBottom"
-                  style={{ fill: "#111844", fontSize: 13, fontWeight: "bold" }}
+                  className="fill-[#111844] dark:fill-[#F9F7F7] font-bold text-xs md:text-sm"
                 />
               </XAxis>
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#6B7280", fontSize: 12 }}
+                tick={{ fill: "currentColor", fontSize: 12 }}
+                className="text-gray-450 dark:text-slate-400"
                 tickFormatter={(value) => `${value}%`}
                 dx={-10}
               />
@@ -494,10 +495,10 @@ export default function UtilizationChart({
         <div className="flex flex-col h-full gap-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
             {[
-              { label: "CPU", value: serverObj?.cpu || 0, color: "text-[#792CA2]", bg: "bg-[#792CA2]/10" },
-              { label: "Memory", value: serverObj?.memory || 0, color: "text-[#9A4DCC]", bg: "bg-[#9A4DCC]/10" },
-              { label: "Storage", value: serverObj?.storage || 0, color: "text-[#1F215D]", bg: "bg-[#1F215D]/10" },
-              { label: "Network", value: serverObj?.network || 0, color: "text-[#792CA2]", bg: "bg-[#DCCBFF]/40" },
+              { label: "CPU", value: serverObj?.cpu || 0, color: "text-[#792CA2] dark:text-[#C084FC]", bg: "bg-[#792CA2]/10 dark:bg-[#792CA2]/20" },
+              { label: "Memory", value: serverObj?.memory || 0, color: "text-[#9A4DCC] dark:text-[#E0A9FF]", bg: "bg-[#9A4DCC]/10 dark:bg-[#9A4DCC]/20" },
+              { label: "Storage", value: serverObj?.storage || 0, color: "text-[#1F215D] dark:text-[#93C5FD]", bg: "bg-[#1F215D]/10 dark:bg-[#1e293b]/60" },
+              { label: "Network", value: serverObj?.network || 0, color: "text-[#792CA2] dark:text-[#C084FC]", bg: "bg-[#DCCBFF]/10 dark:bg-[#DCCBFF]/15" },
             ].map((kpi, idx) => (
               <div key={idx} className={`rounded-xl p-4 flex flex-col justify-center items-start ${kpi.bg}`}>
                 <p className="text-xs font-semibold text-gray-500 mb-1">{kpi.label} Usage</p>
@@ -513,8 +514,8 @@ export default function UtilizationChart({
             <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
               <BarChart style={{ outline: "none" }} data={drilldownData} margin={{ top: 20, right: 10, left: 40, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-gray-200 dark:text-slate-800" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 11 }} dy={6} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 11 }} dx={-4} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 11 }} className="text-gray-450 dark:text-slate-400" dy={6} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 11 }} className="text-gray-450 dark:text-slate-400" dx={-4} />
                 <Tooltip cursor={{ fill: "rgba(121, 44, 162, 0.05)" }} contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)" }} />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1000} animationEasing="ease-in-out" onClick={(data) => handleDrilldownBarClick(data)} className="cursor-pointer hover:opacity-80 transition-opacity">
                   {drilldownData.map((entry, index) => (
@@ -523,14 +524,14 @@ export default function UtilizationChart({
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <div className="text-center" style={{ fontSize: 12, fontWeight: 700, color: "#111844", marginTop: 2 }}>
+            <div className="text-center text-[#111844] dark:text-[#F9F7F7]" style={{ fontSize: 12, fontWeight: 700, marginTop: 2 }}>
               Metric ➔
             </div>
           </div>
         </div>
       ) : (
         <div className={`relative w-full ${showAllInstances ? "overflow-y-auto max-h-[400px] pr-2 custom-scrollbar" : ""}`}>
-          <div className="absolute left-[10px] top-1/2" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 11, fontWeight: 700, color: "#111844", userSelect: "none", pointerEvents: "none", zIndex: 10 }}>
+          <div className="absolute left-[10px] top-1/2 text-[#111844] dark:text-[#F9F7F7]" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 11, fontWeight: 700, userSelect: "none", pointerEvents: "none", zIndex: 10 }}>
             Server ➔
           </div>
           <ResponsiveContainer width="100%" height={chartHeight} className="focus:outline-none">
@@ -541,13 +542,14 @@ export default function UtilizationChart({
               margin={{ top: 0, right: 10, left: 30, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
-              <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 10 }} dy={6} />
+              <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 10 }} className="text-gray-450 dark:text-slate-400" dy={6} />
               <YAxis
                 dataKey="name"
                 type="category"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#6B7280", fontSize: 10, fontWeight: 600 }}
+                tick={{ fill: "currentColor", fontSize: 10, fontWeight: 600 }}
+                className="text-gray-450 dark:text-slate-400"
                 width={90}
                 dx={-4}
                 interval={0}
@@ -555,25 +557,14 @@ export default function UtilizationChart({
               />
                <Tooltip
                 cursor={{ fill: "rgba(121, 44, 162, 0.05)" }}
-                position={{ x: 0, y: 0 }}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const name = payload[0].payload.name;
                     const value = payload[0].value;
-                    const pos = coordsRef.current[name];
-                    if (!pos) return null;
-                    
-                    // If the bar value is high, it's near the right edge. Flip tooltip to the left side.
-                    const isNearEdge = value >= 70;
-                    const translateX = isNearEdge ? "-100%" : "0%";
-                    const marginLeft = isNearEdge ? "-10px" : "10px";
-                    
                     return (
-                      <div style={{ position: "absolute", left: pos.x, top: pos.y, transform: `translate(${translateX}, -50%)`, marginLeft }}>
-                        <div className="bg-[#111844] text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg whitespace-nowrap flex flex-col items-start gap-0.5">
-                          <span className="text-[10px] text-[#DCCBFF] font-medium">{name}</span>
-                          <span>{value}%</span>
-                        </div>
+                      <div className="bg-[#111844] text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg whitespace-nowrap flex flex-col items-start gap-0.5 border-none">
+                        <span className="text-[10px] text-[#DCCBFF] font-medium">{name}</span>
+                        <span>{value}%</span>
                       </div>
                     );
                   }
@@ -585,7 +576,7 @@ export default function UtilizationChart({
             </BarChart>
           </ResponsiveContainer>
           <div className="flex flex-col items-center justify-center pt-2 pb-1 relative z-10 w-full">
-            <div className="text-center" style={{ fontSize: 12, fontWeight: 700, color: "#111844" }}>
+            <div className="text-center text-[#111844] dark:text-[#F9F7F7]" style={{ fontSize: 12, fontWeight: 700 }}>
               Percentage ➔
             </div>
             {fullData.length > 5 && (
