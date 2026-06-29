@@ -185,7 +185,7 @@ export default function TopCostChart({
   const COLORS = ["#792CA2", "#9A4DCC", "#1F215D", "#111844", "#DCCBFF"];
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 h-[400px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+    <div className="bg-white/90 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 dark:border-white/5 h-[400px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
       <style>{`
         .tick-text {
           font-size: 8px;
@@ -198,7 +198,7 @@ export default function TopCostChart({
       `}</style>
       {/* Subtle loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
+        <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
@@ -216,16 +216,16 @@ export default function TopCostChart({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
                 {drilldownTime} Cost Details
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
                 Resources Cost
               </span>
-              <span className="text-[11px] text-gray-400 font-medium mt-0.5 tracking-normal">
+              <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">
                 Click data point for details
               </span>
             </div>
@@ -240,12 +240,12 @@ export default function TopCostChart({
                   setResourceFilterOpen(!resourceFilterOpen);
                   setTimeFilterOpen(false);
                 }}
-                className="bg-[#F9F7F7] border border-gray-200 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-[#111844] hover:bg-gray-50 transition-colors flex items-center gap-1"
+                className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1"
               >
-                {resourceFilter} <ChevronDownIcon className="w-3 h-3 text-gray-500" />
+                <span>{resourceFilter}</span> <ChevronDownIcon className="w-3 h-3 text-gray-500" />
               </button>
               {resourceFilterOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-1 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-20 py-1 overflow-hidden">
                   {resourceOptions.map((resOption) => (
                     <button
                       key={resOption}
@@ -253,7 +253,7 @@ export default function TopCostChart({
                         setResourceFilter(resOption);
                         setResourceFilterOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors"
+                      className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                     >
                       {resOption}
                     </button>
@@ -269,12 +269,12 @@ export default function TopCostChart({
                   setTimeFilterOpen(!timeFilterOpen);
                   setResourceFilterOpen(false);
                 }}
-                className="bg-[#F9F7F7] border border-gray-200 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-[#111844] hover:bg-gray-50 transition-colors flex items-center gap-1"
+                className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1"
               >
-                {timeFilter} <ChevronDownIcon className="w-3 h-3 text-gray-500" />
+                <span>{timeFilter}</span> <ChevronDownIcon className="w-3 h-3 text-gray-500" />
               </button>
               {timeFilterOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-1 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-20 py-1 overflow-hidden">
                   {timeOptions.map((timeOption) => (
                     <button
                       key={timeOption}
@@ -282,7 +282,7 @@ export default function TopCostChart({
                         setTimeFilter(timeOption);
                         setTimeFilterOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors"
+                      className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                     >
                       {timeOption}
                     </button>
@@ -330,19 +330,19 @@ export default function TopCostChart({
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="flex items-center justify-between p-3 rounded-xl bg-[#F9F7F7] border border-gray-100 hover:bg-white hover:shadow-md transition-all group cursor-pointer"
+                      className="flex items-center justify-between p-3 rounded-xl bg-[#F9F7F7] dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-750 hover:shadow-md transition-all group cursor-pointer"
                     >
                       <div className="flex items-center gap-3 w-1/2">
                         <div
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: COLORS[index % COLORS.length] }}
                         />
-                        <span className="font-semibold text-xs text-gray-700 group-hover:text-[#111844] transition-colors truncate">
+                        <span className="font-semibold text-xs text-gray-700 dark:text-gray-300 group-hover:text-[#111844] dark:group-hover:text-[#F9F7F7] transition-colors truncate">
                           {item.name}
                         </span>
                       </div>
 
-                      <div className="w-full mx-4 h-1.5 bg-gray-200 rounded-full overflow-hidden flex-grow hidden md:block">
+                      <div className="w-full mx-4 h-1.5 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden flex-grow hidden md:block">
                         <div
                           className="h-full rounded-full transition-all duration-1000 ease-out"
                           style={{
@@ -353,7 +353,7 @@ export default function TopCostChart({
                       </div>
 
                       <div className="w-1/2 md:w-1/4 text-right">
-                        <span className="font-bold text-xs text-[#111844] group-hover:text-[#792CA2] transition-colors">
+                        <span className="font-bold text-xs text-[#111844] dark:text-[#F9F7F7] group-hover:text-[#792CA2] dark:group-hover:text-[#C084FC] transition-colors">
                           ${item.value.toLocaleString()}
                         </span>
                       </div>

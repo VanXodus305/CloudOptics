@@ -192,7 +192,7 @@ export default function CostResourceChart({
   const COLORS = ["#792CA2", "#9A4DCC", "#1F215D", "#111844", "#DCCBFF"];
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 h-[380px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+    <div className="bg-white/90 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 dark:border-white/5 h-[380px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
       <style>{`
         .tick-text {
           font-size: 8px;
@@ -205,7 +205,7 @@ export default function CostResourceChart({
       `}</style>
       {/* Subtle loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
+        <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
@@ -223,16 +223,16 @@ export default function CostResourceChart({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
                 {drilldownResource} Usage Details
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
                 Resources Average Cost
               </span>
-              <span className="text-[11px] text-gray-400 font-medium mt-0.5 tracking-normal">
+              <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">
                 Click chart bar for details
               </span>
             </div>

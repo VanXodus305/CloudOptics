@@ -109,14 +109,14 @@ export default function RecommendationsPage() {
 
   if (status === "loading" || (status === "unauthenticated" && !isSigningOut)) {
     return (
-      <div className="min-h-screen bg-[#F9F7F7] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F9F7F7] dark:bg-[#080A1A] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen relative overflow-hidden bg-[#F9F7F7] text-[#111844] transition-colors duration-300 flex flex-col">
+    <div className="h-screen relative overflow-hidden bg-[#F9F7F7] dark:bg-[#080A1A] text-[#111844] dark:text-[#F9F7F7] transition-colors duration-300 flex flex-col dashboard-layout">
       {/* SIGN OUT TRANSITION SCREEN */}
       <AnimatePresence>
         {isSigningOut && (

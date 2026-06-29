@@ -9,13 +9,11 @@ import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
-import RestrictedOverlay from "../components/common/RestrictedOverlay";
 
 // Settings Components
 import AdminAccountDetails from "./components/AdminAccountDetails";
 import SettingsOptions from "./components/SettingsOptions";
 import UserAccessManagement from "./components/UserAccessManagement";
-import EditAccess from "./components/EditAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -71,14 +69,16 @@ export default function SettingsPage() {
 
   if (status === "loading" || (status === "unauthenticated" && !isSigningOut)) {
     return (
-      <div className="min-h-screen bg-[#F9F7F7] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F9F7F7] dark:bg-[#080A1A] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
+  const isAdmin = session?.user?.role === "Admin";
+
   return (
-    <div className="h-screen relative overflow-hidden bg-[#F9F7F7] text-[#111844] transition-colors duration-300 flex flex-col">
+    <div className="h-screen relative overflow-hidden bg-[#F9F7F7] dark:bg-[#080A1A] text-[#111844] dark:text-[#F9F7F7] transition-colors duration-300 flex flex-col dashboard-layout">
       {/* SIGN OUT TRANSITION SCREEN */}
       <AnimatePresence>
         {isSigningOut && (
@@ -136,26 +136,38 @@ export default function SettingsPage() {
         />
 
         {/* MAIN CONTENT AREA */}
-        <div className={`flex-grow flex flex-col h-full overflow-x-hidden relative p-4 md:p-8 ${session?.user?.role === "Viewer" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
-          {session?.user?.role === "Viewer" && (
-            <RestrictedOverlay pageName="Settings" />
-          )}
+        <div className="flex-grow flex flex-col h-full overflow-x-hidden relative p-4 md:p-8 overflow-y-auto">
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pb-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow pt-4">
               
-              {/* Left Column (Sections 13 & Options) */}
+              {/* Left Column (Profile details & Options) */}
               <div className="lg:col-span-4 flex flex-col h-full">
                 <AdminAccountDetails />
                 <SettingsOptions />
               </div>
 
-              {/* Right Column (Sections 14, 15 & 16) */}
+              {/* Right Column (User Management or Restricted state) */}
               <div className="lg:col-span-8 flex flex-col h-full">
                 <div className="flex-1 min-h-[400px]">
-                  <UserAccessManagement />
-                </div>
-                <div className="h-[250px]">
-                  <EditAccess />
+                  {isAdmin ? (
+                    <UserAccessManagement />
+                  ) : (
+                    <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white dark:border-white/5 rounded-3xl p-8 md:p-12 text-center h-full flex flex-col items-center justify-center shadow-xl relative overflow-hidden min-h-[400px]">
+                      {/* Glow */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+                      
+                      <div className="w-16 h-16 bg-[#792CA2]/10 dark:bg-[#792CA2]/20 rounded-2xl flex items-center justify-center mb-6">
+                        <svg className="w-8 h-8 text-[#792CA2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">User Management Restricted</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mt-3 leading-relaxed font-medium">
+                        You are signed in as a Viewer. Managing user access levels, viewing permission logs, and sending team invitations are exclusive to Administrator accounts.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 

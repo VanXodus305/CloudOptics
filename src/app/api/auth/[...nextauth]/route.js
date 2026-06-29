@@ -24,15 +24,30 @@ const config = {
           // Create new member on first sign-in
           member = new Member({
             email: user.email,
-            name: user.name,
+            name: user.name || user.email.split('@')[0],
             picture: user.image,
             role: "Viewer",
           });
           await member.save();
         } else {
-          // Update picture if it changed
+          // Update details once the user signs in with that Google account for the first time
+          let updated = false;
+
+          const isNamePlaceholder = !member.name || 
+            member.name === "Pending Invitation" || 
+            member.name === member.email.split('@')[0];
+
+          if (isNamePlaceholder && user.name) {
+            member.name = user.name;
+            updated = true;
+          }
+
           if (user.image && user.image !== member.picture) {
             member.picture = user.image;
+            updated = true;
+          }
+
+          if (updated) {
             await member.save();
           }
         }

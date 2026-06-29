@@ -17,29 +17,29 @@ export default function CostTrendsChart({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 relative"
+      className="bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 dark:border-white/5 relative"
     >
       {/* Subtle loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
+        <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h3 className="text-base font-bold text-[#111844]">
+          <h3 className="text-base font-bold text-[#111844] dark:text-[#F9F7F7]">
             {chartTimeframe} Cost Trends
           </h3>
         </div>
-        <div className="bg-gray-100 rounded-lg p-0.5 flex text-[10px]">
+        <div className="bg-gray-100 dark:bg-slate-800 rounded-lg p-0.5 flex text-[10px]">
           {["Monthly", "Weekly", "Daily"].map((p) => (
             <button
               key={p}
               onClick={() => setChartTimeframe(p)}
               className={`px-2.5 py-1 rounded-md font-bold transition-all ${
                 chartTimeframe === p
-                  ? "bg-white text-[#111844] shadow-sm"
-                  : "text-gray-400 hover:text-gray-600"
+                  ? "bg-white dark:bg-slate-700 text-[#111844] dark:text-[#F9F7F7] shadow-sm"
+                  : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-200"
               }`}
             >
               {p}

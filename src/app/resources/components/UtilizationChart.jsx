@@ -289,7 +289,7 @@ export default function UtilizationChart({
   const chartHeight = drilldownServer ? 500 : data.length * 40 + 80;
 
   return (
-    <div className={`bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 mt-8 h-auto`} style={{ minHeight: drilldownServer ? 500 : 250 }}>
+    <div className={`bg-white/90 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 dark:border-white/5 w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 mt-8 h-auto`} style={{ minHeight: drilldownServer ? 500 : 250 }}>
       <style>{`
         .tick-text {
           font-size: 8px;
@@ -302,7 +302,7 @@ export default function UtilizationChart({
       `}</style>
       {/* Subtle loading overlay */}
       {(isLoading || isTrendsLoading) && (
-        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
+        <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
@@ -326,16 +326,16 @@ export default function UtilizationChart({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
                 {drilldownMetric ? `${drilldownServer} - ${drilldownMetric} Trend` : `${drilldownServer} Details`}
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
                 Utilization Metrics
               </span>
-              <span className="text-[11px] text-gray-400 font-medium mt-0.5 tracking-normal">
+              <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">
                 Click chart bar for details
               </span>
             </div>
@@ -346,12 +346,12 @@ export default function UtilizationChart({
             <div className="relative">
               <button
                 onClick={() => setTimeFilterOpen(!timeFilterOpen)}
-                className="bg-[#F9F7F7] border border-gray-200 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] hover:bg-gray-50 transition-colors flex items-center gap-2"
+                className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
               >
                 {timeFilter} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
               </button>
               {timeFilterOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-gray-100 z-[999] py-1 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-[999] py-1 overflow-hidden">
                   {["Hourly", "Daily", "Weekly", "Monthly"].map((option) => (
                     <button
                       key={option}
@@ -359,7 +359,7 @@ export default function UtilizationChart({
                         setTimeFilter(option);
                         setTimeFilterOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors"
+                      className="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                     >
                       {option}
                     </button>
@@ -372,12 +372,12 @@ export default function UtilizationChart({
               <div className="relative">
                 <button
                   onClick={() => { setServiceFilterOpen(!serviceFilterOpen); setFilterOpen(false); }}
-                  className="bg-[#F9F7F7] border border-gray-200 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                 >
                   {serviceFilter} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
                 </button>
                 {serviceFilterOpen && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border border-gray-100 z-[999] py-1 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-[999] py-1 overflow-hidden">
                     {["All", "EC2", "RDS", "S3"].map((option) => (
                       <button
                         key={option}
@@ -385,7 +385,7 @@ export default function UtilizationChart({
                           setServiceFilter(option);
                           setServiceFilterOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-2 text-xs font-medium text-gray-700 hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors"
+                        className="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors"
                       >
                         {option}
                       </button>
@@ -396,12 +396,12 @@ export default function UtilizationChart({
               <div className="relative">
                 <button
                   onClick={() => { setFilterOpen(!filterOpen); setServiceFilterOpen(false); }}
-                  className="bg-[#F9F7F7] border border-gray-200 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                 >
                   {selectedMetric} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
                 </button>
                 {filterOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 z-[999] py-1 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 z-[999] py-1 overflow-hidden">
                     {["CPU Utilization", "Memory Utilization", "Storage", "Network"].map((metric) => (
                       <button
                         key={metric}
@@ -409,7 +409,7 @@ export default function UtilizationChart({
                           setSelectedMetric(metric);
                           setFilterOpen(false);
                         }}
-                        className={`block w-full text-left px-4 py-2 text-xs font-medium hover:bg-[#792CA2]/10 hover:text-[#792CA2] transition-colors ${selectedMetric === metric ? "bg-[#792CA2]/5 text-[#792CA2]" : "text-gray-700"}`}
+                        className={`block w-full text-left px-4 py-2 text-xs font-medium hover:bg-[#792CA2]/10 dark:hover:bg-[#C084FC]/10 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors ${selectedMetric === metric ? "bg-[#792CA2]/5 dark:bg-[#792CA2]/10 text-[#792CA2] dark:text-[#C084FC]" : "text-gray-700 dark:text-gray-300"}`}
                       >
                         {metric}
                       </button>
@@ -507,12 +507,12 @@ export default function UtilizationChart({
           </div>
 
           <div className="flex-grow w-full relative" style={{ height: 260 }}>
-            <div className="absolute left-[10px] top-1/2 -translate-y-1/2 -translate-x-1" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 12, fontWeight: 700, color: "#111844", userSelect: "none", pointerEvents: "none" }}>
+            <div className="absolute left-[10px] top-1/2 -translate-y-1/2 -translate-x-1 text-[#111844] dark:text-[#F9F7F7]" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 12, fontWeight: 700, color: "currentColor", userSelect: "none", pointerEvents: "none" }}>
               Percentage ➔
             </div>
             <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
               <BarChart style={{ outline: "none" }} data={drilldownData} margin={{ top: 20, right: 10, left: 40, bottom: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-gray-200 dark:text-slate-800" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 11 }} dy={6} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 11 }} dx={-4} />
                 <Tooltip cursor={{ fill: "rgba(121, 44, 162, 0.05)" }} contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)" }} />

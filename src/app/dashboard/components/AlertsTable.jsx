@@ -9,29 +9,29 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: 0.1 }}
-      className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 relative"
+      className="bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 dark:border-white/5 relative"
     >
       {/* Subtle loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
+        <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
       <div className="flex justify-between items-start mb-2">
         <div>
-          <h3 className="text-base font-bold text-[#111844]">
+          <h3 className="text-base font-bold text-[#111844] dark:text-[#F9F7F7]">
             Optimization Alerts
           </h3>
         </div>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
           <button
             onClick={() => setIsAlertsModalOpen(true)}
-            className="text-xs text-[#792CA2] hover:underline font-bold flex items-center gap-0.5 focus:outline-none"
+            className="text-xs text-[#792CA2] dark:text-[#C084FC] hover:underline font-bold flex items-center gap-0.5 focus:outline-none"
           >
             View All
           </button>
           {/* Color Symbols Legend for Alerts Category */}
-          <div className="flex items-center gap-2 text-[8px] font-black text-gray-400 uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Critical
             </span>
@@ -52,7 +52,7 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
         {alerts.map((alert) => (
           <div
             key={alert.id}
-            className="bg-gray-50 border border-gray-100/80 rounded-2xl flex items-stretch overflow-hidden shadow-sm"
+            className="bg-gray-50 dark:bg-slate-800/80 border border-gray-100/80 dark:border-slate-700 rounded-2xl flex items-stretch overflow-hidden shadow-sm"
           >
             <div className="p-3 flex justify-between items-center flex-grow">
               <div className="space-y-0.5">
@@ -70,11 +70,11 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
                     }`}
                     title={alert.severity}
                   />
-                  <h4 className="text-xs font-extrabold text-gray-800">
+                  <h4 className="text-xs font-extrabold text-gray-800 dark:text-gray-200">
                     {alert.title}
                   </h4>
                 </div>
-                <p className="text-[10px] text-gray-400 leading-normal">
+                <p className="text-[10px] text-gray-400 dark:text-gray-400 leading-normal">
                   {alert.desc}
                 </p>
               </div>

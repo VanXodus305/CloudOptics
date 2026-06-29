@@ -49,8 +49,12 @@ export default function Navigationbar() {
   // Handle mounting and initial theme check
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    const hasDarkClass = document.documentElement.classList.contains("dark");
-    if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+    const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (
+      savedTheme === "dark" || 
+      (savedTheme === "system" && isSystemDark) ||
+      (!savedTheme && isSystemDark)
+    ) {
       setTheme("dark");
       document.documentElement.classList.add("dark");
     } else {

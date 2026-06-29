@@ -41,10 +41,10 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
   const donutCircumference = 2 * Math.PI * donutRadius;
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 h-[380px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+    <div className="bg-white/90 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 dark:border-white/5 h-[380px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
       {/* Subtle loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
+        <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
@@ -66,16 +66,16 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
                 {drilldownService} Instances
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] to-[#792CA2] dark:from-[#F9F7F7] dark:to-[#C084FC] tracking-tight">
                 Resources Count
               </span>
-              <span className="text-[11px] text-gray-400 font-medium mt-0.5 tracking-normal">
+              <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">
                 Click chart slice for details
               </span>
             </div>
@@ -87,7 +87,7 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
         {drilldownService ? (
           <div className="overflow-y-auto h-full pr-2 pb-2 custom-scrollbar">
             <table className="w-full text-left text-[11px] table-fixed">
-              <thead className="bg-[#F9F7F7] sticky top-0 z-10 text-gray-600">
+              <thead className="bg-[#F9F7F7] dark:bg-slate-800 sticky top-0 z-10 text-gray-600 dark:text-gray-400">
                 <tr>
                   <th className="px-2 py-1.5 font-semibold rounded-tl-lg w-[38%]">Resource ID</th>
                   <th className="px-2 py-1.5 font-semibold w-[22%]">Region</th>
@@ -103,16 +103,16 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
                   </tr>
                 ) : (
                   drilldownResources.map((res, i) => (
-                    <tr key={i} className="border-b border-gray-50 hover:bg-[#792CA2]/5 transition-colors">
-                      <td className="px-2 py-1.5 font-medium text-[#792CA2] break-all whitespace-normal">{res.resourceId}</td>
-                      <td className="px-2 py-1.5 text-gray-500 truncate">{res.region}</td>
+                    <tr key={i} className="border-b border-gray-50 dark:border-slate-800 hover:bg-[#792CA2]/5 dark:hover:bg-[#C084FC]/5 transition-colors">
+                      <td className="px-2 py-1.5 font-medium text-[#792CA2] dark:text-[#C084FC] break-all whitespace-normal">{res.resourceId}</td>
+                      <td className="px-2 py-1.5 text-gray-500 dark:text-gray-400 truncate">{res.region}</td>
                       <td className="px-2 py-1.5">
-                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold ${res.status === 'Running' || res.status === 'running' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold ${res.status === 'Running' || res.status === 'running' ? 'bg-green-100 dark:bg-green-950/45 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-950/45 text-red-700 dark:text-red-400'}`}>
                           {res.status}
                         </span>
                       </td>
-                      <td className="px-2 py-1.5 text-gray-500">${typeof res.costPerHour === 'number' ? res.costPerHour.toFixed(3) : res.costPerHour}/hr</td>
-                      <td className="px-2 py-1.5 text-gray-500 hidden sm:table-cell lg:hidden xl:table-cell truncate">{res.environment}</td>
+                      <td className="px-2 py-1.5 text-gray-500 dark:text-gray-400">${typeof res.costPerHour === 'number' ? res.costPerHour.toFixed(3) : res.costPerHour}/hr</td>
+                      <td className="px-2 py-1.5 text-gray-500 dark:text-gray-400 hidden sm:table-cell lg:hidden xl:table-cell truncate">{res.environment}</td>
                     </tr>
                   ))
                 )}
@@ -202,15 +202,15 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
                     }}
                     className={`flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all duration-200 ${
                       isHovered || isSelected
-                        ? "bg-white shadow-md border border-gray-100"
-                        : "hover:bg-white/40"
+                        ? "bg-white dark:bg-slate-800 shadow-md border border-gray-100 dark:border-slate-700"
+                        : "hover:bg-white/40 dark:hover:bg-slate-800/40"
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.colorHex }} />
-                      <span className="text-[10px] text-gray-600 font-semibold truncate max-w-[120px] sm:max-w-[80px]">{item.name}</span>
+                      <span className="text-[10px] text-gray-600 dark:text-gray-300 font-semibold truncate max-w-[120px] sm:max-w-[80px]">{item.name}</span>
                     </div>
-                    <span className="text-xs font-extrabold text-[#111844]">{item.value}%</span>
+                    <span className="text-xs font-extrabold text-[#111844] dark:text-[#F9F7F7]">{item.value}%</span>
                   </div>
                 );
               })}

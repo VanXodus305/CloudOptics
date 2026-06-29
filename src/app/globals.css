@@ -109,4 +109,84 @@ section {
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(121, 44, 162, 0.2) transparent;
-}
+}
+
+/* Hide Google Translate top bar and banners */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+.goog-te-gadget-simple,
+.goog-te-gadget-icon,
+.goog-te-menu-value,
+.skiptranslate[style*="visibility: visible"] {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+/* Hide Google Translate tooltip hover popups */
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Dashboard Dark Mode Scoped Overrides */
+html.dark .dashboard-layout .bg-white\/90,
+html.dark .dashboard-layout .bg-white\/80,
+html.dark .dashboard-layout .bg-white\/70,
+html.dark .dashboard-layout .bg-white\/60,
+html.dark .dashboard-layout .bg-white\/50,
+html.dark .dashboard-layout .bg-white\/40,
+html.dark .dashboard-layout .bg-white {
+  background-color: rgba(15, 18, 43, 0.6) !important;
+}
+
+html.dark .dashboard-layout .border-white\/60,
+html.dark .dashboard-layout .border-white\/50,
+html.dark .dashboard-layout .border-white\/40,
+html.dark .dashboard-layout .border-white\/30,
+html.dark .dashboard-layout .border-white {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+html.dark .dashboard-layout .text-\[\#111844\] {
+  color: #F9F7F7 !important;
+}
+
+html.dark .dashboard-layout .text-gray-800 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .dashboard-layout .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .dashboard-layout .bg-gray-50 {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+html.dark .dashboard-layout .bg-\[\#F9F7F7\] {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+html.dark .dashboard-layout .border-gray-100 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Text Gradient Dark Mode Adaptations */
+html.dark .dashboard-layout .from-\[\#111844\] {
+  --tw-gradient-from: #F9F7F7 !important;
+  --tw-gradient-to: rgba(249, 247, 247, 0) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+html.dark .dashboard-layout .to-\[\#792CA2\] {
+  --tw-gradient-to: #C084FC !important;
+}
+
+

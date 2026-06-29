@@ -19,7 +19,7 @@ export async function DELETE(request, { params }) {
     );
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   if (!Types.ObjectId.isValid(id)) {
     return Response.json({ error: "Invalid member ID" }, { status: 400 });

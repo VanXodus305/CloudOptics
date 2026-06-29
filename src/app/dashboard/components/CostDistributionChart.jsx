@@ -30,21 +30,21 @@ export default function CostDistributionChart({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: 0.1 }}
-      className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 flex flex-col justify-between relative"
+      className="bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 dark:border-white/5 flex flex-col justify-between relative"
     >
       {/* Subtle loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
+        <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
 
       <div className="flex flex-row justify-between items-center sm:items-start gap-2 mb-4 flex-wrap">
         <div>
-          <h3 className="text-sm sm:text-base font-bold text-[#111844]">
+          <h3 className="text-sm sm:text-base font-bold text-[#111844] dark:text-[#F9F7F7]">
             Cost Distribution
           </h3>
-          <span className="text-[10px] text-gray-400 font-semibold mt-0.5 sm:mt-1 block">
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold mt-0.5 sm:mt-1 block">
             Resource share breakdown by service category.
           </span>
         </div>
@@ -55,12 +55,12 @@ export default function CostDistributionChart({
             <Button
               size="sm"
               variant="flat"
-              className="bg-[#792CA2]/10 hover:bg-[#792CA2]/20 border border-[#792CA2]/20 text-[10px] sm:text-xs font-bold text-[#792CA2] rounded-xl px-2.5 sm:px-3 h-8 min-w-0 flex items-center gap-1.5 transition-all select-none whitespace-nowrap"
+              className="bg-[#792CA2]/10 hover:bg-[#792CA2]/20 dark:bg-[#792CA2]/20 dark:hover:bg-[#792CA2]/30 border border-[#792CA2]/20 text-[10px] sm:text-xs font-bold text-[#792CA2] dark:text-[#C084FC] rounded-xl px-2.5 sm:px-3 h-8 min-w-0 flex items-center gap-1.5 transition-all select-none whitespace-nowrap"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#792CA2] opacity-80 flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#792CA2] dark:text-[#C084FC] opacity-80 flex-shrink-0">
                 <path fillRule="evenodd" d="M2.628 1.6A1 1 0 013.6 1h12.8a1 1 0 01.972.6l-5.633 11.265a1 1 0 01-.972.535H9.203a1 1 0 01-.972-.535L2.628 2.2a1 1 0 010-.6z" clipRule="evenodd" />
               </svg>
-              <span className="hidden sm:inline text-[#792CA2]/70 font-medium">Filter:</span>
+              <span className="hidden sm:inline text-[#792CA2]/70 dark:text-[#C084FC]/70 font-medium">Filter:</span>
               <span className="truncate">{filterMap[donutFilter]}</span>
               <span className="text-[8px] opacity-75">▼</span>
             </Button>
@@ -75,7 +75,7 @@ export default function CostDistributionChart({
               const selected = Array.from(keys)[0];
               setDonutFilter(selected);
             }}
-            className="text-xs text-[#111844]"
+            className="text-xs text-[#111844] dark:text-[#F9F7F7]"
           >
             <DropdownItem key="All">All Clusters</DropdownItem>
             <DropdownItem key="Production">Production</DropdownItem>
@@ -96,15 +96,15 @@ export default function CostDistributionChart({
           : "Cost allocation is evenly distributed.";
 
         return (
-          <div className="bg-gradient-to-r from-[#792CA2]/5 to-[#9A4DCC]/5 border border-purple-500/10 rounded-2xl p-3 mb-2 flex items-center justify-between text-[10px]">
+          <div className="bg-gradient-to-r from-[#792CA2]/5 to-[#9A4DCC]/5 dark:from-[#792CA2]/10 dark:to-[#9A4DCC]/10 border border-purple-500/10 dark:border-purple-500/20 rounded-2xl p-3 mb-2 flex items-center justify-between text-[10px]">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span className="text-gray-500 font-semibold">{allocationMsg}</span>
+              <span className="text-gray-500 dark:text-gray-400 font-semibold">{allocationMsg}</span>
             </div>
-            <div className="text-[#792CA2] font-bold">
+            <div className="text-[#792CA2] dark:text-[#C084FC] font-bold">
               Active Services: {donutData?.length || 3}
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function CostDistributionChart({
             <circle
               cx="50" cy="50" r={donutRadius}
               fill="transparent"
-              stroke="rgba(255, 255, 255, 0.25)"
+              stroke="rgba(255, 255, 255, 0.1)"
               strokeWidth={10}
             />
 
@@ -187,12 +187,12 @@ export default function CostDistributionChart({
 
           {/* Centre label — sits above the SVG */}
           <div className="absolute flex flex-col items-center text-center pointer-events-none">
-            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">
+            <span className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
               {donutSelectedSegment !== null
                 ? donutData[donutSelectedSegment].name.split(" ")[0]
                 : "Total"}
             </span>
-            <span className="text-base font-black text-[#111844] font-mono mt-0.5">
+            <span className="text-base font-black text-[#111844] dark:text-[#F9F7F7] font-mono mt-0.5">
               {donutSelectedSegment !== null
                 ? `${donutData[donutSelectedSegment].value}%`
                 : `$${Math.round(donutTotalSpend).toLocaleString()}`}
@@ -212,8 +212,8 @@ export default function CostDistributionChart({
                 onClick={() => setDonutSelectedSegment(isSelected ? null : idx)}
                 className={`flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all duration-200 ${
                   isHovered || isSelected
-                    ? "bg-white shadow-md border border-gray-100"
-                    : "hover:bg-white/40"
+                    ? "bg-white dark:bg-slate-800 shadow-md border border-gray-100 dark:border-slate-700"
+                    : "hover:bg-white/40 dark:hover:bg-slate-800/40"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -221,11 +221,11 @@ export default function CostDistributionChart({
                     className="w-2 rounded-full h-2"
                     style={{ backgroundColor: item.colorHex }}
                   />
-                  <span className="text-[10px] text-gray-600 font-semibold truncate max-w-[120px]">
+                  <span className="text-[10px] text-gray-600 dark:text-gray-300 font-semibold truncate max-w-[120px]">
                     {item.name}
                   </span>
                 </div>
-                <span className="text-xs font-extrabold text-[#111844]">
+                <span className="text-xs font-extrabold text-[#111844] dark:text-[#F9F7F7]">
                   {item.value}%
                 </span>
               </div>

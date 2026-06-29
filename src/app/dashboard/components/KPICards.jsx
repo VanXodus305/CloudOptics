@@ -66,18 +66,18 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
             boxShadow: "0 15px 35px rgba(121, 44, 162, 0.12)",
             transition: { duration: 0.15, ease: "easeOut" },
           }}
-          className={`relative bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-lg border border-white/60 border-t-4 ${card.border} flex flex-col justify-between min-h-[110px] md:min-h-[160px]`}
+          className={`relative bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-lg border border-white/60 dark:border-white/5 border-t-4 ${card.border} flex flex-col justify-between min-h-[110px] md:min-h-[160px]`}
         >
           {/* Subtle loading overlay */}
           {isLoading && (
-            <div className="absolute inset-0 bg-white/40 rounded-2xl md:rounded-3xl flex items-center justify-center z-10 backdrop-blur-[0.5px]">
+            <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-2xl md:rounded-3xl flex items-center justify-center z-10 backdrop-blur-[0.5px]">
               <div className="w-5 h-5 border-2 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
 
           <div>
             <div className="flex justify-between items-start mb-1 md:mb-2">
-              <h3 className="text-[9px] md:text-xs font-bold text-gray-400 uppercase tracking-wider">
+              <h3 className="text-[9px] md:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 {card.title}
               </h3>
               {/* Trend Badge and Label */}
@@ -85,21 +85,21 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
                 <span
                   className={`text-[8px] md:text-[9.5px] px-1.5 py-0.5 rounded-full font-bold select-none ${
                     card.trend.startsWith("-")
-                      ? "bg-rose-50 text-rose-600 border border-rose-100"
+                      ? "bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30"
                       : card.trend.startsWith("+")
-                      ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                      : "bg-gray-50 text-gray-500 border border-gray-100"
+                      ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30"
+                      : "bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-slate-700"
                   }`}
                 >
                   {card.trend}
                 </span>
-                <span className="text-[7px] md:text-[8px] text-gray-400 font-semibold mt-0.5 whitespace-nowrap">
+                <span className="text-[7px] md:text-[8px] text-gray-400 dark:text-gray-500 font-semibold mt-0.5 whitespace-nowrap">
                   {card.trendLabel}
                 </span>
               </div>
             </div>
 
-            <p className="text-base sm:text-xl md:text-2xl font-black text-[#111844] mt-0.5 md:mt-2 font-mono">
+            <p className="text-base sm:text-xl md:text-2xl font-black text-[#111844] dark:text-[#F9F7F7] mt-0.5 md:mt-2 font-mono">
               {card.prefix}
               <CountUp
                 end={card.value}
@@ -110,8 +110,8 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
             </p>
           </div>
 
-          <div className="mt-2 pt-2 border-t border-gray-100/50">
-            <span className="text-[8px] md:text-[10px] text-gray-400 font-semibold block leading-tight">
+          <div className="mt-2 pt-2 border-t border-gray-100/50 dark:border-slate-800">
+            <span className="text-[8px] md:text-[10px] text-gray-400 dark:text-gray-500 font-semibold block leading-tight">
               {card.description}
             </span>
           </div>
