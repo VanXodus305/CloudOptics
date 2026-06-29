@@ -2,19 +2,33 @@
 import React from "react";
 import { motion } from "framer-motion";
 
+import { BellAlertIcon } from "@heroicons/react/24/outline";
+
 export default function AlertsHeader() {
   return (
-    <div className="relative mb-8 flex justify-between items-center bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-sm z-50">
-      <h1 className="text-3xl font-extrabold text-[#111844] tracking-tight">Alerts</h1>
-      
-      {/* Floating Section 13 Tab */}
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 relative z-50 max-w-[1600px] mx-auto w-full">
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        className="absolute -top-6 right-8 bg-gradient-to-r from-[#111844] to-[#1F215D] px-6 py-2 rounded-t-xl shadow-lg border border-[#111844]"
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="flex items-center gap-4"
       >
-        <span className="text-sm font-bold text-[#DCCBFF] tracking-widest uppercase">Section 13</span>
+        {/* Animated Icon Badge */}
+        <motion.div
+          whileHover={{ scale: 1.1, rotate: 6 }}
+          transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          className="p-3.5 bg-gradient-to-br from-[#792CA2] to-[#9A4DCC] rounded-2xl shadow-xl shadow-[#792CA2]/30 flex items-center justify-center"
+        >
+          <BellAlertIcon className="w-7 h-7 text-white" strokeWidth={2.5} />
+        </motion.div>
+        <div>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">
+            Alerts Center
+          </h1>
+          <p className="text-sm text-gray-400 font-medium mt-0.5">
+            Monitor, investigate, and resolve active incidents in real-time
+          </p>
+        </div>
       </motion.div>
     </div>
   );

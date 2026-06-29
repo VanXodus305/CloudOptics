@@ -1,11 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ClockIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ClockIcon, ArrowPathIcon, ChartBarIcon, CheckCircleIcon, ExclamationTriangleIcon, BoltIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 
 export default function AlertHistory() {
   const [alerts, setAlerts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedEnv, setSelectedEnv] = useState(null);
+  const [activeTooltip, setActiveTooltip] = useState(null);
 
   const fetchAlerts = async () => {
     setIsLoading(true);
@@ -28,11 +31,31 @@ export default function AlertHistory() {
   const totalAlerts = alerts.length;
   const unresolvedAlerts = alerts.filter(a => a.status === "unresolved").length;
   const inProgressAlerts = alerts.filter(a => a.status === "in progress").length;
-  const resolvedAlerts = alerts.filter(a => a.status === "resolved").length;
+  const resolvedAlerts = alerts.filter(a => a.status === "resolved" || a.status === "archived").length;
 
-  const recentAlerts = [...alerts]
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    .slice(0, 5);
+  const envDataMap = {};
+  alerts.forEach(a => {
+    const env = a.environment || 'Unknown';
+    if (!envDataMap[env]) {
+      envDataMap[env] = { name: env, "Potential Savings ($)": 0, "Current Cost ($)": 0 };
+    }
+    envDataMap[env]["Potential Savings ($)"] += Math.round(a.potentialSavings || 0);
+    envDataMap[env]["Current Cost ($)"] += Math.round(a.currentCost || 0);
+  });
+  const chartData = Object.values(envDataMap);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_10px_25px_rgba(0,0,0,0.05)] px-4 py-2 text-center -translate-x-1/2 -translate-y-full flex flex-col items-center justify-center pointer-events-none min-w-max">
+          <p className="text-[11px] font-black" style={{ color: payload[0].fill }}>
+            {payload[0].name.replace(' ($)', '')} : ${payload[0].value}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <motion.div
@@ -41,21 +64,28 @@ export default function AlertHistory() {
       transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.2 }}
       className="relative mb-24 md:mb-0"
     >
-      <div className="bg-white/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex flex-col relative z-0 min-h-[250px]">
-        
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-          <div className="flex items-center gap-2 justify-center sm:justify-start">
-            <ClockIcon className="w-5 h-5 text-[#792CA2]" />
-            <h3 className="text-lg font-black text-[#111844] tracking-tight text-center sm:text-left">Alert History & Stats</h3>
-          </div>
-          <button 
-            onClick={fetchAlerts}
-            className="w-full sm:w-auto justify-center p-1.5 bg-white border border-gray-200 text-gray-500 hover:text-[#792CA2] hover:border-[#792CA2]/30 rounded-lg shadow-sm transition-all flex items-center gap-1.5 text-xs font-bold"
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4 pl-2">
+        <div className="flex items-center gap-3 justify-center sm:justify-start">
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: -10 }}
+            className="p-2 bg-gradient-to-br from-[#792CA2] to-[#9A4DCC] rounded-xl shadow-lg shadow-[#792CA2]/20 flex items-center justify-center"
           >
-            <ArrowPathIcon className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-            Refresh History
-          </button>
+            <ClockIcon className="w-5 h-5 text-white" strokeWidth={2.5} />
+          </motion.div>
+          <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">Alert History & Stats</h3>
         </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={fetchAlerts}
+          className="w-full sm:w-auto justify-center p-1.5 px-3 bg-white border border-gray-200 text-gray-500 hover:text-[#792CA2] hover:border-[#792CA2]/30 rounded-lg shadow-sm transition-all flex items-center gap-1.5 text-xs font-bold"
+        >
+          <ArrowPathIcon className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
+          Refresh History
+        </motion.button>
+      </div>
+
+      <div className="bg-white/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex flex-col relative z-0 min-h-[250px]">
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           <div className="bg-white/80 border border-gray-150 p-4 rounded-2xl shadow-sm text-center">
@@ -76,44 +106,129 @@ export default function AlertHistory() {
           </div>
         </div>
 
-        <div className="bg-white/80 rounded-2xl p-6 border border-white shadow-inner flex-grow">
-          <h4 className="text-xs font-black text-[#111844] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Recent Status Changes</h4>
+        <div className="bg-white/80 rounded-2xl p-6 border border-white shadow-inner flex-grow flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <ChartBarIcon className="w-4 h-4 text-[#792CA2]" />
+              <h4 className="text-sm font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] uppercase">Optimization Impact Analysis</h4>
+            </div>
+          </div>
           
           {isLoading ? (
-            <div className="space-y-3">
-              {[0, 1, 2].map(i => (
-                <div key={i} className="h-10 bg-gray-100 animate-pulse rounded-xl w-full" />
-              ))}
+            <div className="flex-grow flex items-center justify-center min-h-[250px]">
+              <div className="w-8 h-8 border-2 border-[#792CA2] border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : recentAlerts.length === 0 ? (
-            <p className="text-gray-400 font-medium text-center py-6 text-xs">No recent alert updates found.</p>
+          ) : chartData.length === 0 ? (
+            <div className="flex-grow flex items-center justify-center min-h-[250px]">
+              <p className="text-gray-400 font-medium text-xs">No data available for analysis.</p>
+            </div>
+          ) : selectedEnv ? (
+            <div className="flex-grow flex flex-col w-full h-[300px] mt-4 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="flex items-center gap-3 mb-4 sticky top-0 bg-white/90 backdrop-blur-md z-10 py-2 border-b border-gray-100">
+                <motion.button 
+                  whileHover={{ scale: 1.05, x: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedEnv(null)} 
+                  className="p-1 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1 text-gray-500 font-bold text-xs"
+                >
+                  <ArrowLeftIcon className="w-4 h-4" /> Back to Chart
+                </motion.button>
+                <h5 className="text-[11px] font-black text-[#111844] uppercase tracking-wider ml-auto">{selectedEnv} Environment Alerts</h5>
+              </div>
+              <div className="flex flex-col gap-3">
+                {alerts.filter(a => a.environment === selectedEnv).map((alert, index) => (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ scale: 1.02, x: 4 }}
+                    transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 20 }}
+                    key={alert._id} 
+                    className="group bg-white border border-gray-150 p-4 rounded-xl shadow-sm hover:shadow-md hover:border-[#792CA2]/40 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 cursor-default relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b opacity-0 group-hover:opacity-100 transition-opacity duration-300 from-[#792CA2] to-[#2B3074]" />
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${
+                        (alert.status === 'resolved' || alert.status === 'archived') ? 'bg-emerald-50 text-emerald-500 border-emerald-100' :
+                        alert.status === 'in progress' ? 'bg-amber-50 text-amber-500 border-amber-100' : 'bg-rose-50 text-rose-500 border-rose-100'
+                      }`}>
+                        {(alert.status === 'resolved' || alert.status === 'archived') ? <CheckCircleIcon className="w-5 h-5" /> :
+                         alert.status === 'in progress' ? <BoltIcon className="w-5 h-5" /> : <ExclamationTriangleIcon className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider ${alert.severity === 'Critical' ? 'bg-red-100 text-red-700 border border-red-200' :
+                              alert.severity === 'High' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
+                                alert.severity === 'Medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 'bg-blue-100 text-blue-700 border border-blue-200'
+                            }`}>
+                            {alert.severity}
+                          </span>
+                          <span className="text-gray-400 font-bold text-[10px] bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                            {new Date(alert.updatedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <span className="font-extrabold text-gray-700 text-xs leading-snug line-clamp-1 group-hover:text-[#111844] transition-colors">{alert.message}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start sm:items-end gap-2 ml-14 sm:ml-0">
+                      <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm border ${(alert.status === 'resolved' || alert.status === 'archived') ? 'bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20 text-emerald-700' :
+                          alert.status === 'in progress' ? 'bg-gradient-to-r from-amber-500/10 to-amber-500/5 border-amber-500/20 text-amber-700' : 'bg-gradient-to-r from-rose-500/10 to-rose-500/5 border-rose-500/20 text-rose-700'
+                        }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full shadow-sm ${(alert.status === 'resolved' || alert.status === 'archived') ? 'bg-emerald-500' : alert.status === 'in progress' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                        {alert.status === 'archived' ? 'resolved' : alert.status}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           ) : (
-            <div className="divide-y divide-gray-100">
-              {recentAlerts.map((alert) => (
-                <div key={alert._id} className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-3">
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
-                      alert.severity === 'Critical' ? 'bg-red-100 text-red-700' :
-                      alert.severity === 'High' ? 'bg-orange-100 text-orange-700' :
-                      alert.severity === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'
-                    }`}>
-                      {alert.severity}
-                    </span>
-                    <span className="font-semibold text-gray-700 leading-snug">{alert.message}</span>
-                  </div>
-                  <div className="flex items-center gap-3 self-end sm:self-auto text-[10px] font-bold">
-                    <span className="text-gray-400 uppercase tracking-wider">{alert.environment}</span>
-                    <span className="text-gray-400">•</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
-                      alert.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                      alert.status === 'in progress' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'
-                    }`}>
-                      {alert.status}
-                    </span>
-                    <span className="text-gray-400 font-medium">{new Date(alert.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                </div>
-              ))}
+            <div className="w-full h-[300px] mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 700 }} 
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 600 }}
+                    tickFormatter={(value) => `$${value}`}
+                  />
+                  <Tooltip 
+                    shared={false}
+                    cursor={{ fill: '#f9fafb' }}
+                    content={<CustomTooltip />}
+                    position={activeTooltip ? { x: activeTooltip.x, y: activeTooltip.y - 4 } : undefined}
+                    wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
+                  />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 700, paddingTop: '15px' }} />
+                  <Bar 
+                    dataKey="Current Cost ($)" 
+                    fill="#111844" 
+                    radius={[6, 6, 0, 0]} 
+                    maxBarSize={40} 
+                    onClick={(data) => setSelectedEnv(data.name)} 
+                    onMouseEnter={(data) => setActiveTooltip({ x: data.x + data.width / 2, y: data.y })}
+                    onMouseLeave={() => setActiveTooltip(null)}
+                    cursor="pointer" 
+                  />
+                  <Bar 
+                    dataKey="Potential Savings ($)" 
+                    fill="#792CA2" 
+                    radius={[6, 6, 0, 0]} 
+                    maxBarSize={40} 
+                    onClick={(data) => setSelectedEnv(data.name)} 
+                    onMouseEnter={(data) => setActiveTooltip({ x: data.x + data.width / 2, y: data.y })}
+                    onMouseLeave={() => setActiveTooltip(null)}
+                    cursor="pointer" 
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           )}
         </div>

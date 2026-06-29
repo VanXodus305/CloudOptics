@@ -32,8 +32,12 @@ const AlertSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["unresolved", "in progress", "resolved"],
+      enum: ["unresolved", "in progress", "resolved", "archived"],
       default: "unresolved",
+    },
+    previousStatus: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true }

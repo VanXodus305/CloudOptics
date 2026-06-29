@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDownIcon, BellAlertIcon, CheckCircleIcon, ArrowPathIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon, BellAlertIcon, CheckCircleIcon, ArrowPathIcon, ExclamationTriangleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import { FlagIcon } from "@heroicons/react/24/solid";
 
 export default function ActiveAlerts() {
   const [alerts, setAlerts] = useState([]);
@@ -10,9 +11,29 @@ export default function ActiveAlerts() {
   const [activeTab, setActiveTab] = useState("Unresolved");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortOption, setSortOption] = useState("Critical");
-  
+  const [isEnvOpen, setIsEnvOpen] = useState(false);
+  const [envFilter, setEnvFilter] = useState("All");
+  const sortRef = useRef(null);
+  const envRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sortRef.current && !sortRef.current.contains(event.target)) {
+        setIsSortOpen(false);
+      }
+      if (envRef.current && !envRef.current.contains(event.target)) {
+        setIsEnvOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const tabs = ["Resolved", "In progress", "Unresolved"];
   const sortOptions = ["Critical", "High", "Medium", "Low"];
+  const uniqueEnvs = ["All", ...new Set(alerts.map(a => a.environment || "Unknown"))];
 
   const fetchAlerts = async () => {
     setIsLoading(true);
@@ -21,12 +42,8 @@ export default function ActiveAlerts() {
       if (!res.ok) throw new Error("Failed to fetch alerts");
       const data = await res.json();
       setAlerts(data);
-      
-      // Update selected alert with latest data
-      if (selectedAlert) {
-        const updated = data.find(a => a._id === selectedAlert._id);
-        setSelectedAlert(updated || null);
-      }
+
+      // The new useEffect will handle selecting the default alert
     } catch (err) {
       console.error("Error loading alerts:", err);
     } finally {
@@ -37,6 +54,31 @@ export default function ActiveAlerts() {
   useEffect(() => {
     fetchAlerts();
   }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const tabStatusMap = {
+      "Resolved": "resolved",
+      "In progress": "in progress",
+      "Unresolved": "unresolved"
+    };
+    const currentFiltered = alerts.filter(alert => alert.status === tabStatusMap[activeTab]);
+    const severityOrder = { "Critical": 0, "High": 1, "Medium": 2, "Low": 3 };
+    const currentSorted = currentFiltered
+      .filter(a => sortOption === "All" || a.severity === sortOption)
+      .filter(a => envFilter === "All" || a.environment === envFilter)
+      .sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+
+    if (currentSorted.length > 0) {
+      setSelectedAlert(prev => {
+        const isSelectedInList = prev && currentSorted.some(a => a._id === prev._id);
+        return isSelectedInList ? prev : currentSorted[0];
+      });
+    } else {
+      setSelectedAlert(null);
+    }
+  }, [activeTab, sortOption, envFilter, alerts, isLoading]);
 
   const updateAlertStatus = async (alertId, newStatus) => {
     try {
@@ -49,7 +91,7 @@ export default function ActiveAlerts() {
       });
       if (!res.ok) throw new Error("Failed to update status");
       const updated = await res.json();
-      
+
       // Snappily update state in UI
       setAlerts(prev => prev.map(a => a._id === alertId ? updated : a));
       setSelectedAlert(updated);
@@ -67,13 +109,10 @@ export default function ActiveAlerts() {
   const filteredAlerts = alerts.filter(alert => alert.status === tabStatusMap[activeTab]);
 
   const severityOrder = { "Critical": 0, "High": 1, "Medium": 2, "Low": 3 };
-  const sortedAlerts = [...filteredAlerts].sort((a, b) => {
-    const aMatch = a.severity === sortOption;
-    const bMatch = b.severity === sortOption;
-    if (aMatch && !bMatch) return -1;
-    if (!aMatch && bMatch) return 1;
-    return severityOrder[a.severity] - severityOrder[b.severity];
-  });
+  const sortedAlerts = [...filteredAlerts]
+    .filter(a => sortOption === "All" || a.severity === sortOption)
+    .filter(a => envFilter === "All" || a.environment === envFilter)
+    .sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
 
   return (
     <motion.div
@@ -83,47 +122,72 @@ export default function ActiveAlerts() {
       className="relative mb-12"
     >
       <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white flex flex-col md:flex-row gap-6 relative z-0">
-        
+
 
         {/* Left Side: Details View */}
         <div className="hidden md:flex order-2 md:order-1 flex-1 bg-gradient-to-br from-white to-[#F9F7F7] rounded-2xl p-6 md:p-8 border border-gray-100 flex-col min-h-[350px] relative overflow-hidden shadow-inner">
           <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#9A4DCC]/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-          
+
           {selectedAlert ? (
-            <motion.div 
+            <motion.div
               key={selectedAlert._id}
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col h-full gap-5 relative z-10 w-full"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
-                <div className="flex items-center gap-2.5 flex-nowrap whitespace-nowrap">
-                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
-                    selectedAlert.severity === 'Critical' ? 'bg-red-100 text-red-700 border border-red-200' :
-                    selectedAlert.severity === 'High' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
-                    selectedAlert.severity === 'Medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 
-                    'bg-blue-100 text-blue-700 border border-blue-200'
-                  }`}>
-                    {selectedAlert.severity} Severity
-                  </span>
-                  <span className="text-[10px] font-bold text-gray-400">•</span>
-                  <span className="text-xs font-bold text-gray-500 uppercase">{selectedAlert.environment}</span>
-                </div>
-                <div className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase w-fit ${
-                  selectedAlert.status === 'resolved' ? 'bg-green-100 text-green-700 border border-green-200/50' :
-                  selectedAlert.status === 'in progress' ? 'bg-amber-100 text-amber-700 border border-amber-200/50' :
-                  'bg-rose-100 text-rose-700 border border-rose-200/50'
-                }`}>
-                  {selectedAlert.status}
+              <div className="flex justify-center pb-2">
+                <div className="flex items-center gap-2 bg-gray-50/80 p-1.5 rounded-xl border border-gray-100 shadow-sm w-full xl:w-auto">
+                  <button
+                    onClick={() => updateAlertStatus(selectedAlert._id, "unresolved")}
+                    className={`flex-1 xl:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${selectedAlert.status === "unresolved" ? "bg-red-100 border border-red-200 shadow-sm" : "hover:bg-red-50 opacity-60 hover:opacity-100 grayscale hover:grayscale-0"
+                      }`}
+                    title="Mark Unresolved"
+                  >
+                    <FlagIcon className={`w-4 h-4 ${selectedAlert.status === "unresolved" ? "text-red-500" : "text-gray-400"}`} />
+                    <span className={`text-[10px] font-bold ${selectedAlert.status === "unresolved" ? "text-red-700" : "text-gray-500"}`}>Unresolved</span>
+                  </button>
+
+                  <button
+                    onClick={() => updateAlertStatus(selectedAlert._id, "in progress")}
+                    className={`flex-1 xl:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${selectedAlert.status === "in progress" ? "bg-yellow-100 border border-yellow-200 shadow-sm" : "hover:bg-yellow-50 opacity-60 hover:opacity-100 grayscale hover:grayscale-0"
+                      }`}
+                    title="Start Progress"
+                  >
+                    <FlagIcon className={`w-4 h-4 ${selectedAlert.status === "in progress" ? "text-yellow-500" : "text-gray-400"}`} />
+                    <span className={`text-[10px] font-bold ${selectedAlert.status === "in progress" ? "text-yellow-700" : "text-gray-500"}`}>In Progress</span>
+                  </button>
+
+                  <button
+                    onClick={() => updateAlertStatus(selectedAlert._id, "resolved")}
+                    className={`flex-1 xl:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${selectedAlert.status === "resolved" ? "bg-green-100 border border-green-200 shadow-sm" : "hover:bg-green-50 opacity-60 hover:opacity-100 grayscale hover:grayscale-0"
+                      }`}
+                    title="Mark Resolved"
+                  >
+                    <FlagIcon className={`w-4 h-4 ${selectedAlert.status === "resolved" ? "text-green-500" : "text-gray-400"}`} />
+                    <span className={`text-[10px] font-bold ${selectedAlert.status === "resolved" ? "text-green-700" : "text-gray-500"}`}>Resolved</span>
+                  </button>
                 </div>
               </div>
+
+
 
               <div>
                 <h3 className="text-base font-black text-[#111844] leading-snug">{selectedAlert.message}</h3>
                 <div className="mt-2.5 flex flex-wrap gap-2 text-[11px] font-semibold text-gray-500">
-                  <span className="bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200/40">Resource ID: <strong className="text-gray-700">{selectedAlert.resourceId}</strong></span>
-                  <span className="bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200/40">Type: <strong className="text-gray-700">{selectedAlert.type}</strong></span>
+                  <span className="bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200/40 flex items-center gap-1">
+                    Resource ID: <strong className="text-gray-700 ml-0.5">{selectedAlert.resourceId}</strong>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(selectedAlert.resourceId)}
+                      className="p-0.5 hover:bg-gray-200 rounded transition-colors text-gray-400 hover:text-gray-700 ml-0.5"
+                      title="Copy Resource ID"
+                    >
+                      <DocumentDuplicateIcon className="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                  <span className="bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200/40 flex items-center">
+                    Type: <strong className="text-gray-700 ml-1">{selectedAlert.type}</strong>
+                  </span>
                 </div>
               </div>
 
@@ -147,64 +211,59 @@ export default function ActiveAlerts() {
                 </p>
               </div>
 
-              <div className="mt-auto pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+              <div className="mt-auto pt-4 flex flex-col sm:flex-row justify-center gap-3 border-t border-gray-100">
                 {selectedAlert.status === "unresolved" && (
-                  <>
-                    <button 
-                      onClick={() => updateAlertStatus(selectedAlert._id, "in progress")}
-                      className="flex-1 bg-white hover:bg-[#792CA2]/5 text-[#792CA2] border border-[#792CA2]/20 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
-                    >
-                      Start Progress
-                    </button>
-                    <button 
-                      onClick={() => updateAlertStatus(selectedAlert._id, "resolved")}
-                      className="flex-1 bg-[#111844] hover:bg-[#1F215D] text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
-                    >
-                      Resolve Alert
-                    </button>
-                  </>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => updateAlertStatus(selectedAlert._id, "in progress")}
+                    className="w-full sm:w-auto bg-[#111844] hover:bg-[#1F215D] text-white px-8 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm"
+                  >
+                    Start Progress
+                  </motion.button>
                 )}
                 {selectedAlert.status === "in progress" && (
-                  <>
-                    <button 
+                  <div className="flex w-full sm:w-auto justify-center gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => updateAlertStatus(selectedAlert._id, "unresolved")}
-                      className="flex-1 bg-white hover:bg-gray-50 text-gray-500 border border-gray-300 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
+                      className="flex-1 sm:flex-none bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm"
                     >
                       Mark Unresolved
-                    </button>
-                    <button 
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => updateAlertStatus(selectedAlert._id, "resolved")}
-                      className="flex-1 bg-[#111844] hover:bg-[#1F215D] text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
+                      className="flex-1 sm:flex-none bg-[#111844] hover:bg-[#1F215D] text-white px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm"
                     >
-                      Resolve Alert
-                    </button>
-                  </>
+                      Mark Resolved
+                    </motion.button>
+                  </div>
                 )}
                 {selectedAlert.status === "resolved" && (
-                  <button 
-                    onClick={() => updateAlertStatus(selectedAlert._id, "unresolved")}
-                    className="w-full bg-white hover:bg-[#792CA2]/5 text-[#792CA2] border border-[#792CA2]/20 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => updateAlertStatus(selectedAlert._id, "archived")}
+                    className="w-full sm:w-auto bg-white hover:bg-[#792CA2]/5 text-[#792CA2] border border-[#792CA2]/20 px-8 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm"
                   >
-                    Reopen Alert
-                  </button>
+                    Done
+                  </motion.button>
                 )}
               </div>
             </motion.div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full flex-grow py-12">
-              <motion.div 
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 relative"
-              >
-                <ExclamationTriangleIcon className="w-10 h-10 text-[#792CA2]" />
-                <span className="absolute top-0 right-0 w-4 h-4 bg-[#792CA2] border-2 border-white rounded-full animate-ping" />
-                <span className="absolute top-0 right-0 w-4 h-4 bg-[#792CA2] border-2 border-white rounded-full" />
-              </motion.div>
-              
-              <h3 className="text-xl font-black text-[#111844]">Show the Alerts</h3>
+
+              <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">
+                {sortedAlerts.length === 0 ? "No alerts" : "Show the Alerts"}
+              </h3>
               <p className="text-sm text-gray-500 font-medium text-center max-w-[80%] mt-2">
-                Select an alert on the right to view its full details and mitigation steps here.
+                {sortedAlerts.length === 0
+                  ? "There are no alerts in this category to display."
+                  : "Select an alert on the right to view its full details and mitigation steps here."}
               </p>
             </div>
           )}
@@ -214,38 +273,73 @@ export default function ActiveAlerts() {
         <div className="order-1 md:order-2 flex-grow flex-1 flex flex-col pt-4 md:pt-0">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-4 mb-4">
             <div className="flex gap-1.5 bg-gray-100/50 p-1 rounded-xl w-fit flex-nowrap whitespace-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {tabs.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => { setActiveTab(tab); setSelectedAlert(null); }}
-                  className={`relative px-3 sm:px-4 py-1.5 text-xs font-bold rounded-lg transition-all z-10 ${
-                    activeTab === tab ? "text-[#111844]" : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  {activeTab === tab && (
-                    <motion.div
-                      layoutId="alertTab"
-                      className="absolute inset-0 bg-white rounded-lg shadow-sm"
-                      initial={false}
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    />
-                  )}
-                  <span className="relative z-10">{tab}</span>
-                </button>
-              ))}
+              {tabs.map((tab) => {
+                const isUnresolvedTab = tab === "Unresolved";
+                const hasUnresolvedAlerts = alerts.some(a => a.status === "unresolved");
+                const shouldBlink = isUnresolvedTab && hasUnresolvedAlerts;
+
+                return (
+                  <motion.button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`relative px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-lg transition-all z-10 ${activeTab === tab ? "text-[#111844]" : "text-gray-500 hover:text-gray-700"
+                      }`}
+                  >
+                    {activeTab === tab && (
+                      <motion.div
+                        layoutId="alertTab"
+                        className="absolute inset-0 bg-white rounded-lg shadow-sm"
+                        initial={false}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                      />
+                    )}
+                    <span className={`relative z-10 ${shouldBlink ? "animate-pulse text-red-500 font-black drop-shadow-sm" : ""}`}>
+                      {tab}
+                    </span>
+                  </motion.button>
+                );
+              })}
             </div>
 
             {/* Sort & Refresh controls */}
             <div className="flex items-center gap-2.5">
-              <span className="text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Sort by:</span>
-              <div className="relative">
-                <button 
+              <div className="relative" ref={envRef}>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setIsEnvOpen(!isEnvOpen)}
+                  className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-[11px] font-semibold shadow-sm flex items-center gap-1.5 hover:bg-gray-50 whitespace-nowrap"
+                >
+                  {envFilter}
+                  <ChevronDownIcon className="w-3.5 h-3.5" />
+                </motion.button>
+                {isEnvOpen && (
+                  <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-xl border border-gray-100 py-1 overflow-hidden z-30">
+                    {uniqueEnvs.map(env => (
+                      <button
+                        key={env}
+                        onClick={() => { setEnvFilter(env); setIsEnvOpen(false); }}
+                        className={`block w-full text-left px-3 py-1.5 text-xs font-medium hover:bg-[#792CA2]/10 hover:text-[#792CA2] ${envFilter === env ? "bg-[#792CA2]/5 text-[#792CA2]" : "text-gray-600"}`}
+                      >
+                        {env}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="relative" ref={sortRef}>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs font-semibold shadow-sm flex items-center gap-2 hover:bg-gray-50 whitespace-nowrap"
+                  className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-[11px] font-semibold shadow-sm flex items-center gap-1.5 hover:bg-gray-50 whitespace-nowrap"
                 >
                   {sortOption}
                   <ChevronDownIcon className="w-3.5 h-3.5" />
-                </button>
+                </motion.button>
                 {isSortOpen && (
                   <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-xl border border-gray-100 py-1 overflow-hidden z-30">
                     {sortOptions.map(opt => (
@@ -261,17 +355,19 @@ export default function ActiveAlerts() {
                 )}
               </div>
 
-              <button 
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={fetchAlerts}
-                className="p-1.5 bg-white border border-gray-200 text-gray-500 hover:text-[#792CA2] hover:border-[#792CA2]/30 rounded-lg shadow-sm transition-all flex-shrink-0"
+                className="p-1.5 bg-white border border-gray-200 text-gray-700 font-semibold hover:text-[#792CA2] hover:bg-gray-50 hover:border-[#792CA2]/30 rounded-lg shadow-sm transition-all flex items-center justify-center flex-shrink-0"
                 title="Refresh alerts list"
               >
                 <ArrowPathIcon className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
-              </button>
+              </motion.button>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 flex-grow overflow-visible md:overflow-y-auto custom-scrollbar pr-2 h-auto md:h-0">
+          <div className="flex flex-col gap-2 flex-grow overflow-y-auto custom-scrollbar p-3 bg-[#F9F7F7]/80 backdrop-blur-md border border-gray-150 rounded-2xl max-h-[400px] md:max-h-none md:h-0 shadow-inner">
             <AnimatePresence mode="popLayout">
               {isLoading ? (
                 [0, 1, 2, 3].map(i => (
@@ -283,8 +379,13 @@ export default function ActiveAlerts() {
                   </div>
                 ))
               ) : sortedAlerts.length === 0 ? (
-                <div className="text-center py-12 text-xs font-semibold text-gray-400 bg-gray-50/50 border border-dashed border-gray-200 rounded-xl">
-                  No {activeTab.toLowerCase()} alerts in this category
+                <div className="text-center py-12 px-4 text-xs font-semibold text-gray-400 bg-gray-50/50 border border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-1.5">
+                  <p>No {activeTab.toLowerCase()} alerts in this category</p>
+                  {activeTab === "In progress" && (
+                    <p className="font-medium text-gray-500">
+                      Check the <button onClick={() => setActiveTab("Unresolved")} className="text-[#792CA2] hover:underline font-bold transition-all">Unresolved</button> tab for new alerts to work on.
+                    </p>
+                  )}
                 </div>
               ) : (
                 sortedAlerts.map((alert, i) => (
@@ -292,30 +393,36 @@ export default function ActiveAlerts() {
                     key={alert._id}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    whileHover={{ scale: 1.01, x: -4 }}
+                    transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 20 }}
                     onClick={() => setSelectedAlert(selectedAlert?._id === alert._id ? null : alert)}
-                    className={`bg-white border p-3.5 rounded-xl shadow-sm hover:shadow-md transition-colors duration-250 cursor-pointer flex flex-col group ${
-                      selectedAlert?._id === alert._id ? 'border-2 border-[#792CA2] bg-[#792CA2]/5' : 'border-gray-100 hover:border-[#792CA2]/30'
-                    }`}
+                    className={`bg-white border p-3.5 rounded-xl shadow-sm hover:shadow-md transition-colors duration-250 cursor-pointer flex flex-col group ${selectedAlert?._id === alert._id ? 'border-2 border-[#792CA2] bg-[#792CA2]/5' : 'border-gray-100 hover:border-[#792CA2]/30'
+                      }`}
                   >
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-2.5 h-2.5 rounded-full ${
-                          alert.severity === 'Critical' ? 'bg-red-500 animate-pulse' :
-                          alert.severity === 'High' ? 'bg-orange-500' :
-                          alert.severity === 'Medium' ? 'bg-yellow-500' : 'bg-blue-500'
-                        }`} />
+                    <div className="flex flex-col gap-1.5 w-full">
+                      <div className="flex items-start justify-between w-full">
                         <span className="text-sm font-semibold text-gray-700 group-hover:text-[#792CA2] transition-colors line-clamp-1">{alert.message}</span>
+                        <ChevronDownIcon className={`w-4 h-4 text-gray-300 transition-transform flex-shrink-0 mt-0.5 ${selectedAlert?._id === alert._id ? 'rotate-0 text-[#792CA2]' : '-rotate-90 group-hover:translate-x-1'
+                          }`} />
                       </div>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-300 transition-transform ${
-                        selectedAlert?._id === alert._id ? 'rotate-0 text-[#792CA2]' : '-rotate-90 group-hover:translate-x-1'
-                      }`} />
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider ${alert.severity === 'Critical' ? 'bg-red-100 text-red-700 border border-red-200' :
+                            alert.severity === 'High' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
+                              alert.severity === 'Medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                                'bg-blue-100 text-blue-700 border border-blue-200'
+                          }`}>
+                          {alert.severity}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-lg text-[9px] font-black text-gray-600 bg-gray-100 border border-gray-200 uppercase tracking-wider shadow-sm">
+                          {alert.environment}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Collapsible Mobile Accordion Details View */}
                     <AnimatePresence initial={false}>
                       {selectedAlert?._id === alert._id && (
-                        <motion.div 
+                        <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
@@ -323,95 +430,112 @@ export default function ActiveAlerts() {
                           onClick={(e) => e.stopPropagation()}
                           className="md:hidden w-full mt-4 pt-4 border-t border-gray-100 flex flex-col gap-4 text-left cursor-default overflow-hidden"
                         >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3">
-                          <div className="flex items-center gap-2.5 flex-nowrap whitespace-nowrap">
-                            <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
-                              alert.severity === 'Critical' ? 'bg-red-100 text-red-700 border border-red-200' :
-                              alert.severity === 'High' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
-                              alert.severity === 'Medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 
-                              'bg-blue-100 text-blue-700 border border-blue-200'
-                            }`}>
-                              {alert.severity} Severity
-                            </span>
-                            <span className="text-[10px] font-bold text-gray-400">•</span>
-                            <span className="text-xs font-bold text-gray-500 uppercase">{alert.environment}</span>
-                          </div>
-                          <div className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase w-fit ${
-                            alert.status === 'resolved' ? 'bg-green-100 text-green-700 border border-green-200/50' :
-                            alert.status === 'in progress' ? 'bg-amber-100 text-amber-700 border border-amber-200/50' :
-                            'bg-rose-100 text-rose-700 border border-rose-200/50'
-                          }`}>
-                            {alert.status}
-                          </div>
-                        </div>
+                          <div className="flex justify-center pb-2">
+                            <div className="flex items-center justify-between bg-gray-50/80 p-1.5 rounded-xl border border-gray-100 shadow-sm w-full">
+                              <button
+                                onClick={() => updateAlertStatus(alert._id, "unresolved")}
+                                className={`flex items-center justify-center flex-1 py-1.5 rounded-lg transition-all ${alert.status === "unresolved" ? "bg-red-100 border border-red-200 shadow-sm" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0 hover:bg-red-50"
+                                  }`}
+                                title="Mark Unresolved"
+                              >
+                                <FlagIcon className={`w-4 h-4 ${alert.status === "unresolved" ? "text-red-500" : "text-gray-400"}`} />
+                              </button>
 
-                        <div className="flex flex-wrap gap-2 text-[10px] font-semibold text-gray-500">
-                          <span className="bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200/40">Resource ID: <strong className="text-gray-700">{alert.resourceId}</strong></span>
-                          <span className="bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200/40">Type: <strong className="text-gray-700">{alert.type}</strong></span>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-white border border-gray-150 p-2.5 rounded-xl shadow-sm">
-                            <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wide">Current Cost</p>
-                            <p className="text-xs font-extrabold text-gray-600 mt-0.5">${Math.round(alert.currentCost || 0)}/mo</p>
-                          </div>
-                          <div className="bg-emerald-500/5 border border-emerald-500/15 p-2.5 rounded-xl shadow-sm">
-                            <p className="text-[8px] font-bold text-emerald-600 uppercase tracking-wide">Potential Savings</p>
-                            <p className="text-xs font-black text-emerald-600 mt-0.5">${Math.round(alert.potentialSavings || 0)}/mo</p>
-                          </div>
-                        </div>
-
-                        <div className="bg-white border border-gray-150 rounded-xl p-3 shadow-sm">
-                          <h4 className="text-[9px] font-black text-[#111844] uppercase tracking-wider mb-1">Recommended Mitigation</h4>
-                          <p className="text-[11px] text-gray-500 leading-relaxed font-medium">
-                            {alert.type === "Idle" && "This resource has average CPU utilization below 5% for the past 7 days, indicating it is currently not being utilized. To optimize costs, terminate the instance or configure standard scheduling to shut it down during off-hours."}
-                            {alert.type === "Oversized" && "The instance's maximum CPU and memory utilization are low, indicating it is oversized for its workload. Downsizing the instance to a smaller family (e.g. t3.medium to t3.small) will safely save up to 40% of compute cost."}
-                            {alert.type === "UnattachedStorage" && "This S3 bucket has zero read/write operations over the past 7 days, indicating it is likely abandoned. Archive data to Glacier or delete the bucket completely to eliminate storage overhead."}
-                          </p>
-                        </div>
-
-                        <div className="pt-2 flex flex-col gap-2">
-                          {alert.status === "unresolved" && (
-                            <>
-                              <button 
+                              <button
                                 onClick={() => updateAlertStatus(alert._id, "in progress")}
-                                className="w-full bg-white hover:bg-[#792CA2]/5 text-[#792CA2] border border-[#792CA2]/20 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
+                                className={`flex items-center justify-center flex-1 mx-1.5 py-1.5 rounded-lg transition-all ${alert.status === "in progress" ? "bg-yellow-100 border border-yellow-200 shadow-sm" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0 hover:bg-yellow-50"
+                                  }`}
+                                title="Start Progress"
+                              >
+                                <FlagIcon className={`w-4 h-4 ${alert.status === "in progress" ? "text-yellow-500" : "text-gray-400"}`} />
+                              </button>
+
+                              <button
+                                onClick={() => updateAlertStatus(alert._id, "resolved")}
+                                className={`flex items-center justify-center flex-1 py-1.5 rounded-lg transition-all ${alert.status === "resolved" ? "bg-green-100 border border-green-200 shadow-sm" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0 hover:bg-green-50"
+                                  }`}
+                                title="Mark Resolved"
+                              >
+                                <FlagIcon className={`w-4 h-4 ${alert.status === "resolved" ? "text-green-500" : "text-gray-400"}`} />
+                              </button>
+                            </div>
+                          </div>
+
+
+
+                          <div className="flex flex-wrap gap-2 text-[10px] font-semibold text-gray-500">
+                            <span className="bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200/40 flex items-center gap-1">
+                              Resource ID: <strong className="text-gray-700 ml-0.5">{alert.resourceId}</strong>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigator.clipboard.writeText(alert.resourceId);
+                                }}
+                                className="p-0.5 hover:bg-gray-200 rounded transition-colors text-gray-400 hover:text-gray-700 ml-0.5"
+                                title="Copy Resource ID"
+                              >
+                                <DocumentDuplicateIcon className="w-3 h-3" />
+                              </button>
+                            </span>
+                            <span className="bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200/40 flex items-center">
+                              Type: <strong className="text-gray-700 ml-1">{alert.type}</strong>
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-white border border-gray-150 p-2.5 rounded-xl shadow-sm">
+                              <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wide">Current Cost</p>
+                              <p className="text-xs font-extrabold text-gray-600 mt-0.5">${Math.round(alert.currentCost || 0)}/mo</p>
+                            </div>
+                            <div className="bg-emerald-500/5 border border-emerald-500/15 p-2.5 rounded-xl shadow-sm">
+                              <p className="text-[8px] font-bold text-emerald-600 uppercase tracking-wide">Potential Savings</p>
+                              <p className="text-xs font-black text-emerald-600 mt-0.5">${Math.round(alert.potentialSavings || 0)}/mo</p>
+                            </div>
+                          </div>
+
+                          <div className="bg-white border border-gray-150 rounded-xl p-3 shadow-sm">
+                            <h4 className="text-[9px] font-black text-[#111844] uppercase tracking-wider mb-1">Recommended Mitigation</h4>
+                            <p className="text-[11px] text-gray-500 leading-relaxed font-medium">
+                              {alert.type === "Idle" && "This resource has average CPU utilization below 5% for the past 7 days, indicating it is currently not being utilized. To optimize costs, terminate the instance or configure standard scheduling to shut it down during off-hours."}
+                              {alert.type === "Oversized" && "The instance's maximum CPU and memory utilization are low, indicating it is oversized for its workload. Downsizing the instance to a smaller family (e.g. t3.medium to t3.small) will safely save up to 40% of compute cost."}
+                              {alert.type === "UnattachedStorage" && "This S3 bucket has zero read/write operations over the past 7 days, indicating it is likely abandoned. Archive data to Glacier or delete the bucket completely to eliminate storage overhead."}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-col gap-2 mt-2">
+                            {alert.status === "unresolved" && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); updateAlertStatus(alert._id, "in progress"); }}
+                                className="w-full bg-[#111844] hover:bg-[#1F215D] text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
                               >
                                 Start Progress
                               </button>
-                              <button 
-                                onClick={() => updateAlertStatus(alert._id, "resolved")}
-                                className="w-full bg-[#111844] hover:bg-[#1F215D] text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
+                            )}
+                            {alert.status === "in progress" && (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); updateAlertStatus(alert._id, "unresolved"); }}
+                                  className="flex-1 bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
+                                >
+                                  Mark Unresolved
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); updateAlertStatus(alert._id, "resolved"); }}
+                                  className="flex-1 bg-[#111844] hover:bg-[#1F215D] text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
+                                >
+                                  Mark Resolved
+                                </button>
+                              </div>
+                            )}
+                            {alert.status === "resolved" && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); updateAlertStatus(alert._id, "archived"); }}
+                                className="w-full bg-white hover:bg-[#792CA2]/5 text-[#792CA2] border border-[#792CA2]/20 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
                               >
-                                Resolve Alert
+                                Done
                               </button>
-                            </>
-                          )}
-                          {alert.status === "in progress" && (
-                            <>
-                              <button 
-                                onClick={() => updateAlertStatus(alert._id, "unresolved")}
-                                className="w-full bg-white hover:bg-gray-50 text-gray-500 border border-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
-                              >
-                                Mark Unresolved
-                              </button>
-                              <button 
-                                onClick={() => updateAlertStatus(alert._id, "resolved")}
-                                className="w-full bg-[#111844] hover:bg-[#1F215D] text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
-                              >
-                                Resolve Alert
-                              </button>
-                            </>
-                          )}
-                          {alert.status === "resolved" && (
-                            <button 
-                              onClick={() => updateAlertStatus(alert._id, "unresolved")}
-                              className="w-full bg-white hover:bg-[#792CA2]/5 text-[#792CA2] border border-[#792CA2]/20 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm"
-                            >
-                              Reopen Alert
-                            </button>
-                          )}
-                        </div>
+                            )}
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -421,7 +545,7 @@ export default function ActiveAlerts() {
             </AnimatePresence>
           </div>
         </div>
-        
+
       </div>
     </motion.div>
   );

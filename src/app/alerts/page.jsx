@@ -151,11 +151,15 @@ export default function AlertsPage() {
             <RestrictedOverlay pageName="Alert Center" />
           )}
           <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pt-4 gap-6">
-            <div className="flex items-center gap-2 px-2 mt-2">
-              <div className="bg-[#792CA2]/10 p-1.5 rounded-lg border border-[#792CA2]/20">
-                <BellAlertIcon className="w-5 h-5 text-[#792CA2]" />
-              </div>
-              <h1 className="text-xl font-extrabold text-[#111844] tracking-tight">Active Optimization Alerts</h1>
+            <div className="flex items-center gap-3 px-2 mt-2">
+              <motion.div 
+                whileHover={{ scale: 1.1, rotate: [0, -15, 15, -15, 0] }}
+                transition={{ duration: 0.5 }}
+                className="bg-gradient-to-br from-[#792CA2]/20 to-[#9A4DCC]/10 p-2 rounded-xl border border-[#792CA2]/30 shadow-[0_0_15px_rgba(121,44,162,0.15)] flex items-center justify-center cursor-default"
+              >
+                <BellAlertIcon className="w-6 h-6 text-[#792CA2] drop-shadow-sm" />
+              </motion.div>
+              <h1 className="text-2xl font-extrabold text-[#111844] tracking-tight drop-shadow-sm">Active Optimization Alerts</h1>
             </div>
             <ActiveAlerts />
             <AlertHistory />

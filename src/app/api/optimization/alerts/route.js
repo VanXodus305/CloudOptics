@@ -44,21 +44,22 @@ export async function PATCH(request) {
       return Response.json({ error: "alertId and status are required" }, { status: 400 });
     }
 
-    if (!["unresolved", "in progress", "resolved"].includes(status)) {
+    if (!["unresolved", "in progress", "resolved", "archived"].includes(status)) {
       return Response.json({ error: "Invalid status value" }, { status: 400 });
     }
 
-    const updatedAlert = await Alert.findByIdAndUpdate(
-      alertId,
-      { status },
-      { new: true }
-    );
-
-    if (!updatedAlert) {
+    const existingAlert = await Alert.findById(alertId);
+    if (!existingAlert) {
       return Response.json({ error: "Alert not found" }, { status: 404 });
     }
 
-    return Response.json(updatedAlert);
+    if (existingAlert.status !== status) {
+      existingAlert.previousStatus = existingAlert.status;
+      existingAlert.status = status;
+      await existingAlert.save();
+    }
+
+    return Response.json(existingAlert);
   } catch (error) {
     console.error("Error updating optimization alert:", error);
     return Response.json(
