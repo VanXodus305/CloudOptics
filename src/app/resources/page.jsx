@@ -296,8 +296,9 @@ export default function ResourcesPage() {
                     </svg>
                   </motion.div>
                     <div>
-                      <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
-                        Resource Center
+                      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex gap-3">
+                        <span>Resource</span>
+                        <span>Center</span>
                       </h1>
                     <p className="text-xs sm:text-sm text-gray-400 font-medium mt-0.5">
                       Real-time analytics · <span className="text-[#792CA2] font-semibold">{selectedEnvironment === "All" ? "All Environments" : `${selectedEnvironment} Environment`}</span>

@@ -101,8 +101,18 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                   placeholder="Search recommendations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl leading-5 bg-[#ffffff] dark:bg-slate-800 placeholder-gray-400 focus:outline-none focus:bg-[#ffffff] dark:focus:bg-slate-900 text-[#111844] dark:text-[#F9F7F7] focus:ring-2 focus:ring-[#792CA2]/50 focus:border-transparent sm:text-sm transition-all"
+                  className="block w-full pl-9 pr-10 py-2 border border-gray-200 dark:border-slate-700 rounded-xl leading-5 bg-[#ffffff] dark:bg-slate-800 placeholder-gray-400 focus:outline-none focus:bg-[#ffffff] dark:focus:bg-slate-900 text-[#111844] dark:text-[#F9F7F7] focus:ring-2 focus:ring-[#792CA2]/50 focus:border-transparent sm:text-sm transition-all"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                  >
+                    <svg className="w-4 h-4 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-full p-0.5 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               {/* Impact Summary Indicator */}

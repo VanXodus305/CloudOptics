@@ -215,7 +215,17 @@ export default function AlertHistory() {
                     position={activeTooltip ? { x: activeTooltip.x, y: activeTooltip.y - 4 } : undefined}
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                   />
-                  <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 700, paddingTop: '15px' }} />
+                  <Legend 
+                    iconType="circle" 
+                    align="center"
+                    verticalAlign="bottom"
+                    wrapperStyle={{ 
+                      fontSize: '11px', 
+                      fontWeight: 700, 
+                      paddingTop: '15px',
+                      marginLeft: '10px' // Shift slightly right to compensate for chart's left margin
+                    }} 
+                  />
                   <Bar 
                     dataKey="Current Cost ($)" 
                     fill={isDark ? "#93C5FD" : "#111844"} 
