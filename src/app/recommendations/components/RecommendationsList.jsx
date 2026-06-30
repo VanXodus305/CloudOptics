@@ -116,7 +116,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
               </div>
 
               {/* Impact Summary Indicator */}
-              <div className="flex flex-wrap items-center justify-end gap-3">
+              <div className="flex flex-wrap items-center justify-center md:justify-end gap-3">
                 <span className="text-[11px] font-black text-[#111844] dark:text-[#F9F7F7] uppercase tracking-widest">Impact Summary:</span>
               <div className="flex gap-2">
                 <span className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
