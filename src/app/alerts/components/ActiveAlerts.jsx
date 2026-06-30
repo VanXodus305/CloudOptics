@@ -369,7 +369,6 @@ export default function ActiveAlerts() {
                   </div>
                 )}
               </div>
-
               <div className="relative" ref={sortRef}>
                 <motion.button
                   whileHover={{ scale: 1.02 }}

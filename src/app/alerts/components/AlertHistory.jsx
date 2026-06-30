@@ -216,15 +216,27 @@ export default function AlertHistory() {
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                   />
                   <Legend 
-                    iconType="circle" 
-                    align="center"
-                    verticalAlign="bottom"
-                    wrapperStyle={{ 
-                      fontSize: '11px', 
-                      fontWeight: 700, 
-                      paddingTop: '15px',
-                      marginLeft: '10px' // Shift slightly right to compensate for chart's left margin
-                    }} 
+                    content={(props) => {
+                      const { payload } = props;
+                      return (
+                        <div className="flex flex-row justify-center items-center gap-3 pt-4 text-[10px] sm:text-xs font-bold whitespace-nowrap">
+                          {payload?.map((entry, index) => (
+                            <div key={`item-${index}`} className="flex items-center gap-1.5">
+                              <span 
+                                className="w-2 h-2 rounded-full inline-block flex-shrink-0" 
+                                style={{ backgroundColor: entry.color }} 
+                              />
+                              <span className="text-gray-700 dark:text-gray-300">
+                                {entry.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    }}
+                    wrapperStyle={{
+                      paddingLeft: '30px'
+                    }}
                   />
                   <Bar 
                     dataKey="Current Cost ($)" 

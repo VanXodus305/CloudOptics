@@ -296,7 +296,7 @@ export default function ResourcesPage() {
                     </svg>
                   </motion.div>
                     <div>
-                      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex gap-3">
+                      <h1 className="text-[20px] xs:text-[22px] sm:text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-2 gap-y-0.5">
                         <span>Resource</span>
                         <span>Center</span>
                       </h1>
