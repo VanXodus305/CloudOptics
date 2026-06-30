@@ -25,8 +25,10 @@ export default function ResourcesTable({
         </div>
       )}
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
-          Top Cost Resources
+        <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-1.5 gap-y-0.5">
+          <span>Top</span>
+          <span>Cost</span>
+          <span>Resources</span>
         </h3>
         <button
           onClick={() => setIsResourcesModalOpen(true)}

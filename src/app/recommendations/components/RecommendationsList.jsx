@@ -132,6 +132,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
             </div>
             </div>
 
+            <div className="flex flex-col gap-4 overflow-y-auto custom-scrollbar pr-2 pb-24 md:pb-4 max-h-[60vh] md:max-h-[calc(100vh-350px)]">
             {filteredRecs.length === 0 ? (
               <div className="relative z-10 flex flex-col items-center justify-center py-12 text-center bg-[#ffffff] dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-800">
                 <DocumentMagnifyingGlassIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-4" />
@@ -204,7 +205,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                className="px-3 pb-3 text-[11px] md:text-xs text-gray-700 dark:text-slate-200 font-sans"
+                                className="px-3 pb-3 text-[11px] md:text-xs text-gray-700 dark:text-slate-200 font-sans max-h-60 overflow-y-auto custom-scrollbar"
                               >
                                 <ol className="list-decimal pl-5 space-y-2 font-mono">
                                   {(() => {
@@ -239,6 +240,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                 </div>
               );
             })}
+            </div>
           </div>
         )}
       </motion.div>

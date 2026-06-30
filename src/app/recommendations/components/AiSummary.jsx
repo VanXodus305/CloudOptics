@@ -27,7 +27,10 @@ export default function AiSummary({
         <div className="bg-[#792CA2]/10 p-1.5 rounded-lg border border-[#792CA2]/20">
           <SparklesIcon className="w-5 h-5 text-[#792CA2]" />
         </div>
-        <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">AI-Recommended Summary</h2>
+        <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-1.5 gap-y-0.5">
+          <span>AI-Recommended</span>
+          <span>Summary</span>
+        </h2>
       </div>
       
       <div className="relative mt-2 flex-grow flex flex-col">
@@ -37,10 +40,7 @@ export default function AiSummary({
         {/* Main Box */}
         <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/5 flex-grow flex flex-col gap-4 sm:gap-5 relative z-0">
           <div className="flex justify-between items-center w-full border-b border-gray-100 dark:border-slate-800 pb-4">
-            <div className="bg-gray-100/80 dark:bg-slate-800 rounded-lg px-4 py-1.5 shadow-inner border border-gray-200/60 dark:border-slate-700 font-bold text-[#111844] dark:text-[#F9F7F7] text-sm flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              AI Insights
-            </div>
+            
             <button 
               onClick={onRegenerate}
               disabled={isRegenerating || isLoading}
@@ -54,13 +54,11 @@ export default function AiSummary({
           {/* Highlights Banner */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Actions Card */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-purple-500/10 to-indigo-500/5 dark:from-purple-950/20 dark:to-indigo-950/10 p-3 rounded-2xl border border-[#792CA2]/15 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#792CA2] to-[#9A4DCC] flex items-center justify-center text-white shadow-md shadow-[#792CA2]/20 flex-shrink-0">
-                <SparklesIcon className="w-5 h-5 text-white" />
-              </div>
-              <div>
+            <div className="relative overflow-hidden bg-gradient-to-r from-purple-500/10 to-indigo-500/5 dark:from-purple-950/20 dark:to-indigo-950/10 p-3 rounded-2xl border border-[#792CA2]/15 flex flex-col items-center justify-center">
+              
+              <div className="text-center">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Actions</p>
-                <div className="flex items-baseline gap-1 mt-0.5">
+                <div className="flex items-baseline justify-center gap-1 mt-0.5">
                   <span className="text-xl font-black text-[#111844] dark:text-[#F9F7F7] tracking-tight">
                     {isLoading || isRegenerating ? (
                       <span className="w-6 h-5 block bg-gray-200/50 animate-pulse rounded" />
@@ -74,13 +72,11 @@ export default function AiSummary({
             </div>
 
             {/* Savings Card */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 to-teal-500/5 dark:from-emerald-950/20 dark:to-teal-950/10 p-3 rounded-2xl border border-emerald-500/20 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 flex-shrink-0">
-                <span className="text-base font-black font-mono text-white">$</span>
-              </div>
-              <div>
+            <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 to-teal-500/5 dark:from-emerald-950/20 dark:to-teal-950/10 p-3 rounded-2xl border border-emerald-500/20 flex flex-col items-center justify-center">
+              
+              <div className="text-center">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Potential Savings</p>
-                <div className="flex items-baseline gap-1 mt-0.5">
+                <div className="flex items-baseline justify-center gap-1 mt-0.5">
                   <span className="text-xl font-black text-emerald-600 dark:text-emerald-450 tracking-tight">
                     {isLoading || isRegenerating ? (
                       <span className="w-12 h-5 block bg-gray-200/50 animate-pulse rounded" />

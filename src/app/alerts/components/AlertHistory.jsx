@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ClockIcon, ArrowPathIcon, ChartBarIcon, CheckCircleIcon, ExclamationTriangleIcon, BoltIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { FlagIcon } from "@heroicons/react/24/solid";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 
 export default function AlertHistory() {
@@ -81,7 +82,12 @@ export default function AlertHistory() {
           >
             <ClockIcon className="w-5 h-5 text-white" strokeWidth={2.5} />
           </motion.div>
-          <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">Alert History & Stats</h3>
+          <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-1.5 gap-y-0.5">
+            <span>Alert</span>
+            <span>History</span>
+            <span>&</span>
+            <span>Stats</span>
+          </h3>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -94,24 +100,33 @@ export default function AlertHistory() {
         </motion.button>
       </div>
 
-      <div className="bg-white/50 dark:bg-[#0F122B]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/10 flex flex-col relative z-0 min-h-[250px]">
+      <div className="bg-white/50 dark:bg-[#0F122B]/50 backdrop-blur-md rounded-3xl p-6 shadow-lg border border-white dark:border-white/10 flex flex-col relative z-0 min-h-[250px]">
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           <div className="bg-white/80 dark:bg-white/5 border border-gray-150 dark:border-white/10 p-4 rounded-2xl shadow-sm text-center">
             <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Total Alerts</p>
             <p className="text-2xl font-black text-[#111844] dark:text-white mt-1">{totalAlerts}</p>
           </div>
-          <div className="bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/10 dark:border-rose-500/20 p-4 rounded-2xl shadow-sm text-center">
-            <p className="text-[10px] font-bold text-rose-500 dark:text-rose-400 uppercase tracking-wider">Unresolved</p>
-            <p className="text-2xl font-black text-rose-600 dark:text-rose-500 mt-1">{unresolvedAlerts}</p>
+          <div className="bg-white/80 dark:bg-white/5 border border-gray-150 dark:border-white/10 p-4 rounded-2xl shadow-sm text-center">
+            <div className="flex items-center justify-center gap-1.5">
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Unresolved</p>
+              <FlagIcon className="w-3 h-3 text-rose-500" />
+            </div>
+            <p className="text-2xl font-black text-[#111844] dark:text-white mt-1">{unresolvedAlerts}</p>
           </div>
-          <div className="bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/10 dark:border-amber-500/20 p-4 rounded-2xl shadow-sm text-center">
-            <p className="text-[10px] font-bold text-amber-500 dark:text-amber-400 uppercase tracking-wider">In Progress</p>
-            <p className="text-2xl font-black text-amber-600 dark:text-amber-500 mt-1">{inProgressAlerts}</p>
+          <div className="bg-white/80 dark:bg-white/5 border border-gray-150 dark:border-white/10 p-4 rounded-2xl shadow-sm text-center">
+            <div className="flex items-center justify-center gap-1.5">
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">In Progress</p>
+              <FlagIcon className="w-3 h-3 text-amber-500" />
+            </div>
+            <p className="text-2xl font-black text-[#111844] dark:text-white mt-1">{inProgressAlerts}</p>
           </div>
-          <div className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 dark:border-emerald-500/20 p-4 rounded-2xl shadow-sm text-center">
-            <p className="text-[10px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">Resolved</p>
-            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-500 mt-1">{resolvedAlerts}</p>
+          <div className="bg-white/80 dark:bg-white/5 border border-gray-150 dark:border-white/10 p-4 rounded-2xl shadow-sm text-center">
+            <div className="flex items-center justify-center gap-1.5">
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Resolved</p>
+              <FlagIcon className="w-3 h-3 text-emerald-500" />
+            </div>
+            <p className="text-2xl font-black text-[#111844] dark:text-white mt-1">{resolvedAlerts}</p>
           </div>
         </div>
 
@@ -119,7 +134,11 @@ export default function AlertHistory() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <ChartBarIcon className="w-4 h-4 text-[#792CA2] dark:text-[#DCCBFF]" />
-              <h4 className="text-sm font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] uppercase">Optimization Impact Analysis</h4>
+              <h4 className="text-sm font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] uppercase flex flex-wrap gap-x-1.5 gap-y-0.5">
+                <span>Optimization</span>
+                <span>Impact</span>
+                <span>Analysis</span>
+              </h4>
             </div>
           </div>
           

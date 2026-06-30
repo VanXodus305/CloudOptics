@@ -19,8 +19,9 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
       )}
       <div className="flex justify-between items-start mb-2">
         <div>
-          <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
-            Optimization Alerts
+          <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-1.5 gap-y-0.5">
+            <span>Optimization</span>
+            <span>Alerts</span>
           </h3>
         </div>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">

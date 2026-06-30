@@ -385,8 +385,10 @@ export default function RecommendationChat() {
         <div className="bg-[#792CA2]/10 p-1.5 rounded-lg border border-[#792CA2]/20">
           <ChatBubbleLeftRightIcon className="w-5 h-5 text-[#792CA2]" />
         </div>
-        <h2 className="text-xl font-extrabold text-[#111844] tracking-tight">
-          AI Cloud Assistant
+        <h2 className="text-xl font-extrabold text-[#111844] tracking-tight flex flex-wrap gap-x-1.5 gap-y-0.5">
+          <span>AI</span>
+          <span>Cloud</span>
+          <span>Assistant</span>
         </h2>
       </div>
 

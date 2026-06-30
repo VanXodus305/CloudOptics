@@ -261,8 +261,12 @@ export default function ActiveAlerts() {
           ) : (
             <div className="flex flex-col items-center justify-center h-full flex-grow py-12">
 
-              <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2]">
-                {sortedAlerts.length === 0 ? "No alerts" : "Show the Alerts"}
+              <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] flex flex-wrap justify-center gap-x-1.5 gap-y-0.5">
+                {sortedAlerts.length === 0 ? (
+                  <><span>No</span><span>alerts</span></>
+                ) : (
+                  <><span>Active</span><span>Alerts</span></>
+                )}
               </h3>
               <p className="text-sm text-gray-500 font-medium text-center max-w-[80%] mt-2">
                 {sortedAlerts.length === 0

@@ -223,14 +223,16 @@ export default function CostResourceChart({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] tracking-tight">
                 {drilldownResource} Usage Details
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
-                Resources Average Cost
+              <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] tracking-tight flex flex-wrap gap-x-1.5 gap-y-0.5">
+                <span>Resources </span>
+                <span>Average</span>
+                <span>Cost</span>
               </span>
               <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-0.5 tracking-normal">
                 Click chart bar for details

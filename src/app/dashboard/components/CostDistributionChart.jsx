@@ -41,8 +41,9 @@ export default function CostDistributionChart({
 
       <div className="flex flex-row justify-between items-center sm:items-start gap-2 mb-4 flex-wrap">
         <div>
-          <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC]">
-            Cost Distribution
+          <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-1.5 gap-y-0.5">
+            <span>Cost</span>
+            <span>Distribution</span>
           </h3>
           <span className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold mt-0.5 sm:mt-1 block">
             Resource share breakdown by service category.
@@ -57,10 +58,6 @@ export default function CostDistributionChart({
               variant="flat"
               className="bg-[#792CA2]/10 hover:bg-[#792CA2]/20 dark:bg-[#792CA2]/20 dark:hover:bg-[#792CA2]/30 border border-[#792CA2]/20 text-[10px] sm:text-xs font-bold text-[#792CA2] dark:text-[#C084FC] rounded-xl px-2.5 sm:px-3 h-8 min-w-0 flex items-center gap-1.5 transition-all select-none whitespace-nowrap"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#792CA2] dark:text-[#C084FC] opacity-80 flex-shrink-0">
-                <path fillRule="evenodd" d="M2.628 1.6A1 1 0 013.6 1h12.8a1 1 0 01.972.6l-5.633 11.265a1 1 0 01-.972.535H9.203a1 1 0 01-.972-.535L2.628 2.2a1 1 0 010-.6z" clipRule="evenodd" />
-              </svg>
-              <span className="hidden sm:inline text-[#792CA2]/70 dark:text-[#C084FC]/70 font-medium">Filter:</span>
               <span className="truncate">{filterMap[donutFilter]}</span>
               <span className="text-[8px] opacity-75">▼</span>
             </Button>

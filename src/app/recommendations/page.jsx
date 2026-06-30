@@ -208,8 +208,8 @@ export default function RecommendationsPage() {
                 </svg>
               </motion.div>
               <div>
-                <h1 className="text-[20px] xs:text-[22px] sm:text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-2 gap-y-0.5">
-                  <span>AI</span>
+                <h1 className="inline-block text-[20px] xs:text-[22px] sm:text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] pb-2">
+                  <span className="mr-2">AI</span>
                   <span>Recommendations</span>
                 </h1>
                 <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 font-medium mt-0.5">
