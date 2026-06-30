@@ -396,6 +396,8 @@ export default function HeroSection() {
   useEffect(() => {
     if (isPaused) return;
 
+    const timeoutDuration = 5000;
+
     const timer = setTimeout(() => {
       if (currentMacroSlide === 0) {
         if (currentSlide < slides.length - 1) {
@@ -410,7 +412,7 @@ export default function HeroSection() {
           return next;
         });
       }
-    }, 3000);
+    }, timeoutDuration);
 
     return () => clearTimeout(timer);
   }, [currentSlide, currentMacroSlide, isPaused]);
@@ -431,7 +433,7 @@ export default function HeroSection() {
       px-8
       pt-28
       pb-36
-      md:pt-0
+      md:pt-7
       md:pb-36
       relative
       overflow-hidden
@@ -614,7 +616,7 @@ export default function HeroSection() {
                     stiffness: 220,
                     damping: 24,
                   }}
-                  className="absolute top-0 left-0 p-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-white/40 dark:border-slate-800/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-60 overflow-hidden cursor-pointer"
+                  className="absolute top-0 left-6 md:left-12 p-5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-white/40 dark:border-slate-800/40 rounded-2xl shadow-[0_10px_30px_rgba(121,44,162,0.05)] w-60 overflow-hidden cursor-pointer"
                 >
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">
@@ -728,7 +730,7 @@ export default function HeroSection() {
                     stiffness: 220,
                     damping: 24,
                   }}
-                  className="absolute bottom-16 left-10 md:left-14 p-4 bg-[#792CA2] dark:bg-[#5E1A86] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
+                  className="absolute bottom-24 left-10 md:left-14 p-4 bg-[#792CA2] dark:bg-[#5E1A86] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/10 rounded-xl">
@@ -778,7 +780,7 @@ export default function HeroSection() {
               onMouseLeave={() => setIsPaused(false)}
             >
               {/* Subtle background image that bleeds outside the card edges, extending leftward */}
-              <div className="absolute -top-5 -bottom-5 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.20] dark:opacity-[0.15] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
+              <div className="absolute top-20 -bottom-20 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.20] dark:opacity-[0.15] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentSlide}
@@ -786,7 +788,7 @@ export default function HeroSection() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.6 }}
-                    className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
+                    className="w-full h-full"
                     style={{
                       backgroundImage: `url('/hero-${currentSlide + 1}.jpg')`,
                       backgroundSize: "cover",
@@ -920,7 +922,7 @@ export default function HeroSection() {
                             initial={{ width: isPaused ? "100%" : "0%" }}
                             animate={{ width: "100%" }}
                             transition={{
-                              duration: isPaused ? 0 : 3,
+                              duration: isPaused ? 0 : 5,
                               ease: "linear",
                             }}
                             className="absolute inset-y-0 left-0 bg-[#792CA2] dark:bg-[#B770FF]"
@@ -943,14 +945,14 @@ export default function HeroSection() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: isMobile ? 0 : -40 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full"
+            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full pb-16 lg:pb-32"
           >
             <div>
               <motion.h1
                 initial={{ opacity: 0, x: -200 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 1.2 }}
-                className="text-5xl sm:text-6xl md:text-8xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3 pr-8 whitespace-nowrap"
               >
                 Advanced
                 <br />
@@ -970,47 +972,80 @@ export default function HeroSection() {
               >
                 Deep Dive Into Your Cloud Costs
               </motion.p>
-              
-              <div className="mt-8 relative h-[320px] w-full hidden md:block" />
+              <div className="mt-12 space-y-6 hidden md:block">
+                {[
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />,
+                    title: "Real-time Processing",
+                    desc: "Analyze millions of data points with sub-second latency"
+                  },
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />,
+                    title: "Predictive Forecasting",
+                    desc: "Machine learning driven projections for future expenditures"
+                  },
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
+                    title: "Granular Visibility",
+                    desc: "Resource-level tracking across your entire ecosystem"
+                  }
+                ].map((feature, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.8 + i * 0.15 }}
+                    className="flex items-center gap-5 group cursor-default"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 dark:bg-slate-900/50 border border-white/10 dark:border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#792CA2]/10 transition-all duration-300 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#792CA2]/20 to-[#B770FF]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <svg className="w-6 h-6 text-[#792CA2] dark:text-[#B770FF] relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {feature.icon}
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-[#111844] dark:text-white group-hover:text-[#792CA2] dark:group-hover:text-[#B770FF] transition-colors">{feature.title}</h4>
+                      <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium mt-1">{feature.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             <div
-              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/60 dark:bg-slate-950/60 border border-white/50 dark:border-white/20 backdrop-blur-md shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
+              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/10 dark:bg-slate-950/20 border border-white/30 dark:border-white/5 backdrop-blur-[2px] shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
             >
-              <div className="absolute -top-5 -bottom-5 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.40] dark:opacity-[0.30] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
+              <div className="absolute top-20 -bottom-20 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.20] dark:opacity-[0.15] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
                 <motion.div
                   initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6 }}
-                  className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
+                  className="w-full h-full"
                   style={{
                     backgroundImage: `url('/slide-bg-1.jpg')`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    maskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
-                    WebkitMaskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                    backgroundPosition: "center 60%",
+                    maskImage: "radial-gradient(ellipse at 80% 50%, black 25%, transparent 70%)",
+                    WebkitMaskImage: "radial-gradient(ellipse at 80% 50%, black 25%, transparent 70%)",
                   }}
                 />
               </div>
 
-              <div className="min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
+              <div className="flex-1 h-full min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
                 <div className="flex flex-col items-start">
                   <h2 className="text-4xl md:text-5xl font-black text-[#111844] dark:text-white leading-tight overflow-visible">
                     Interactive Dashboards.
                     <br />
                     <span className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2">Visualized Efficiency.</span>
                   </h2>
-                  <motion.div
+                  <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.7 }}
-                    className="mt-8 p-5 md:p-6 rounded-2xl bg-white/10 dark:bg-slate-900/10 backdrop-blur-md border border-white/20 dark:border-white/5 shadow-lg max-w-xl relative overflow-hidden group hover:shadow-xl transition-all"
+                    className="text-lg md:text-xl text-gray-500 dark:text-gray-400 leading-relaxed font-medium mt-6 md:mt-8 max-w-lg"
                   >
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#792CA2] to-[#B770FF] opacity-80 group-hover:opacity-100 transition-opacity" />
-                    <p className="text-lg md:text-xl text-gray-800 dark:text-gray-200 leading-relaxed font-medium pl-2">
-                      Understand your expenditure like never before with powerful data visualization tools tailored for complex cloud architectures.
-                    </p>
-                  </motion.div>
+                    Understand your expenditure like never before with powerful data visualization tools tailored for complex cloud architectures.
+                  </motion.p>
                 </div>
               </div>
             </div>
@@ -1025,14 +1060,14 @@ export default function HeroSection() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: isMobile ? 0 : -40 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full"
+            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full pb-16 lg:pb-32"
           >
             <div>
               <motion.h1
                 initial={{ opacity: 0, x: -200 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 1.2 }}
-                className="text-5xl sm:text-6xl md:text-8xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3"
+                className="text-4xl sm:text-3xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3 pr-8 whitespace-nowrap"
               >
                 Security
                 <br />
@@ -1053,46 +1088,80 @@ export default function HeroSection() {
                 Ensure Compliance Across Regions
               </motion.p>
               
-              <div className="mt-8 relative h-[320px] w-full hidden md:block" />
+              <div className="mt-12 space-y-6 hidden md:block">
+                {[
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />,
+                    title: "Zero-Day Protection",
+                    desc: "Instantly identify and mitigate emerging threat vectors"
+                  },
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />,
+                    title: "Continuous Compliance",
+                    desc: "Automated mapping to SOC2, HIPAA, and PCI-DSS"
+                  },
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
+                    title: "Vulnerability Scanning",
+                    desc: "Deep inspection of containers and serverless functions"
+                  }
+                ].map((feature, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.8 + i * 0.15 }}
+                    className="flex items-center gap-5 group cursor-default"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 dark:bg-slate-900/50 border border-white/10 dark:border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#792CA2]/10 transition-all duration-300 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#792CA2]/20 to-[#B770FF]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <svg className="w-6 h-6 text-[#792CA2] dark:text-[#B770FF] relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {feature.icon}
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-[#111844] dark:text-white group-hover:text-[#792CA2] dark:group-hover:text-[#B770FF] transition-colors">{feature.title}</h4>
+                      <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium mt-1">{feature.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             <div
-              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/60 dark:bg-slate-950/60 border border-white/50 dark:border-white/20 backdrop-blur-md shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
+              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/10 dark:bg-slate-950/20 border border-white/30 dark:border-white/5 backdrop-blur-[2px] shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
             >
-              <div className="absolute -top-5 -bottom-5 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.40] dark:opacity-[0.30] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
+              <div className="absolute top-20 -bottom-20 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.20] dark:opacity-[0.15] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
                 <motion.div
                   initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6 }}
-                  className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
+                  className="w-full h-full"
                   style={{
                     backgroundImage: `url('/slide-bg-2.jpg')`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    maskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
-                    WebkitMaskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                    backgroundPosition: "center 60%",
+                    maskImage: "radial-gradient(ellipse at 80% 50%, black 25%, transparent 70%)",
+                    WebkitMaskImage: "radial-gradient(ellipse at 80% 50%, black 25%, transparent 70%)",
                   }}
                 />
               </div>
 
-              <div className="min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
+              <div className="flex-1 h-full min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
                 <div className="flex flex-col items-start">
                   <h2 className="text-4xl md:text-5xl font-black text-[#111844] dark:text-white leading-tight overflow-visible">
                     Zero Vulnerabilities.
                     <br />
                     <span className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2">Total Control.</span>
                   </h2>
-                  <motion.div
+                  <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.7 }}
-                    className="mt-8 p-5 md:p-6 rounded-2xl bg-white/10 dark:bg-slate-900/10 backdrop-blur-md border border-white/20 dark:border-white/5 shadow-lg max-w-xl relative overflow-hidden group hover:shadow-xl transition-all"
+                    className="text-lg md:text-xl text-gray-500 dark:text-gray-400 leading-relaxed font-medium mt-6 md:mt-8 max-w-lg"
                   >
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#792CA2] to-[#B770FF] opacity-80 group-hover:opacity-100 transition-opacity" />
-                    <p className="text-lg md:text-xl text-gray-800 dark:text-gray-200 leading-relaxed font-medium pl-2">
-                      Continuously scan for misconfigurations and vulnerabilities, keeping your infrastructure fortified against modern threats.
-                    </p>
-                  </motion.div>
+                    Continuously scan for misconfigurations and vulnerabilities, keeping your infrastructure fortified against modern threats.
+                  </motion.p>
                 </div>
               </div>
             </div>
@@ -1107,14 +1176,14 @@ export default function HeroSection() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: isMobile ? 0 : -40 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full"
+            className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 w-full pb-16 lg:pb-32"
           >
             <div>
               <motion.h1
                 initial={{ opacity: 0, x: -200 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 1.2 }}
-                className="text-5xl sm:text-6xl md:text-8xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3"
+                className="text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-[#111844] via-[#792CA2] to-[#B770FF] bg-clip-text mt-2 md:mt-24 text-transparent dark:text-white leading-none overflow-visible pb-3 pr-8 whitespace-nowrap"
               >
                 Automated
                 <br />
@@ -1135,46 +1204,80 @@ export default function HeroSection() {
                 Policy-Driven Infrastructure
               </motion.p>
               
-              <div className="mt-8 relative h-[320px] w-full hidden md:block" />
+              <div className="mt-12 space-y-6 hidden md:block">
+                {[
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />,
+                    title: "Policy as Code",
+                    desc: "Define and enforce guardrails directly in your repository"
+                  },
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />,
+                    title: "Cost & Security Guardrails",
+                    desc: "Prevent deployments that violate budgets or baselines"
+                  },
+                  {
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
+                    title: "Multi-Cloud Unified Control",
+                    desc: "Seamless standardization across AWS, Azure, and GCP"
+                  }
+                ].map((feature, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.8 + i * 0.15 }}
+                    className="flex items-center gap-5 group cursor-default"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 dark:bg-slate-900/50 border border-white/10 dark:border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#792CA2]/10 transition-all duration-300 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#792CA2]/20 to-[#B770FF]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <svg className="w-6 h-6 text-[#792CA2] dark:text-[#B770FF] relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {feature.icon}
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-[#111844] dark:text-white group-hover:text-[#792CA2] dark:group-hover:text-[#B770FF] transition-colors">{feature.title}</h4>
+                      <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium mt-1">{feature.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             <div
-              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/60 dark:bg-slate-950/60 border border-white/50 dark:border-white/20 backdrop-blur-md shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
+              className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/10 dark:bg-slate-950/20 border border-white/30 dark:border-white/5 backdrop-blur-[2px] shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
             >
-              <div className="absolute -top-5 -bottom-5 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.40] dark:opacity-[0.30] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
+              <div className="absolute top-20 -bottom-20 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.20] dark:opacity-[0.15] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
                 <motion.div
                   initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6 }}
-                  className="w-full h-full mix-blend-luminosity dark:mix-blend-overlay dark:invert dark:hue-rotate-180"
+                  className="w-full h-full"
                   style={{
                     backgroundImage: `url('/slide-bg-3.jpg')`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    maskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
-                    WebkitMaskImage: "radial-gradient(ellipse at 20% 50%, black 40%, transparent 80%)",
+                    backgroundPosition: "center 60%",
+                    maskImage: "radial-gradient(ellipse at 80% 50%, black 25%, transparent 70%)",
+                    WebkitMaskImage: "radial-gradient(ellipse at 80% 50%, black 25%, transparent 70%)",
                   }}
                 />
               </div>
 
-              <div className="min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
+              <div className="flex-1 h-full min-h-[340px] flex flex-col justify-center relative z-10" style={{ perspective: "1200px", transformStyle: "preserve-3d" }}>
                 <div className="flex flex-col items-start">
                   <h2 className="text-4xl md:text-5xl font-black text-[#111844] dark:text-white leading-tight overflow-visible">
                     Standardize.
                     <br />
                     <span className="bg-gradient-to-r from-[#792CA2] to-[#B770FF] dark:from-[#9A4DCC] dark:to-[#C084FC] bg-clip-text text-transparent font-black pb-2 -mb-2">Scale Efficiently.</span>
                   </h2>
-                  <motion.div
+                  <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.7 }}
-                    className="mt-8 p-5 md:p-6 rounded-2xl bg-white/10 dark:bg-slate-900/10 backdrop-blur-md border border-white/20 dark:border-white/5 shadow-lg max-w-xl relative overflow-hidden group hover:shadow-xl transition-all"
+                    className="text-lg md:text-xl text-gray-500 dark:text-gray-400 leading-relaxed font-medium mt-6 md:mt-8 max-w-lg"
                   >
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#792CA2] to-[#B770FF] opacity-80 group-hover:opacity-100 transition-opacity" />
-                    <p className="text-lg md:text-xl text-gray-800 dark:text-gray-200 leading-relaxed font-medium pl-2">
-                      Implement robust governance rules that enforce consistent standards globally without slowing down your engineering velocity.
-                    </p>
-                  </motion.div>
+                    Implement robust governance rules that enforce consistent standards globally without slowing down your engineering velocity.
+                  </motion.p>
                 </div>
               </div>
             </div>
