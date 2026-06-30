@@ -109,6 +109,36 @@ export default function UserAccessManagement() {
     }
   };
 
+  const [updatingRoleId, setUpdatingRoleId] = useState(null);
+
+  const handleUpdateRole = async (memberId, currentRole) => {
+    const newRole = currentRole === "Admin" ? "Viewer" : "Admin";
+    if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) return;
+
+    try {
+      setUpdatingRoleId(memberId);
+      const res = await fetch(`/api/members/${memberId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to update role");
+      }
+
+      // Refresh list
+      fetchMembers(search);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setUpdatingRoleId(null);
+    }
+  };
+
   const handleRevoke = async (memberId) => {
     if (!confirm("Are you sure you want to permanently revoke access for this user?")) return;
 
@@ -359,8 +389,21 @@ export default function UserAccessManagement() {
                       </div>
                     </div>
 
-                    {/* Revoke Action (Check that it is not self) */}
-                    <div className="mt-4 pt-4">
+                    {/* Access Actions (Check that it is not self) */}
+                    <div className="mt-4 pt-4 flex flex-col gap-2">
+                      {selectedMember.email !== currentUserEmail && (
+                        <button
+                          disabled={updatingRoleId === selectedMember._id}
+                          onClick={() => handleUpdateRole(selectedMember._id, selectedMember.role)}
+                          className="w-full bg-[#792CA2] hover:bg-[#68248c] text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all shadow-[#792CA2]/15 active:scale-95 disabled:opacity-50"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          {updatingRoleId === selectedMember._id ? "Updating Role..." : `Change to ${selectedMember.role === "Admin" ? "Viewer" : "Admin"}`}
+                        </button>
+                      )}
+
                       {selectedMember.email === currentUserEmail ? (
                         <div className="text-[10px] text-center font-bold text-gray-400 dark:text-gray-500 bg-white/40 dark:bg-slate-800/40 py-2.5 rounded-xl border border-gray-100 dark:border-slate-700/60">
                           Active Account (Logged In)
@@ -489,7 +532,7 @@ export default function UserAccessManagement() {
                     >
                       {inviting ? (
                         <>
-                          <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                          <div className="w-3.5 h-3.5 border-2 rounded-full animate-spin" style={{ borderColor: "rgba(255, 255, 255, 0.3)", borderTopColor: "#FFFFFF" }} />
                           <span>Inviting...</span>
                         </>
                       ) : (
