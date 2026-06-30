@@ -132,7 +132,7 @@ export default function AlertHistory() {
               <p className="text-gray-400 font-medium text-xs">No data available for analysis.</p>
             </div>
           ) : selectedEnv ? (
-            <div className="flex-grow flex flex-col w-full h-[300px] mt-4 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="flex-grow flex flex-col w-full h-[300px] mt-4 overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar">
               <div className="flex items-center gap-3 mb-4 sticky top-0 bg-white/90 dark:bg-[#111844]/90 backdrop-blur-md z-10 py-2 border-b border-gray-100 dark:border-white/10">
                 <motion.button 
                   whileHover={{ scale: 1.05, x: -2 }}

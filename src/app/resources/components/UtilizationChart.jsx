@@ -13,7 +13,7 @@ import {
   Cell,
   LineChart,
   Line,
-  Label
+  Label,
 } from "recharts";
 
 export default function UtilizationChart({
@@ -32,6 +32,16 @@ export default function UtilizationChart({
   const [drilldownServer, setDrilldownServer] = useState(null);
   const [drilldownMetric, setDrilldownMetric] = useState(null);
   const [showAllInstances, setShowAllInstances] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const [activeTrends, setActiveTrends] = useState({ hourly: [], daily: [] });
   const [isTrendsLoading, setIsTrendsLoading] = useState(false);
@@ -54,7 +64,9 @@ export default function UtilizationChart({
     async function fetchTrends() {
       setIsTrendsLoading(true);
       try {
-        const res = await fetch(`/api/resources/trends?resourceId=${drilldownServer}`);
+        const res = await fetch(
+          `/api/resources/trends?resourceId=${drilldownServer}`,
+        );
         if (!res.ok) throw new Error("Failed to fetch resource trends");
         const json = await res.json();
         if (active) {
@@ -90,7 +102,8 @@ export default function UtilizationChart({
 
   // Filter instances by service
   const serverResources = resources.filter((r) => {
-    if (r.service !== "EC2" && r.service !== "RDS" && r.service !== "S3") return false;
+    if (r.service !== "EC2" && r.service !== "RDS" && r.service !== "S3")
+      return false;
     if (serviceFilter === "All") return true;
     return r.service === serviceFilter;
   });
@@ -123,29 +136,65 @@ export default function UtilizationChart({
       barSize: 14,
       className: "cursor-pointer hover:opacity-80 transition-opacity",
       shape: (props) => {
-        const { x, y, width, height, fill, payload, onClick, className } = props;
+        const { x, y, width, height, fill, payload, onClick, className } =
+          props;
         if (payload && payload.name) {
           coordsRef.current[payload.name] = { x: x + width, y: y + height / 2 };
         }
         const r = 4;
         if (width < r) {
-          return <rect x={x} y={y} width={width} height={height} fill={fill} onClick={onClick} className={className} />;
+          return (
+            <rect
+              x={x}
+              y={y}
+              width={width}
+              height={height}
+              fill={fill}
+              onClick={onClick}
+              className={className}
+            />
+          );
         }
-        const d = `M${x},${y} L${x+width-r},${y} A${r},${r} 0 0,1 ${x+width},${y+r} L${x+width},${y+height-r} A${r},${r} 0 0,1 ${x+width-r},${y+height} L${x},${y+height} Z`;
-        return <path d={d} fill={fill} onClick={onClick} className={className} />;
-      }
+        const d = `M${x},${y} L${x + width - r},${y} A${r},${r} 0 0,1 ${x + width},${y + r} L${x + width},${y + height - r} A${r},${r} 0 0,1 ${x + width - r},${y + height} L${x},${y + height} Z`;
+        return (
+          <path d={d} fill={fill} onClick={onClick} className={className} />
+        );
+      },
     };
 
     switch (selectedMetric) {
       case "Memory Utilization":
-        return <Bar dataKey="memory" name="Memory (%)" fill="#792CA2" {...commonProps} />;
+        return (
+          <Bar
+            dataKey="memory"
+            name="Memory (%)"
+            fill="#792CA2"
+            {...commonProps}
+          />
+        );
       case "Storage":
-        return <Bar dataKey="storage" name="Storage (%)" fill="#792CA2" {...commonProps} />;
+        return (
+          <Bar
+            dataKey="storage"
+            name="Storage (%)"
+            fill="#792CA2"
+            {...commonProps}
+          />
+        );
       case "Network":
-        return <Bar dataKey="network" name="Network (%)" fill="#792CA2" {...commonProps} />;
+        return (
+          <Bar
+            dataKey="network"
+            name="Network (%)"
+            fill="#792CA2"
+            {...commonProps}
+          />
+        );
       case "CPU Utilization":
       default:
-        return <Bar dataKey="cpu" name="CPU (%)" fill="#792CA2" {...commonProps} />;
+        return (
+          <Bar dataKey="cpu" name="CPU (%)" fill="#792CA2" {...commonProps} />
+        );
     }
   };
 
@@ -166,30 +215,45 @@ export default function UtilizationChart({
   // Generate LineChart data if Level 2 drilldown is active
   const getTrendData = () => {
     if (!drilldownServer || !drilldownMetric) return [];
-    
+
     // Use on-demand fetched trend data grouped by the appropriate frequency
-    const serverTrends = timeFilter === "Hourly" ? activeTrends.hourly : activeTrends.daily;
-    
+    const serverTrends =
+      timeFilter === "Hourly" ? activeTrends.hourly : activeTrends.daily;
+
     const getMetricValue = (t) => {
       if (drilldownMetric === "CPU") return t.cpu || 0;
       if (drilldownMetric === "Memory") return t.memory || 0;
       if (drilldownMetric === "Storage") return t.storage || 0;
-      if (drilldownMetric === "Network") return Math.min(100, Math.round(((t.readOps || 0) + (t.writeOps || 0)) / 400));
+      if (drilldownMetric === "Network")
+        return Math.min(
+          100,
+          Math.round(((t.readOps || 0) + (t.writeOps || 0)) / 400),
+        );
       return 0;
     };
 
     if (timeFilter === "Hourly") {
       const hourlyMap = {};
-      serverTrends.forEach(t => {
+      serverTrends.forEach((t) => {
         const key = `${t.year}-${t.month}-${t.day}-${t.hour}`;
         if (!hourlyMap[key]) {
-          hourlyMap[key] = { year: t.year, month: t.month, day: t.day, hour: t.hour, val: 0, count: 0 };
+          hourlyMap[key] = {
+            year: t.year,
+            month: t.month,
+            day: t.day,
+            hour: t.hour,
+            val: 0,
+            count: 0,
+          };
         }
         hourlyMap[key].val += getMetricValue(t);
         hourlyMap[key].count += 1;
       });
       const sorted = Object.values(hourlyMap).sort((a, b) => {
-        return new Date(a.year, a.month - 1, a.day, a.hour) - new Date(b.year, b.month - 1, b.day, b.hour);
+        return (
+          new Date(a.year, a.month - 1, a.day, a.hour) -
+          new Date(b.year, b.month - 1, b.day, b.hour)
+        );
       });
       const slice = sorted.slice(-24);
       return slice.map((t) => {
@@ -236,26 +300,39 @@ export default function UtilizationChart({
         const startIndex = Math.max(0, sortedKeys.length - (4 - i) * 7);
         const endIndex = sortedKeys.length - (3 - i) * 7;
         const weekSliceKeys = sortedKeys.slice(startIndex, endIndex);
-        
+
         let sum = 0;
         let count = 0;
-        weekSliceKeys.forEach(k => {
+        weekSliceKeys.forEach((k) => {
           sum += dailyMap[k].val;
           count += dailyMap[k].count;
         });
-        
+
         let weekLabel = `Week ${i + 1}`;
         if (weekSliceKeys.length > 0) {
           const firstDay = weekSliceKeys[0];
           const lastDay = weekSliceKeys[weekSliceKeys.length - 1];
-          const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-          
+          const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+
           const [y1, m1, d1] = firstDay.split("-");
           const startStr = `${months[parseInt(m1, 10) - 1]} ${parseInt(d1, 10)}`;
-          
+
           const [y2, m2, d2] = lastDay.split("-");
           const endStr = `${months[parseInt(m2, 10) - 1]} ${parseInt(d2, 10)}`;
-          
+
           weekLabel = `${startStr} - ${endStr}`;
         }
 
@@ -269,7 +346,20 @@ export default function UtilizationChart({
 
     if (timeFilter === "Monthly") {
       const monthlyMap = {};
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       serverTrends.forEach((t) => {
         const key = months[t.month - 1] || `Month ${t.month}`;
         if (!monthlyMap[key]) monthlyMap[key] = { val: 0, count: 0 };
@@ -289,7 +379,10 @@ export default function UtilizationChart({
   const chartHeight = drilldownServer ? 500 : data.length * 40 + 80;
 
   return (
-    <div className={`bg-white/90 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 dark:border-white/5 w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 mt-8 h-auto`} style={{ minHeight: drilldownServer ? 500 : 250 }}>
+    <div
+      className={`bg-white/90 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 dark:border-white/5 w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 mt-8 h-auto`}
+      style={{ minHeight: drilldownServer ? 500 : 250 }}
+    >
       <style>{`
         .tick-text {
           font-size: 8px;
@@ -307,7 +400,7 @@ export default function UtilizationChart({
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h3 className="flex items-center gap-2">
           {drilldownServer ? (
             <div className="flex items-center gap-2">
@@ -320,14 +413,28 @@ export default function UtilizationChart({
                   }
                 }}
                 className="text-gray-400 hover:text-[#792CA2] transition-colors"
-                title={drilldownMetric ? "Back to Server Metrics" : "Back to Servers"}
+                title={
+                  drilldownMetric ? "Back to Server Metrics" : "Back to Servers"
+                }
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
                 </svg>
               </button>
               <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
-                {drilldownMetric ? `${drilldownServer} - ${drilldownMetric} Trend` : `${drilldownServer} Details`}
+                {drilldownMetric
+                  ? `${drilldownServer} - ${drilldownMetric} Trend`
+                  : `${drilldownServer} Details`}
               </span>
             </div>
           ) : (
@@ -341,14 +448,15 @@ export default function UtilizationChart({
             </div>
           )}
         </h3>
-        <div className="relative flex items-center gap-3" ref={filterRef}>
+        <div className="relative flex flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto" ref={filterRef}>
           {drilldownMetric ? (
             <div className="relative">
               <button
                 onClick={() => setTimeFilterOpen(!timeFilterOpen)}
                 className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
               >
-                {timeFilter} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+                {timeFilter}{" "}
+                <ChevronDownIcon className="w-4 h-4 text-gray-500" />
               </button>
               {timeFilterOpen && (
                 <div className="absolute right-0 mt-2 w-36 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-[999] py-1 overflow-hidden">
@@ -371,10 +479,14 @@ export default function UtilizationChart({
             <>
               <div className="relative">
                 <button
-                  onClick={() => { setServiceFilterOpen(!serviceFilterOpen); setFilterOpen(false); }}
+                  onClick={() => {
+                    setServiceFilterOpen(!serviceFilterOpen);
+                    setFilterOpen(false);
+                  }}
                   className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                 >
-                  {serviceFilter} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+                  {serviceFilter}{" "}
+                  <ChevronDownIcon className="w-4 h-4 text-gray-500" />
                 </button>
                 {serviceFilterOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-[999] py-1 overflow-hidden">
@@ -395,14 +507,23 @@ export default function UtilizationChart({
               </div>
               <div className="relative">
                 <button
-                  onClick={() => { setFilterOpen(!filterOpen); setServiceFilterOpen(false); }}
+                  onClick={() => {
+                    setFilterOpen(!filterOpen);
+                    setServiceFilterOpen(false);
+                  }}
                   className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                 >
-                  {selectedMetric} <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+                  {selectedMetric}{" "}
+                  <ChevronDownIcon className="w-4 h-4 text-gray-500" />
                 </button>
                 {filterOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-[999] py-1 overflow-hidden">
-                    {["CPU Utilization", "Memory Utilization", "Storage", "Network"].map((metric) => (
+                    {[
+                      "CPU Utilization",
+                      "Memory Utilization",
+                      "Storage",
+                      "Network",
+                    ].map((metric) => (
                       <button
                         key={metric}
                         onClick={() => {
@@ -421,28 +542,55 @@ export default function UtilizationChart({
           ) : null}
         </div>
       </div>
-      
+
       {drilldownServer && drilldownMetric ? (
         <div className="flex-grow w-full relative flex flex-col">
-          <div className="absolute left-[10px] top-1/2 text-[#111844] dark:text-[#F9F7F7]" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 13, fontWeight: "bold", userSelect: "none", pointerEvents: "none", zIndex: 10 }}>
+          <div
+            className="absolute left-[10px] top-1/2 text-[#111844] dark:text-[#F9F7F7]"
+            style={{
+              writingMode: "vertical-rl",
+              transform: "rotate(180deg) translateY(50%)",
+              fontSize: 13,
+              fontWeight: "bold",
+              userSelect: "none",
+              pointerEvents: "none",
+              zIndex: 10,
+            }}
+          >
             {drilldownMetric} (%) ➔
           </div>
-          <ResponsiveContainer width="100%" height={380} className="focus:outline-none">
+          <ResponsiveContainer
+            width="100%"
+            height={380}
+            className="focus:outline-none"
+          >
             <LineChart
               style={{ outline: "none" }}
               data={trendData}
-              margin={{ top: 30, right: 45, left: 45, bottom: 20 }}
+              margin={isMobile ? { top: 20, right: 15, left: 15, bottom: 15 } : { top: 30, right: 45, left: 45, bottom: 20 }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#E5E7EB"
+              />
               <XAxis
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
                 interval={timeFilter === "Hourly" ? 2 : 0}
-                dy={10}
+                dy={isMobile ? 5 : 10}
                 tick={({ x, y, payload }) => (
                   <g transform={`translate(${x},${y})`}>
-                    <text x={0} y={0} dy={10} textAnchor="middle" fill="#6B7280" className="tick-text">
+                    <text
+                      x={0}
+                      y={0}
+                      dy={isMobile ? 5 : 10}
+                      textAnchor="middle"
+                      fill="#6B7280"
+                      style={{ fontSize: isMobile ? 8 : 10 }}
+                      className="tick-text"
+                    >
                       {payload.value}
                     </text>
                   </g>
@@ -450,7 +598,7 @@ export default function UtilizationChart({
               >
                 <Label
                   value="Time ➔"
-                  offset={-15}
+                  offset={isMobile ? -5 : -15}
                   position="insideBottom"
                   className="fill-[#111844] dark:fill-[#F9F7F7] font-bold text-xs md:text-sm"
                 />
@@ -458,18 +606,27 @@ export default function UtilizationChart({
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "currentColor", fontSize: 12 }}
+                width={isMobile ? 35 : 50}
+                tick={{ fill: "currentColor", fontSize: isMobile ? 9 : 12 }}
                 className="text-gray-450 dark:text-slate-400"
                 tickFormatter={(value) => `${value}%`}
-                dx={-10}
+                dx={isMobile ? -2 : -10}
               />
               <Tooltip
                 cursor={{ stroke: "rgba(121, 44, 162, 0.1)", strokeWidth: 2 }}
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     return (
-                      <div className="bg-[#111844] text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg whitespace-nowrap flex flex-col items-center gap-0.5" style={{ transform: "translate(-50%, -100%)", marginTop: "-10px" }}>
-                        <span className="text-[10px] text-[#DCCBFF] font-medium">{label}</span>
+                      <div
+                        className="bg-[#111844] text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg whitespace-nowrap flex flex-col items-center gap-0.5"
+                        style={{
+                          transform: "translate(-50%, -100%)",
+                          marginTop: "-10px",
+                        }}
+                      >
+                        <span className="text-[10px] text-[#DCCBFF] font-medium">
+                          {label}
+                        </span>
                         <span>{payload[0].value}%</span>
                       </div>
                     );
@@ -495,67 +652,181 @@ export default function UtilizationChart({
         <div className="flex flex-col h-full gap-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
             {[
-              { label: "CPU", value: serverObj?.cpu || 0, color: "text-[#792CA2] dark:text-[#C084FC]", bg: "bg-[#792CA2]/10 dark:bg-[#792CA2]/20" },
-              { label: "Memory", value: serverObj?.memory || 0, color: "text-[#9A4DCC] dark:text-[#E0A9FF]", bg: "bg-[#9A4DCC]/10 dark:bg-[#9A4DCC]/20" },
-              { label: "Storage", value: serverObj?.storage || 0, color: "text-[#1F215D] dark:text-[#93C5FD]", bg: "bg-[#1F215D]/10 dark:bg-[#1e293b]/60" },
-              { label: "Network", value: serverObj?.network || 0, color: "text-[#792CA2] dark:text-[#C084FC]", bg: "bg-[#DCCBFF]/10 dark:bg-[#DCCBFF]/15" },
+              {
+                label: "CPU",
+                value: serverObj?.cpu || 0,
+                color: "text-[#792CA2] dark:text-[#C084FC]",
+                bg: "bg-[#792CA2]/10 dark:bg-[#792CA2]/20",
+              },
+              {
+                label: "Memory",
+                value: serverObj?.memory || 0,
+                color: "text-[#9A4DCC] dark:text-[#E0A9FF]",
+                bg: "bg-[#9A4DCC]/10 dark:bg-[#9A4DCC]/20",
+              },
+              {
+                label: "Storage",
+                value: serverObj?.storage || 0,
+                color: "text-[#1F215D] dark:text-[#93C5FD]",
+                bg: "bg-[#1F215D]/10 dark:bg-[#1e293b]/60",
+              },
+              {
+                label: "Network",
+                value: serverObj?.network || 0,
+                color: "text-[#792CA2] dark:text-[#C084FC]",
+                bg: "bg-[#DCCBFF]/10 dark:bg-[#DCCBFF]/15",
+              },
             ].map((kpi, idx) => (
-              <div key={idx} className={`rounded-xl p-4 flex flex-col justify-center items-start ${kpi.bg}`}>
-                <p className="text-xs font-semibold text-gray-500 mb-1">{kpi.label} Usage</p>
-                <p className={`text-2xl font-bold ${kpi.color}`}>{kpi.value}%</p>
+              <div
+                key={idx}
+                className={`rounded-xl p-4 flex flex-col justify-center items-start ${kpi.bg}`}
+              >
+                <p className="text-xs font-semibold text-gray-500 mb-1">
+                  {kpi.label} Usage
+                </p>
+                <p className={`text-2xl font-bold ${kpi.color}`}>
+                  {kpi.value}%
+                </p>
               </div>
             ))}
           </div>
 
           <div className="flex-grow w-full relative" style={{ height: 260 }}>
-            <div className="absolute left-[10px] top-1/2 -translate-y-1/2 -translate-x-1 text-[#111844] dark:text-[#F9F7F7]" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 12, fontWeight: 700, color: "currentColor", userSelect: "none", pointerEvents: "none" }}>
+            <div
+              className="absolute left-[10px] top-1/2 -translate-y-1/2 -translate-x-1 text-[#111844] dark:text-[#F9F7F7]"
+              style={{
+                writingMode: "vertical-rl",
+                transform: "rotate(180deg) translateY(50%)",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "currentColor",
+                userSelect: "none",
+                pointerEvents: "none",
+              }}
+            >
               Percentage ➔
             </div>
-            <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
-              <BarChart style={{ outline: "none" }} data={drilldownData} margin={{ top: 20, right: 10, left: 40, bottom: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-gray-200 dark:text-slate-800" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 11 }} className="text-gray-450 dark:text-slate-400" dy={6} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 11 }} className="text-gray-450 dark:text-slate-400" dx={-4} />
-                <Tooltip cursor={{ fill: "rgba(121, 44, 162, 0.05)" }} contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)" }} />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1000} animationEasing="ease-in-out" onClick={(data) => handleDrilldownBarClick(data)} className="cursor-pointer hover:opacity-80 transition-opacity">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              className="focus:outline-none"
+            >
+              <BarChart
+                style={{ outline: "none" }}
+                data={drilldownData}
+                margin={{ top: 20, right: 10, left: 40, bottom: 30 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="currentColor"
+                  className="text-gray-200 dark:text-slate-800"
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "currentColor", fontSize: 11 }}
+                  className="text-gray-450 dark:text-slate-400"
+                  dy={6}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "currentColor", fontSize: 11 }}
+                  className="text-gray-450 dark:text-slate-400"
+                  dx={-4}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgba(121, 44, 162, 0.05)" }}
+                  contentStyle={{
+                    borderRadius: "12px",
+                    border: "none",
+                    boxShadow:
+                      "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+                  }}
+                />
+                <Bar
+                  dataKey="value"
+                  radius={[4, 4, 0, 0]}
+                  isAnimationActive={true}
+                  animationDuration={1000}
+                  animationEasing="ease-in-out"
+                  onClick={(data) => handleDrilldownBarClick(data)}
+                  className="cursor-pointer hover:opacity-80 transition-opacity"
+                >
                   {drilldownData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <div className="text-center text-[#111844] dark:text-[#F9F7F7]" style={{ fontSize: 12, fontWeight: 700, marginTop: 2 }}>
+            <div
+              className="text-center text-[#111844] dark:text-[#F9F7F7]"
+              style={{ fontSize: 12, fontWeight: 700, marginTop: 2 }}
+            >
               Metric ➔
             </div>
           </div>
         </div>
       ) : (
-        <div className={`relative w-full ${showAllInstances ? "overflow-y-auto max-h-[400px] pr-2 custom-scrollbar" : ""}`}>
-          <div className="absolute left-[10px] top-1/2 text-[#111844] dark:text-[#F9F7F7]" style={{ writingMode: "vertical-rl", transform: "rotate(180deg) translateY(50%)", fontSize: 11, fontWeight: 700, userSelect: "none", pointerEvents: "none", zIndex: 10 }}>
+        <div
+          className={`relative w-full ${showAllInstances ? "overflow-y-auto max-h-[400px] pr-2 custom-scrollbar" : ""}`}
+        >
+          <div
+            className="absolute top-1/2 text-[#111844] dark:text-[#F9F7F7]"
+            style={{
+              left: isMobile ? "5px" : "10px",
+              writingMode: "vertical-rl",
+              transform: "rotate(180deg) translateY(50%)",
+              fontSize: isMobile ? 10 : 11,
+              fontWeight: 700,
+              userSelect: "none",
+              pointerEvents: "none",
+              zIndex: 10,
+            }}
+          >
             Server ➔
           </div>
-          <ResponsiveContainer width="100%" height={chartHeight} className="focus:outline-none">
+          <ResponsiveContainer
+            width="100%"
+            height={chartHeight}
+            className="focus:outline-none"
+          >
             <BarChart
               style={{ outline: "none" }}
               layout="vertical"
               data={data}
-              margin={{ top: 0, right: 10, left: 30, bottom: 20 }}
+              margin={isMobile ? { top: 0, right: 10, left: 15, bottom: 10 } : { top: 0, right: 10, left: 30, bottom: 20 }}
             >
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
-              <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 10 }} className="text-gray-450 dark:text-slate-400" dy={6} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                horizontal={false}
+                stroke="#E5E7EB"
+              />
+              <XAxis
+                type="number"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "currentColor", fontSize: 10 }}
+                className="text-gray-450 dark:text-slate-400"
+                dy={6}
+              />
               <YAxis
                 dataKey="name"
                 type="category"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "currentColor", fontSize: 10, fontWeight: 600 }}
+                tick={{ fill: "currentColor", fontSize: isMobile ? 9 : 10, fontWeight: 600 }}
                 className="text-gray-450 dark:text-slate-400"
-                width={90}
-                dx={-4}
+                width={isMobile ? 70 : 90}
+                dx={isMobile ? -2 : -4}
                 interval={0}
-                tickFormatter={(val) => val.length > 14 ? `${val.slice(0, 11)}...` : val}
+                tickFormatter={(val) =>
+                  val.length > (isMobile ? 11 : 14) ? `${val.slice(0, isMobile ? 8 : 11)}...` : val
+                }
               />
-               <Tooltip
+              <Tooltip
                 cursor={{ fill: "rgba(121, 44, 162, 0.05)" }}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
@@ -563,7 +834,9 @@ export default function UtilizationChart({
                     const value = payload[0].value;
                     return (
                       <div className="bg-[#111844] text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg whitespace-nowrap flex flex-col items-start gap-0.5 border-none">
-                        <span className="text-[10px] text-[#DCCBFF] font-medium">{name}</span>
+                        <span className="text-[10px] text-[#DCCBFF] font-medium">
+                          {name}
+                        </span>
                         <span>{value}%</span>
                       </div>
                     );
@@ -571,12 +844,19 @@ export default function UtilizationChart({
                   return null;
                 }}
               />
-              <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: "12px" }} />
+              <Legend
+                verticalAlign="top"
+                height={36}
+                wrapperStyle={{ fontSize: "12px" }}
+              />
               {renderBar()}
             </BarChart>
           </ResponsiveContainer>
           <div className="flex flex-col items-center justify-center pt-2 pb-1 relative z-10 w-full">
-            <div className="text-center text-[#111844] dark:text-[#F9F7F7]" style={{ fontSize: 12, fontWeight: 700 }}>
+            <div
+              className="text-center text-[#111844] dark:text-[#F9F7F7]"
+              style={{ fontSize: 12, fontWeight: 700 }}
+            >
               Percentage ➔
             </div>
             {fullData.length > 5 && (
@@ -584,8 +864,12 @@ export default function UtilizationChart({
                 onClick={() => setShowAllInstances(!showAllInstances)}
                 className="mt-3 px-4 py-1.5 text-xs font-bold text-[#792CA2] bg-[#792CA2]/10 hover:bg-[#792CA2]/20 rounded-full transition-colors flex items-center gap-1.5"
               >
-                {showAllInstances ? "Show Less" : `View All (${fullData.length})`}
-                <ChevronDownIcon className={`w-3 h-3 transition-transform ${showAllInstances ? "rotate-180" : ""}`} />
+                {showAllInstances
+                  ? "Show Less"
+                  : `View All (${fullData.length})`}
+                <ChevronDownIcon
+                  className={`w-3 h-3 transition-transform ${showAllInstances ? "rotate-180" : ""}`}
+                />
               </button>
             )}
           </div>

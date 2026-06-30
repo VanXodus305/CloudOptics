@@ -28,6 +28,16 @@ export default function TopCostChart({
   const [showDetails, setShowDetails] = useState(false);
   const [drilldownTime, setDrilldownTime] = useState(null);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     setDrilldownTime(null);
   }, [environment, timeFilter, resourceFilter]);
@@ -54,12 +64,16 @@ export default function TopCostChart({
   }, []);
 
   const getChartData = () => {
-    if (timeFilter === "Select Time" || resourceFilter === "Select Resource") return [];
+    if (timeFilter === "Select Time" || resourceFilter === "Select Resource")
+      return [];
 
     // Filter trends by resource type
-    const trendsToUse = timeFilter === "Hourly" ? costTrendsHourly : costTrendsDaily;
-    const filteredTrends = resourceFilter === "All" ? trendsToUse : trendsToUse.filter((t) => t.service === resourceFilter);
-
+    const trendsToUse =
+      timeFilter === "Hourly" ? costTrendsHourly : costTrendsDaily;
+    const filteredTrends =
+      resourceFilter === "All"
+        ? trendsToUse
+        : trendsToUse.filter((t) => t.service === resourceFilter);
 
     if (timeFilter === "Hourly") {
       // Group by hour
@@ -67,7 +81,13 @@ export default function TopCostChart({
       filteredTrends.forEach((t) => {
         const key = `${t.year}-${t.month}-${t.day}-${t.hour}`;
         if (!hourlyMap[key]) {
-          hourlyMap[key] = { year: t.year, month: t.month, day: t.day, hour: t.hour, cost: 0 };
+          hourlyMap[key] = {
+            year: t.year,
+            month: t.month,
+            day: t.day,
+            hour: t.hour,
+            cost: 0,
+          };
         }
         hourlyMap[key].cost += t.cost;
       });
@@ -120,20 +140,36 @@ export default function TopCostChart({
         const startIndex = Math.max(0, sortedKeys.length - (4 - i) * 7);
         const endIndex = sortedKeys.length - (3 - i) * 7;
         const weekSliceKeys = sortedKeys.slice(startIndex, endIndex);
-        const weekSum = weekSliceKeys.reduce((sum, k) => sum + dailyCosts[k], 0);
-        
+        const weekSum = weekSliceKeys.reduce(
+          (sum, k) => sum + dailyCosts[k],
+          0,
+        );
+
         let weekLabel = `Week ${i + 1}`;
         if (weekSliceKeys.length > 0) {
           const firstDay = weekSliceKeys[0];
           const lastDay = weekSliceKeys[weekSliceKeys.length - 1];
-          const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-          
+          const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+
           const [y1, m1, d1] = firstDay.split("-");
           const startStr = `${months[parseInt(m1, 10) - 1]} ${parseInt(d1, 10)}`;
-          
+
           const [y2, m2, d2] = lastDay.split("-");
           const endStr = `${months[parseInt(m2, 10) - 1]} ${parseInt(d2, 10)}`;
-          
+
           weekLabel = `${startStr} - ${endStr}`;
         }
 
@@ -148,7 +184,20 @@ export default function TopCostChart({
     if (timeFilter === "Monthly") {
       // Group by month name
       const monthlyMap = {};
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       filteredTrends.forEach((t) => {
         const key = months[t.month - 1] || `Month ${t.month}`;
         monthlyMap[key] = (monthlyMap[key] || 0) + t.cost;
@@ -177,10 +226,14 @@ export default function TopCostChart({
     : [];
 
   const totalCostVal = drilldownPieData.reduce((a, b) => a + b.value, 0);
-  const sortedResources = [...drilldownPieData].sort((a, b) => b.value - a.value);
+  const sortedResources = [...drilldownPieData].sort(
+    (a, b) => b.value - a.value,
+  );
   const topSpender = sortedResources[0]?.name || "N/A";
-  const lowestSpender = sortedResources[sortedResources.length - 1]?.name || "N/A";
-  const avgCostVal = drilldownPieData.length > 0 ? totalCostVal / drilldownPieData.length : 0;
+  const lowestSpender =
+    sortedResources[sortedResources.length - 1]?.name || "N/A";
+  const avgCostVal =
+    drilldownPieData.length > 0 ? totalCostVal / drilldownPieData.length : 0;
 
   const COLORS = ["#792CA2", "#9A4DCC", "#1F215D", "#111844", "#DCCBFF"];
 
@@ -203,7 +256,7 @@ export default function TopCostChart({
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h3 className="flex items-center gap-2">
           {drilldownTime ? (
             <div className="flex items-center gap-2">
@@ -212,8 +265,18 @@ export default function TopCostChart({
                 className="text-gray-400 hover:text-[#792CA2] transition-colors"
                 title="Back to Chart"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
                 </svg>
               </button>
               <span className="text-lg font-extrabold text-[#111844] dark:text-[#F9F7F7] tracking-tight">
@@ -232,7 +295,7 @@ export default function TopCostChart({
           )}
         </h3>
         {!drilldownTime && (
-          <div className="relative flex items-center gap-3" ref={filterRef}>
+          <div className="relative flex flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto" ref={filterRef}>
             {/* Resource Filter */}
             <div className="relative">
               <button
@@ -242,7 +305,8 @@ export default function TopCostChart({
                 }}
                 className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1"
               >
-                <span>{resourceFilter}</span> <ChevronDownIcon className="w-3 h-3 text-gray-500" />
+                <span>{resourceFilter}</span>{" "}
+                <ChevronDownIcon className="w-3 h-3 text-gray-500" />
               </button>
               {resourceFilterOpen && (
                 <div className="absolute right-0 mt-2 w-36 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-20 py-1 overflow-hidden">
@@ -271,7 +335,8 @@ export default function TopCostChart({
                 }}
                 className="bg-[#F9F7F7] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-[#111844] dark:text-[#F9F7F7] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1"
               >
-                <span>{timeFilter}</span> <ChevronDownIcon className="w-3 h-3 text-gray-500" />
+                <span>{timeFilter}</span>{" "}
+                <ChevronDownIcon className="w-3 h-3 text-gray-500" />
               </button>
               {timeFilterOpen && (
                 <div className="absolute right-0 mt-2 w-36 bg-[#ffffff] dark:!bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-20 py-1 overflow-hidden">
@@ -304,17 +369,17 @@ export default function TopCostChart({
                   color: "text-[#792CA2] dark:text-[#C084FC]",
                   bg: "bg-[#792CA2]/10 dark:bg-[#792CA2]/20",
                 },
-                { 
-                  label: "Top Spender", 
-                  value: topSpender, 
-                  color: "text-[#111844] dark:text-[#F9F7F7]", 
-                  bg: "bg-gray-100 dark:bg-slate-800/80" 
+                {
+                  label: "Top Spender",
+                  value: topSpender,
+                  color: "text-[#111844] dark:text-[#F9F7F7]",
+                  bg: "bg-gray-100 dark:bg-slate-800/80",
                 },
-                { 
-                  label: "Lowest Spender", 
-                  value: lowestSpender, 
-                  color: "text-[#111844] dark:text-[#F9F7F7]", 
-                  bg: "bg-gray-100 dark:bg-slate-800/80" 
+                {
+                  label: "Lowest Spender",
+                  value: lowestSpender,
+                  color: "text-[#111844] dark:text-[#F9F7F7]",
+                  bg: "bg-gray-100 dark:bg-slate-800/80",
                 },
                 {
                   label: "Avg Cost/Resource",
@@ -323,17 +388,29 @@ export default function TopCostChart({
                   bg: "bg-[#9A4DCC]/10 dark:bg-[#9A4DCC]/20",
                 },
               ].map((kpi, idx) => (
-                <div key={idx} className={`rounded-xl p-4 flex flex-col justify-center items-start ${kpi.bg}`}>
-                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{kpi.label}</p>
-                  <p className={`text-sm md:text-lg font-bold truncate max-w-full ${kpi.color}`}>{kpi.value}</p>
+                <div
+                  key={idx}
+                  className={`rounded-xl p-4 flex flex-col justify-center items-start ${kpi.bg}`}
+                >
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                    {kpi.label}
+                  </p>
+                  <p
+                    className={`text-sm md:text-lg font-bold truncate max-w-full ${kpi.color}`}
+                  >
+                    {kpi.value}
+                  </p>
                 </div>
               ))}
             </div>
             <div className="flex-grow w-full relative h-0 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
               <div className="space-y-3 mt-2">
                 {sortedResources.map((item, index) => {
-                  const maxVal = Math.max(...drilldownPieData.map((d) => d.value));
-                  const percentage = maxVal > 0 ? (item.value / maxVal) * 100 : 0;
+                  const maxVal = Math.max(
+                    ...drilldownPieData.map((d) => d.value),
+                  );
+                  const percentage =
+                    maxVal > 0 ? (item.value / maxVal) * 100 : 0;
                   return (
                     <motion.div
                       key={index}
@@ -345,7 +422,9 @@ export default function TopCostChart({
                       <div className="flex items-center gap-3 w-1/2">
                         <div
                           className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          style={{
+                            backgroundColor: COLORS[index % COLORS.length],
+                          }}
                         />
                         <span className="font-semibold text-xs text-gray-700 dark:text-gray-300 group-hover:text-[#111844] dark:group-hover:text-[#F9F7F7] transition-colors truncate">
                           {item.name}
@@ -373,34 +452,51 @@ export default function TopCostChart({
               </div>
             </div>
           </div>
-        ) : timeFilter === "Select Time" || resourceFilter === "Select Resource" ? (
+        ) : timeFilter === "Select Time" ||
+          resourceFilter === "Select Resource" ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <p className="text-gray-500 font-medium text-sm bg-[#F9F7F7] px-4 py-2 rounded-lg shadow-sm border border-gray-100">
               Please select a Resource and Time Period to view the trend.
             </p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%" className="focus:outline-none">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            className="focus:outline-none"
+          >
             <LineChart
               style={{ outline: "none" }}
               key={`${environment}-${timeFilter}-${resourceFilter}`}
               data={data}
-              margin={{ top: 30, right: 45, left: 45, bottom: 20 }}
+              margin={isMobile ? { top: 20, right: 15, left: 15, bottom: 15 } : { top: 30, right: 45, left: 45, bottom: 20 }}
               onClick={(e) => {
                 if (e && e.activeLabel) setDrilldownTime(e.activeLabel);
               }}
               className="cursor-pointer"
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#E5E7EB"
+              />
               <XAxis
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
                 interval={timeFilter === "Hourly" ? 2 : 0}
-                dy={10}
+                dy={isMobile ? 5 : 10}
                 tick={({ x, y, payload }) => (
                   <g transform={`translate(${x},${y})`}>
-                    <text x={0} y={0} dy={10} textAnchor="middle" fill="currentColor" className="tick-text text-gray-450 dark:text-slate-400">
+                    <text
+                      x={0}
+                      y={0}
+                      dy={isMobile ? 5 : 10}
+                      textAnchor="middle"
+                      fill="currentColor"
+                      style={{ fontSize: isMobile ? 8 : 10 }}
+                      className="tick-text text-gray-450 dark:text-slate-400"
+                    >
                       {payload.value}
                     </text>
                   </g>
@@ -408,7 +504,7 @@ export default function TopCostChart({
               >
                 <Label
                   value="Time ➔"
-                  offset={-15}
+                  offset={isMobile ? -5 : -15}
                   position="insideBottom"
                   className="fill-[#111844] dark:fill-[#F9F7F7] font-bold text-xs md:text-sm"
                 />
@@ -416,16 +512,17 @@ export default function TopCostChart({
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "currentColor", fontSize: 12 }}
+                width={isMobile ? 35 : 50}
+                tick={{ fill: "currentColor", fontSize: isMobile ? 9 : 12 }}
                 className="text-gray-450 dark:text-slate-400"
                 tickFormatter={(value) => `$${value}`}
-                dx={-10}
+                dx={isMobile ? -2 : -10}
               >
                 <Label
                   value="Cost ➔"
                   angle={-90}
                   position="insideLeft"
-                  offset={-15}
+                  offset={isMobile ? -5 : -15}
                   className="fill-[#111844] dark:fill-[#F9F7F7] font-bold text-xs md:text-sm"
                 />
               </YAxis>
@@ -438,9 +535,14 @@ export default function TopCostChart({
                       return (
                         <div
                           className="bg-[#111844] text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg whitespace-nowrap flex flex-col items-center gap-0.5"
-                          style={{ transform: "translate(-50%, -100%)", marginTop: "-10px" }}
+                          style={{
+                            transform: "translate(-50%, -100%)",
+                            marginTop: "-10px",
+                          }}
                         >
-                          <span className="text-[10px] text-[#DCCBFF] font-medium">{label}</span>
+                          <span className="text-[10px] text-[#DCCBFF] font-medium">
+                            {label}
+                          </span>
                           <span>${payload[0].value.toLocaleString()}</span>
                         </div>
                       );
@@ -459,7 +561,11 @@ export default function TopCostChart({
                     ? { r: 4, strokeWidth: 2, fill: "#fff", stroke: "#792CA2" }
                     : false
                 }
-                activeDot={showDetails ? { r: 6, strokeWidth: 0, fill: "#9A4DCC" } : false}
+                activeDot={
+                  showDetails
+                    ? { r: 6, strokeWidth: 0, fill: "#9A4DCC" }
+                    : false
+                }
                 isAnimationActive={true}
                 animationDuration={1000}
                 animationEasing="ease-in-out"
