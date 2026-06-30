@@ -148,8 +148,9 @@ export default function SettingsPage() {
         />
 
         {/* MAIN CONTENT AREA */}
-        <div className="flex-grow flex flex-col h-full overflow-x-hidden relative p-4 md:p-8 overflow-y-auto">
-          <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full pb-28 md:pb-8">
+        <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative">
+          <main className="flex-grow p-4 md:p-6 pb-24 md:pb-8 relative">
+            <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full">
             {/* Page Header */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
@@ -212,9 +213,10 @@ export default function SettingsPage() {
               </div>
 
             </div>
-          </div>
+            </div>
+          </main>
           
-          <div className="mt-8 hidden md:block -mx-4 md:-mx-8 -mb-4 md:-mb-8">
+          <div className="hidden md:block -mx-4 md:-mx-8 -mb-4 md:-mb-8">
             <Footer reduced={true} />
           </div>
         </div>

@@ -131,7 +131,7 @@ export default function AdminAccountDetails() {
       transition={{ type: "spring", stiffness: 100, damping: 15 }}
       className="relative flex-grow flex flex-col"
     >
-      <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white dark:border-white/5 flex flex-col items-center flex-grow relative z-0 overflow-hidden min-h-[400px]">
+      <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-8 shadow-lg border border-white dark:border-white/5 flex flex-col items-center flex-grow relative z-0 overflow-hidden min-h-[400px]">
         {/* Background glow */}
         <div className="absolute top-0 right-0 w-48 h-48 bg-[#792CA2]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#9A4DCC]/10 rounded-full blur-3xl pointer-events-none" />
@@ -169,7 +169,7 @@ export default function AdminAccountDetails() {
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{userEmail}</p>
           </div>
 
-          <div className="mt-6 bg-white/80 dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700 rounded-2xl p-4 w-full flex items-center gap-4 shadow-sm">
+          <div className="mt-6 bg-white/80 dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700 rounded-2xl p-4 w-full flex items-center gap-4 shadow-md">
             <div className="bg-[#792CA2]/10 p-3 rounded-xl">
               <ShieldCheckIcon className="w-6 h-6 text-[#792CA2]" />
             </div>

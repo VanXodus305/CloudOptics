@@ -149,7 +149,7 @@ export default function UserAccessManagement() {
       transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.2 }}
       className="relative flex flex-col h-full"
     >
-      <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/5 flex flex-col flex-grow relative z-0 min-h-[500px]">
+      <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white dark:border-white/5 flex flex-col flex-grow relative z-0 min-h-[500px]">
         {/* Glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
 

@@ -198,7 +198,7 @@ export default function SettingsOptions() {
       className="mt-6 flex flex-col gap-3"
     >
       {/* ── LANGUAGE OPTION ── */}
-      <div className="bg-white/70 dark:bg-[#0F122B]/60 backdrop-blur-xl border border-white dark:border-white/5 rounded-2xl shadow-sm overflow-hidden transition-all duration-300">
+      <div className="bg-white/70 dark:bg-[#0F122B]/60 backdrop-blur-xl border border-white dark:border-white/5 rounded-2xl shadow-lg overflow-hidden transition-all duration-300">
         <button
           onClick={() => handleOptionClick("language")}
           className="w-full p-4 flex items-center justify-between group focus:outline-none"
@@ -275,7 +275,7 @@ export default function SettingsOptions() {
       </div>
 
       {/* ── THEME OPTION ── */}
-      <div className="bg-white/70 dark:bg-[#0F122B]/60 backdrop-blur-xl border border-white dark:border-white/5 rounded-2xl shadow-sm overflow-hidden transition-all duration-300">
+      <div className="bg-white/70 dark:bg-[#0F122B]/60 backdrop-blur-xl border border-white dark:border-white/5 rounded-2xl shadow-lg overflow-hidden transition-all duration-300">
         <button
           onClick={() => handleOptionClick("theme")}
           className="w-full p-4 flex items-center justify-between group focus:outline-none"
@@ -337,7 +337,7 @@ export default function SettingsOptions() {
         whileHover={{ scale: 1.01, x: 2 }}
         whileTap={{ scale: 0.99 }}
         onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-        className="w-full bg-red-50/80 dark:bg-red-950/20 backdrop-blur-xl border border-red-100 dark:border-red-900/30 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center justify-between group mt-2"
+        className="w-full bg-red-50/80 dark:bg-red-950/20 backdrop-blur-xl border border-red-100 dark:border-red-900/30 p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-between group mt-2"
       >
         <div className="flex items-center gap-4">
           <div className="bg-red-500/10 text-red-500 p-2.5 rounded-xl group-hover:bg-red-500 group-hover:text-white transition-colors">
