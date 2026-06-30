@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #eaeaea;
+  --tooltip-item-color: #111844;
+  --tooltip-label-color: #4b5563;
+}
+
+html.dark {
+  --tooltip-bg: #0F122B;
+  --tooltip-border: rgba(255, 255, 255, 0.1);
+  --tooltip-item-color: #F9F7F7;
+  --tooltip-label-color: #9CA3AF;
+}
+
 html {
   scroll-behavior: smooth;
 }

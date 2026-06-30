@@ -47,6 +47,12 @@ const ResourceSchema = new mongoose.Schema(
       enum: ["none", "idle", "oversized", "unattached"],
       default: "none",
     },
+    baseCpu: {
+      type: Number,
+    },
+    baseMemory: {
+      type: Number,
+    },
   },
   { timestamps: true },
 );

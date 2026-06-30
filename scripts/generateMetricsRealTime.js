@@ -13,6 +13,7 @@ if (!MONGODB_URI) {
 }
 
 let isRunning = true;
+let simulatedTime = new Date();
 
 // Graceful shutdown
 process.on("SIGINT", async () => {
@@ -36,7 +37,7 @@ function generateRealisticMetrics(resource) {
   let cpuUtilization, memoryUtilization, storageSizeGB, readOps, writeOps;
   const anomalyType = resource.anomalyType || "none";
 
-  const timestamp = new Date();
+  const timestamp = simulatedTime;
   const hour = timestamp.getHours();
   const dayOfWeek = timestamp.getDay();
   const dayOfMonth = timestamp.getDate();
@@ -54,19 +55,23 @@ function generateRealisticMetrics(resource) {
 
   // Generate realistic metrics based on resource type and anomaly type
   if (resource.serviceType === "EC2") {
-    let cpu = faker.number.int({ min: 15, max: 65 });
-    let mem = faker.number.int({ min: 20, max: 70 });
+    const baseCpu = resource.baseCpu ?? 40;
+    const baseMemory = resource.baseMemory ?? 45;
 
-    if (anomalyType === "idle") {
-      cpu = faker.number.int({ min: 1, max: 4 });
-      mem = faker.number.int({ min: 5, max: 20 });
-    } else if (anomalyType === "oversized") {
-      cpu = faker.number.int({ min: 4, max: 12 });
-      mem = faker.number.int({ min: 5, max: 17 });
-    } else {
-      cpu = Math.max(1, Math.min(100, Math.round(cpu * diurnalFactor)));
-      mem = Math.max(1, Math.min(100, Math.round(mem * (diurnalFactor * 0.4 + 0.6))));
+    // Add noise per hour: +/- 15%
+    const noiseCpu = faker.number.int({ min: -15, max: 15 });
+    const noiseMemory = faker.number.int({ min: -15, max: 15 });
+
+    let cpu = baseCpu + noiseCpu;
+    let mem = baseMemory + noiseMemory;
+
+    if (anomalyType === "none") {
+      cpu = Math.round(cpu * diurnalFactor);
+      mem = Math.round(mem * (diurnalFactor * 0.3 + 0.7));
     }
+
+    cpu = Math.max(1, Math.min(100, cpu));
+    mem = Math.max(1, Math.min(100, mem));
 
     cpuUtilization = cpu;
     memoryUtilization = mem;
@@ -74,19 +79,22 @@ function generateRealisticMetrics(resource) {
     writeOps = Math.round(faker.number.int({ min: 50, max: 3000 }) * diurnalFactor);
     storageSizeGB = 0;
   } else if (resource.serviceType === "RDS") {
-    let cpu = faker.number.int({ min: 20, max: 60 });
-    let mem = faker.number.int({ min: 25, max: 65 });
+    const baseCpu = resource.baseCpu ?? 35;
+    const baseMemory = resource.baseMemory ?? 40;
 
-    if (anomalyType === "idle") {
-      cpu = faker.number.int({ min: 1, max: 4 });
-      mem = faker.number.int({ min: 10, max: 30 });
-    } else if (anomalyType === "oversized") {
-      cpu = faker.number.int({ min: 4, max: 12 });
-      mem = faker.number.int({ min: 10, max: 18 });
-    } else {
-      cpu = Math.max(1, Math.min(100, Math.round(cpu * diurnalFactor)));
-      mem = Math.max(1, Math.min(100, Math.round(mem * (diurnalFactor * 0.4 + 0.6))));
+    const noiseCpu = faker.number.int({ min: -12, max: 12 });
+    const noiseMemory = faker.number.int({ min: -12, max: 12 });
+
+    let cpu = baseCpu + noiseCpu;
+    let mem = baseMemory + noiseMemory;
+
+    if (anomalyType === "none") {
+      cpu = Math.round(cpu * diurnalFactor);
+      mem = Math.round(mem * (diurnalFactor * 0.3 + 0.7));
     }
+
+    cpu = Math.max(1, Math.min(100, cpu));
+    mem = Math.max(1, Math.min(100, mem));
 
     cpuUtilization = cpu;
     memoryUtilization = mem;
@@ -114,7 +122,7 @@ function generateRealisticMetrics(resource) {
 
   return {
     resourceId: resource.resourceId,
-    timestamp: new Date(),
+    timestamp: new Date(simulatedTime),
     cpuUtilization,
     memoryUtilization,
     storageSizeGB,
@@ -133,6 +141,9 @@ async function generateMetricsForAllResources() {
       console.log("⚠ No resources found. Run `npm run seed` first.");
       return;
     }
+
+    // Advance simulated time by 1 hour
+    simulatedTime.setHours(simulatedTime.getHours() + 1);
 
     // Generate metrics for each resource
     const metricsToInsert = resources.map((resource) =>
@@ -153,19 +164,19 @@ async function startContinuousGeneration() {
   await connectDB();
 
   console.log("📊 AWS Resource Metrics Generator Started");
-  console.log("⏰ Generating metrics every 10 seconds (simulates hourly data)");
+  console.log("⏰ Generating metrics every 5 seconds (simulates hourly data)");
   console.log("💾 Press Ctrl+C to stop\n");
 
   // Generate initial metrics
   await generateMetricsForAllResources();
 
-  // Generate metrics every 10 seconds (you can adjust this)
+  // Generate metrics every 5 seconds (you can adjust this)
   // In production, this would be longer intervals (e.g., every hour)
   const interval = setInterval(async () => {
     if (isRunning) {
       await generateMetricsForAllResources();
     }
-  }, 10000); // 10 seconds = fast simulation, change to 3600000 (1 hour) for production
+  }, 5000); // 5 seconds = fast simulation, change to 3600000 (1 hour) for production
 
   return interval;
 }

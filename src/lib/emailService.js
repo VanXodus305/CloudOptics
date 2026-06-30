@@ -5,42 +5,90 @@ export async function sendInvitationEmail({ to, role }) {
   const brevoApiKey = process.env.BREVO_API_KEY;
 
   const htmlContent = `
-    <div style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #F9F7F7; padding: 40px; color: #111844; margin: 0;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(121, 44, 162, 0.05); border: 1px solid #EAEAEA;">
-        <!-- Header Banner -->
-        <div style="background: linear-gradient(135deg, #111844 0%, #792CA2 100%); padding: 40px 20px; text-align: center; color: white;">
-          <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">CloudOptics</h1>
-          <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.85; font-weight: 500;">Cloud Cost Optimization Vault</p>
-        </div>
-        
-        <!-- Body Content -->
-        <div style="padding: 40px; text-align: left;">
-          <h2 style="margin-top: 0; color: #111844; font-size: 20px; font-weight: 800; letter-spacing: -0.3px;">You've Been Invited!</h2>
-          <p style="color: #6B7280; font-size: 15px; line-height: 1.6; font-weight: 500;">
-            You have been granted access to the CloudOptics platform with the role of <strong style="color: #792CA2;">${role}</strong>. 
-            You can now sign in using your Google account associated with this email address.
-          </p>
-          
-          <div style="margin: 35px 0; text-align: center;">
-            <a href="${loginUrl}" style="background-color: #792CA2; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 14px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 8px 20px rgba(121, 44, 162, 0.25); transition: all 0.3s ease;">
-              Access CloudOptics Vault
-            </a>
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          @media only screen and (max-width: 600px) {
+            .outer-wrapper {
+              padding: 20px 10px !important;
+            }
+            .email-container {
+              border-radius: 20px !important;
+            }
+            .header-banner {
+              padding: 45px 20px !important;
+            }
+            .header-title {
+              font-size: 26px !important;
+            }
+            .body-content {
+              padding: 30px 20px !important;
+            }
+            .cta-button {
+              padding: 14px 28px !important;
+              font-size: 14px !important;
+              width: 100% !important;
+              box-sizing: border-box !important;
+            }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #0A0C1B; -webkit-text-size-adjust: 100%;">
+        <div class="outer-wrapper" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #080914; padding: 50px 20px; color: #E2E8F0; margin: 0;">
+          <div class="email-container" style="max-width: 560px; margin: 0 auto; background-color: #0F112A; border-radius: 28px; overflow: hidden; box-shadow: 0 20px 50px rgba(121, 44, 162, 0.15); border: 1px solid rgba(121, 44, 162, 0.15);">
+            
+            <!-- Header Banner -->
+            <div class="header-banner" style="background: linear-gradient(135deg, #090B1E 0%, #15193B 50%, #4C1D95 100%); padding: 55px 40px; text-align: center; color: white; border-bottom: 1px solid rgba(121, 44, 162, 0.2);">
+              <div style="background-color: rgba(121, 44, 162, 0.2); width: 48px; height: 48px; border-radius: 16px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(121, 44, 162, 0.35);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="#C084FC"/>
+                </svg>
+              </div>
+              <h1 class="header-title" style="margin: 0; font-size: 32px; font-weight: 850; letter-spacing: -1px; background: linear-gradient(to right, #FFFFFF, #DCCBFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">CloudOptics</h1>
+              <p style="margin: 8px 0 0 0; font-size: 13px; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: #C084FC;">Cloud Intelligence Vault</p>
+            </div>
+            
+            <!-- Body Content -->
+            <div class="body-content" style="padding: 45px; text-align: center;">
+              <h2 style="margin-top: 0; color: #FFFFFF; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.3; margin-bottom: 20px;">Your Cloud Portal is Ready</h2>
+              
+              <p style="color: #94A3B8; font-size: 15px; line-height: 1.6; font-weight: 500; margin-bottom: 30px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+                You have been granted access to the CloudOptics cost optimization platform. Explore metrics, track idle instances, and trigger mitigation playbooks.
+              </p>
+              
+              <!-- Role Badge -->
+              <div style="margin-bottom: 35px;">
+                <p style="color: #64748B; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Assigned Identity Privilege</p>
+                <span style="background-color: rgba(192, 132, 252, 0.1); color: #C084FC; padding: 8px 18px; border-radius: 99px; font-weight: 700; font-size: 13px; border: 1px solid rgba(192, 132, 252, 0.2); display: inline-block; letter-spacing: 0.5px;">
+                  🛡️ ${role}
+                </span>
+              </div>
+              
+              <!-- CTA Button -->
+              <div style="margin: 40px 0;">
+                <a href="${loginUrl}" class="cta-button" style="background: linear-gradient(135deg, #792CA2 0%, #9A4DCC 100%); color: #ffffff; text-decoration: none; padding: 16px 36px; border-radius: 16px; font-weight: 750; font-size: 15px; display: inline-block; box-shadow: 0 10px 25px rgba(121, 44, 162, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); transition: all 0.25s ease-out; letter-spacing: 0.5px;">
+                  Access CloudOptics Vault ➔
+                </a>
+              </div>
+              
+              <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 35px 0;" />
+              
+              <p style="color: #475569; font-size: 11px; line-height: 1.6; font-weight: 500; text-align: left; max-width: 460px; margin: 0 auto;">
+                <strong>Security notice:</strong> This invitation is bound to this email address. If you did not request access, you may safely ignore this message. Powered by CloudOptics automated user provisioning.
+              </p>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #0A0B1A; padding: 28px; text-align: center; font-size: 11px; color: #475569; border-top: 1px solid rgba(255, 255, 255, 0.06); font-weight: 600; letter-spacing: 0.5px;">
+              &copy; ${new Date().getFullYear()} CLOUDOPTICS SYSTEMS &bull; SECURE CONTAINER SCAN
+            </div>
           </div>
-          
-          <hr style="border: 0; border-top: 1px solid #EAEAEA; margin: 30px 0;" />
-          
-          <p style="color: #9CA3AF; font-size: 12px; line-height: 1.6; font-weight: 500;">
-            If you did not expect this invitation, you can safely ignore this email. 
-            This invitation was initiated by an administrator on behalf of the CloudOptics organization.
-          </p>
         </div>
-        
-        <!-- Footer -->
-        <div style="background-color: #F9FAFB; padding: 24px; text-align: center; font-size: 12px; color: #9CA3AF; border-top: 1px solid #F3F4F6; font-weight: 500;">
-          &copy; ${new Date().getFullYear()} CloudOptics. All rights reserved.
-        </div>
-      </div>
-    </div>
+      </body>
+    </html>
   `;
 
   if (!brevoApiKey || brevoApiKey === "your-brevo-api-key-here" || brevoApiKey.startsWith("your-")) {
@@ -93,31 +141,82 @@ export async function sendOtpEmail({ to, otp }) {
   const brevoApiKey = process.env.BREVO_API_KEY;
 
   const htmlContent = `
-    <div style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #F9F7F7; padding: 40px; color: #111844; margin: 0;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(121, 44, 162, 0.05); border: 1px solid #EAEAEA;">
-        <!-- Header Banner -->
-        <div style="background: linear-gradient(135deg, #111844 0%, #792CA2 100%); padding: 40px 20px; text-align: center; color: white;">
-          <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">CloudOptics</h1>
-          <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.85; font-weight: 500;">Cloud Cost Optimization Vault</p>
-        </div>
-        
-        <!-- Body Content -->
-        <div style="padding: 40px; text-align: center;">
-          <h2 style="margin-top: 0; color: #111844; font-size: 20px; font-weight: 800; letter-spacing: -0.3px;">Verify Your Email Address</h2>
-          <p style="color: #6B7280; font-size: 15px; line-height: 1.6; font-weight: 500;">
-            Use the following One-Time Password (OTP) to complete updating your email address. This OTP is valid for 10 minutes.
-          </p>
-          
-          <div style="margin: 30px 0;">
-            <span style="font-family: monospace; font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #792CA2; background-color: rgba(121,44,162,0.1); padding: 12px 24px; border-radius: 12px; border: 1px dashed #792CA2;">${otp}</span>
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          @media only screen and (max-width: 600px) {
+            .outer-wrapper {
+              padding: 20px 10px !important;
+            }
+            .email-container {
+              border-radius: 20px !important;
+            }
+            .header-banner {
+              padding: 45px 20px !important;
+            }
+            .header-title {
+              font-size: 26px !important;
+            }
+            .body-content {
+              padding: 30px 20px !important;
+            }
+            .otp-box {
+              padding: 16px 20px !important;
+            }
+            .otp-code {
+              font-size: 28px !important;
+              letter-spacing: 6px !important;
+            }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #0A0C1B; -webkit-text-size-adjust: 100%;">
+        <div class="outer-wrapper" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #080914; padding: 50px 20px; color: #E2E8F0; margin: 0;">
+          <div class="email-container" style="max-width: 560px; margin: 0 auto; background-color: #0F112A; border-radius: 28px; overflow: hidden; box-shadow: 0 20px 50px rgba(121, 44, 162, 0.15); border: 1px solid rgba(121, 44, 162, 0.15);">
+            
+            <!-- Header Banner -->
+            <div class="header-banner" style="background: linear-gradient(135deg, #090B1E 0%, #15193B 50%, #4C1D95 100%); padding: 55px 40px; text-align: center; color: white; border-bottom: 1px solid rgba(121, 44, 162, 0.2);">
+              <div style="background-color: rgba(192, 132, 252, 0.15); width: 48px; height: 48px; border-radius: 16px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(192, 132, 252, 0.3);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#C084FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 6V12L16 14" stroke="#C084FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h1 class="header-title" style="margin: 0; font-size: 32px; font-weight: 850; letter-spacing: -1px; background: linear-gradient(to right, #FFFFFF, #DCCBFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">CloudOptics</h1>
+              <p style="margin: 8px 0 0 0; font-size: 13px; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: #C084FC;">Security Verification Module</p>
+            </div>
+            
+            <!-- Body Content -->
+            <div class="body-content" style="padding: 45px; text-align: center;">
+              <h2 style="margin-top: 0; color: #FFFFFF; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.3; margin-bottom: 20px;">Email Verification Required</h2>
+              
+              <p style="color: #94A3B8; font-size: 15px; line-height: 1.6; font-weight: 500; margin-bottom: 30px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+                Please input the following high-security One-Time Password (OTP) to authorize your new email configuration. This code will expire in 10 minutes.
+              </p>
+              
+              <!-- OTP Box -->
+              <div class="otp-box" style="margin: 35px 0; background-color: rgba(192, 132, 252, 0.04); padding: 22px 30px; border-radius: 20px; border: 1.5px dashed rgba(192, 132, 252, 0.35); display: inline-block;">
+                <span class="otp-code" style="font-family: 'SF Mono', Consolas, Monaco, monospace; font-size: 36px; font-weight: 850; letter-spacing: 8px; color: #C084FC; display: inline-block;">${otp}</span>
+              </div>
+    
+              <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 35px 0;" />
+              
+              <p style="color: #475569; font-size: 11px; line-height: 1.6; font-weight: 500; text-align: center; max-width: 400px; margin: 0 auto;">
+                This transmission is protected by End-to-End Secure Tunnel. If you did not prompt this update, verify your profile dashboard immediately.
+              </p>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #0A0B1A; padding: 28px; text-align: center; font-size: 11px; color: #475569; border-top: 1px solid rgba(255, 255, 255, 0.06); font-weight: 600; letter-spacing: 0.5px;">
+              &copy; ${new Date().getFullYear()} CLOUDOPTICS SYSTEMS &bull; SECURE CONTAINER SCAN
+            </div>
           </div>
-
-          <p style="color: #9CA3AF; font-size: 12px; font-weight: 500;">
-            If you did not initiate this request, please ignore this email or contact support.
-          </p>
         </div>
-      </div>
-    </div>
+      </body>
+    </html>
   `;
 
   if (!brevoApiKey || brevoApiKey === "your-brevo-api-key-here" || brevoApiKey.startsWith("your-")) {

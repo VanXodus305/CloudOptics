@@ -740,10 +740,24 @@ export default function UtilizationChart({
                 <Tooltip
                   cursor={{ fill: "rgba(121, 44, 162, 0.05)" }}
                   contentStyle={{
+                    backgroundColor: "var(--tooltip-bg)",
+                    border: "1px solid var(--tooltip-border)",
                     borderRadius: "12px",
-                    border: "none",
                     boxShadow:
                       "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+                  }}
+                  itemStyle={{
+                    color: "var(--tooltip-item-color)",
+                    fontWeight: 600,
+                    fontSize: "11px",
+                  }}
+                  labelStyle={{
+                    color: "var(--tooltip-label-color)",
+                    fontWeight: 700,
+                    fontSize: "10px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    marginBottom: "4px",
                   }}
                 />
                 <Bar

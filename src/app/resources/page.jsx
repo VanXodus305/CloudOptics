@@ -380,6 +380,8 @@ export default function ResourcesPage() {
                     environment={selectedEnvironment}
                     costTrendsDaily={dashboardData?.costTrends?.daily || []}
                     costTrendsHourly={dashboardData?.costTrends?.hourly || []}
+                    costTrendsLive={dashboardData?.costTrends?.live || []}
+                    isLiveSimulation={isLiveSimulation}
                     resources={dashboardData?.resources || []}
                     isLoading={isDataLoading}
                   />

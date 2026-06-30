@@ -17,11 +17,19 @@ export default function TopCostChart({
   environment = "Production",
   costTrendsDaily = [],
   costTrendsHourly = [],
+  costTrendsLive = [],
+  isLiveSimulation = false,
   resources = [],
   isLoading = false,
 }) {
   const [timeFilterOpen, setTimeFilterOpen] = useState(false);
   const [timeFilter, setTimeFilter] = useState("Hourly");
+
+  useEffect(() => {
+    if (!isLiveSimulation && timeFilter === "Live") {
+      setTimeFilter("Hourly");
+    }
+  }, [isLiveSimulation, timeFilter]);
 
   const [resourceFilterOpen, setResourceFilterOpen] = useState(false);
   const [resourceFilter, setResourceFilter] = useState("All");
@@ -66,6 +74,42 @@ export default function TopCostChart({
   const getChartData = () => {
     if (timeFilter === "Select Time" || resourceFilter === "Select Resource")
       return [];
+
+    if (timeFilter === "Live") {
+      const filteredLive =
+        resourceFilter === "All"
+          ? costTrendsLive
+          : costTrendsLive.filter((t) => t.service === resourceFilter);
+
+      const liveMap = {};
+      filteredLive.forEach((t) => {
+        const d = new Date(t.timestamp);
+        const key = d.getTime();
+        const name = d.toLocaleTimeString("en-US", {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        if (!liveMap[key]) {
+          liveMap[key] = {
+            timestamp: t.timestamp,
+            name,
+            cost: 0,
+          };
+        }
+        liveMap[key].cost += t.cost;
+      });
+
+      const sortedLive = Object.entries(liveMap)
+        .sort((a, b) => Number(a[0]) - Number(b[0]))
+        .map((entry) => ({
+          name: entry[1].name,
+          cost: Math.round(entry[1].cost * 100) / 100,
+        }));
+
+      return sortedLive.slice(-15);
+    }
 
     // Filter trends by resource type
     const trendsToUse =
@@ -212,7 +256,9 @@ export default function TopCostChart({
   };
 
   const data = getChartData();
-  const timeOptions = ["Hourly", "Daily", "Weekly", "Monthly"];
+  const timeOptions = isLiveSimulation
+    ? ["Live", "Hourly", "Daily", "Weekly", "Monthly"]
+    : ["Hourly", "Daily", "Weekly", "Monthly"];
   const resourceOptions = ["All", "EC2", "S3", "RDS"];
 
   // Actual drilldown resources list

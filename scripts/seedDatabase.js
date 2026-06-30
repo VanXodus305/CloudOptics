@@ -73,23 +73,27 @@ function generateResourceMetrics(resource, timestamp = new Date()) {
   const anomalyType = resource.anomalyType || "none";
   
   const hour = timestamp.getHours();
-  // Diurnal curve peaking at 2 PM: ranges from 0.5 to 1.5
-  const diurnalFactor = 1.0 + 0.5 * Math.sin(((hour - 8) / 24) * 2 * Math.PI);
+  // Diurnal curve peaking at 2 PM: ranges from 0.75 to 1.25
+  const diurnalFactor = 1.0 + 0.25 * Math.sin(((hour - 8) / 24) * 2 * Math.PI);
 
   if (serviceType === "EC2") {
-    let cpu = faker.number.int({ min: 15, max: 65 });
-    let mem = faker.number.int({ min: 20, max: 70 });
-    
-    if (anomalyType === "idle") {
-      cpu = faker.number.int({ min: 1, max: 4 });
-      mem = faker.number.int({ min: 5, max: 20 });
-    } else if (anomalyType === "oversized") {
-      cpu = faker.number.int({ min: 4, max: 12 });
-      mem = faker.number.int({ min: 5, max: 17 });
-    } else {
-      cpu = Math.max(1, Math.min(100, Math.round(cpu * diurnalFactor)));
-      mem = Math.max(1, Math.min(100, Math.round(mem * (diurnalFactor * 0.4 + 0.6))));
+    const baseCpu = resource.baseCpu ?? 40;
+    const baseMemory = resource.baseMemory ?? 45;
+
+    // Add noise per hour: +/- 5%
+    const noiseCpu = faker.number.int({ min: -5, max: 5 });
+    const noiseMemory = faker.number.int({ min: -5, max: 5 });
+
+    let cpu = baseCpu + noiseCpu;
+    let mem = baseMemory + noiseMemory;
+
+    if (anomalyType === "none") {
+      cpu = Math.round(cpu * diurnalFactor);
+      mem = Math.round(mem * (diurnalFactor * 0.3 + 0.7));
     }
+
+    cpu = Math.max(1, Math.min(100, cpu));
+    mem = Math.max(1, Math.min(100, mem));
 
     return {
       cpuUtilization: cpu,
@@ -99,19 +103,22 @@ function generateResourceMetrics(resource, timestamp = new Date()) {
       writeOperations: Math.round(faker.number.int({ min: 50, max: 3000 }) * diurnalFactor),
     };
   } else if (serviceType === "RDS") {
-    let cpu = faker.number.int({ min: 20, max: 60 });
-    let mem = faker.number.int({ min: 25, max: 65 });
+    const baseCpu = resource.baseCpu ?? 35;
+    const baseMemory = resource.baseMemory ?? 40;
 
-    if (anomalyType === "idle") {
-      cpu = faker.number.int({ min: 1, max: 4 });
-      mem = faker.number.int({ min: 10, max: 30 });
-    } else if (anomalyType === "oversized") {
-      cpu = faker.number.int({ min: 4, max: 12 });
-      mem = faker.number.int({ min: 10, max: 18 });
-    } else {
-      cpu = Math.max(1, Math.min(100, Math.round(cpu * diurnalFactor)));
-      mem = Math.max(1, Math.min(100, Math.round(mem * (diurnalFactor * 0.4 + 0.6))));
+    const noiseCpu = faker.number.int({ min: -4, max: 4 });
+    const noiseMemory = faker.number.int({ min: -4, max: 4 });
+
+    let cpu = baseCpu + noiseCpu;
+    let mem = baseMemory + noiseMemory;
+
+    if (anomalyType === "none") {
+      cpu = Math.round(cpu * diurnalFactor);
+      mem = Math.round(mem * (diurnalFactor * 0.3 + 0.7));
     }
+
+    cpu = Math.max(1, Math.min(100, cpu));
+    mem = Math.max(1, Math.min(100, mem));
 
     return {
       cpuUtilization: cpu,
@@ -193,6 +200,9 @@ async function seedDatabase() {
         });
       }
 
+      const baseCpu = faker.number.int({ min: 12, max: 78 });
+      const baseMemory = faker.number.int({ min: 18, max: 84 });
+
       resources.push({
         resourceId,
         serviceType,
@@ -204,6 +214,8 @@ async function seedDatabase() {
         environment: faker.helpers.arrayElement(ENVIRONMENTS),
         department: faker.helpers.arrayElement(DEPARTMENTS),
         anomalyType: "none",
+        baseCpu,
+        baseMemory,
       });
     }
 
@@ -220,6 +232,9 @@ async function seedDatabase() {
           ? faker.helpers.arrayElement(EC2_INSTANCES)
           : faker.helpers.arrayElement(RDS_INSTANCES);
 
+      const baseCpu = faker.number.int({ min: 1, max: 3 });
+      const baseMemory = faker.number.int({ min: 4, max: 12 });
+
       resources.push({
         resourceId,
         serviceType,
@@ -235,12 +250,17 @@ async function seedDatabase() {
         environment: faker.helpers.arrayElement(ENVIRONMENTS),
         department: faker.helpers.arrayElement(DEPARTMENTS),
         anomalyType: "idle",
+        baseCpu,
+        baseMemory,
       });
     }
 
     // Create 3 oversized instances
     console.log("📝 Creating 3 oversized instances...");
     for (let i = 0; i < 3; i++) {
+      const baseCpu = faker.number.int({ min: 3, max: 8 });
+      const baseMemory = faker.number.int({ min: 5, max: 15 });
+
       resources.push({
         resourceId: generateEC2ResourceId(),
         serviceType: "EC2",
@@ -252,6 +272,8 @@ async function seedDatabase() {
         environment: faker.helpers.arrayElement(ENVIRONMENTS),
         department: faker.helpers.arrayElement(DEPARTMENTS),
         anomalyType: "oversized",
+        baseCpu,
+        baseMemory,
       });
     }
 

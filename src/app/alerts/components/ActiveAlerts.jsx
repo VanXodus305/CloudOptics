@@ -10,7 +10,7 @@ export default function ActiveAlerts() {
   const [selectedAlert, setSelectedAlert] = useState(null);
   const [activeTab, setActiveTab] = useState("Unresolved");
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [sortOption, setSortOption] = useState("Critical");
+  const [sortOption, setSortOption] = useState("All");
   const [isEnvOpen, setIsEnvOpen] = useState(false);
   const [envFilter, setEnvFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,7 +33,7 @@ export default function ActiveAlerts() {
   }, []);
 
   const tabs = ["Resolved", "In progress", "Unresolved"];
-  const sortOptions = ["Critical", "High", "Medium", "Low"];
+  const sortOptions = ["All", "Critical", "High", "Medium", "Low"];
   const uniqueEnvs = ["All", ...new Set(alerts.map(a => a.environment || "Unknown"))];
 
   const fetchAlerts = async () => {
@@ -153,35 +153,24 @@ export default function ActiveAlerts() {
             >
               <div className="flex justify-center pb-2">
                 <div className="flex items-center gap-2 bg-gray-50/80 dark:bg-white/5 p-1.5 rounded-xl border border-gray-100 dark:border-white/10 shadow-sm w-full xl:w-auto">
-                  <button
-                    onClick={() => updateAlertStatus(selectedAlert._id, "unresolved")}
-                    className={`flex-1 xl:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${selectedAlert.status === "unresolved" ? "bg-red-100 border border-red-200 shadow-sm" : "hover:bg-red-50 opacity-60 hover:opacity-100 grayscale hover:grayscale-0"
-                      }`}
-                    title="Mark Unresolved"
-                  >
-                    <FlagIcon className={`w-4 h-4 ${selectedAlert.status === "unresolved" ? "text-red-500" : "text-gray-400"}`} />
-                    <span className={`text-[10px] font-bold ${selectedAlert.status === "unresolved" ? "text-red-700" : "text-gray-500"}`}>Unresolved</span>
-                  </button>
-
-                  <button
-                    onClick={() => updateAlertStatus(selectedAlert._id, "in progress")}
-                    className={`flex-1 xl:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${selectedAlert.status === "in progress" ? "bg-yellow-100 dark:bg-yellow-500/20 border border-yellow-200 dark:border-yellow-500/30 shadow-sm" : "hover:bg-yellow-50 dark:hover:bg-white/5 opacity-60 hover:opacity-100 grayscale hover:grayscale-0"
-                      }`}
-                    title="Start Progress"
-                  >
-                    <FlagIcon className={`w-4 h-4 ${selectedAlert.status === "in progress" ? "text-yellow-500" : "text-gray-400"}`} />
-                    <span className={`text-[10px] font-bold ${selectedAlert.status === "in progress" ? "text-yellow-700" : "text-gray-500"}`}>In Progress</span>
-                  </button>
-
-                  <button
-                    onClick={() => updateAlertStatus(selectedAlert._id, "resolved")}
-                    className={`flex-1 xl:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${selectedAlert.status === "resolved" ? "bg-green-100 dark:bg-green-500/20 border border-green-200 dark:border-green-500/30 shadow-sm" : "hover:bg-green-50 dark:hover:bg-white/5 opacity-60 hover:opacity-100 grayscale hover:grayscale-0"
-                      }`}
-                    title="Mark Resolved"
-                  >
-                    <FlagIcon className={`w-4 h-4 ${selectedAlert.status === "resolved" ? "text-green-500" : "text-gray-400"}`} />
-                    <span className={`text-[10px] font-bold ${selectedAlert.status === "resolved" ? "text-green-700" : "text-gray-500"}`}>Resolved</span>
-                  </button>
+                  {selectedAlert.status === "unresolved" && (
+                    <div className="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-red-105 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 rounded-lg w-full">
+                      <FlagIcon className="w-4 h-4 text-red-500" />
+                      <span className="text-[11px] font-extrabold text-red-700 dark:text-red-400 uppercase tracking-wider">Unresolved</span>
+                    </div>
+                  )}
+                  {selectedAlert.status === "in progress" && (
+                    <div className="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-yellow-105 dark:bg-yellow-500/20 border border-yellow-200 dark:border-yellow-500/30 rounded-lg w-full">
+                      <FlagIcon className="w-4 h-4 text-yellow-500" />
+                      <span className="text-[11px] font-extrabold text-yellow-700 dark:text-yellow-400 uppercase tracking-wider">In Progress</span>
+                    </div>
+                  )}
+                  {selectedAlert.status === "resolved" && (
+                    <div className="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-green-100 dark:bg-green-500/20 border border-green-200 dark:border-green-500/30 rounded-lg w-full">
+                      <FlagIcon className="w-4 h-4 text-green-500" />
+                      <span className="text-[11px] font-extrabold text-green-700 dark:text-green-400 uppercase tracking-wider">Resolved</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -350,18 +339,22 @@ export default function ActiveAlerts() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setIsEnvOpen(!isEnvOpen)}
-                  className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 px-2.5 py-1 rounded-lg text-[11px] font-semibold shadow-sm flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-white/5 whitespace-nowrap"
+                  className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 px-2.5 py-1 rounded-lg text-[11px] font-bold shadow-sm flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-white/5 whitespace-nowrap"
                 >
                   {envFilter}
                   <ChevronDownIcon className="w-3.5 h-3.5" />
                 </motion.button>
                 {isEnvOpen && (
-                  <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-[#111844] rounded-lg shadow-xl border border-gray-100 dark:border-white/10 py-1 overflow-hidden z-30">
+                  <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-[#0F122B] rounded-lg shadow-xl border border-gray-200 dark:border-white/10 py-1 overflow-hidden z-30 backdrop-blur-xl">
                     {uniqueEnvs.map(env => (
                       <button
                         key={env}
                         onClick={() => { setEnvFilter(env); setIsEnvOpen(false); }}
-                        className={`block w-full text-left px-3 py-1.5 text-xs font-medium hover:bg-[#792CA2]/10 hover:text-[#792CA2] ${envFilter === env ? "bg-[#792CA2]/5 text-[#792CA2] dark:bg-[#792CA2]/20 dark:text-white" : "text-gray-600 dark:text-gray-400"}`}
+                        className={`block w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-[#792CA2]/10 hover:text-[#792CA2] dark:hover:bg-[#C084FC]/15 dark:hover:text-[#C084FC] transition-colors ${
+                          envFilter === env
+                            ? "bg-[#792CA2]/5 text-[#792CA2] dark:bg-[#C084FC]/20 dark:text-white font-bold"
+                            : "text-gray-750 dark:text-slate-300"
+                        }`}
                       >
                         {env}
                       </button>
@@ -374,18 +367,22 @@ export default function ActiveAlerts() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 px-2.5 py-1 rounded-lg text-[11px] font-semibold shadow-sm flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-white/5 whitespace-nowrap"
+                  className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 px-2.5 py-1 rounded-lg text-[11px] font-bold shadow-sm flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-white/5 whitespace-nowrap"
                 >
                   {sortOption}
                   <ChevronDownIcon className="w-3.5 h-3.5" />
                 </motion.button>
                 {isSortOpen && (
-                  <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-[#111844] rounded-lg shadow-xl border border-gray-100 dark:border-white/10 py-1 overflow-hidden z-30">
+                  <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-[#0F122B] rounded-lg shadow-xl border border-gray-200 dark:border-white/10 py-1 overflow-hidden z-30 backdrop-blur-xl">
                     {sortOptions.map(opt => (
                       <button
                         key={opt}
                         onClick={() => { setSortOption(opt); setIsSortOpen(false); }}
-                        className={`block w-full text-left px-3 py-1.5 text-xs font-medium hover:bg-[#792CA2]/10 hover:text-[#792CA2] ${sortOption === opt ? "bg-[#792CA2]/5 text-[#792CA2] dark:bg-[#792CA2]/20 dark:text-white" : "text-gray-600 dark:text-gray-400"}`}
+                        className={`block w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-[#792CA2]/10 hover:text-[#792CA2] dark:hover:bg-[#C084FC]/15 dark:hover:text-[#C084FC] transition-colors ${
+                          sortOption === opt
+                            ? "bg-[#792CA2]/5 text-[#792CA2] dark:bg-[#C084FC]/20 dark:text-white font-bold"
+                            : "text-gray-755 dark:text-slate-300"
+                        }`}
                       >
                         {opt}
                       </button>
@@ -477,37 +474,27 @@ export default function ActiveAlerts() {
                           className="md:hidden w-full mt-4 pt-4 border-t border-gray-100 flex flex-col gap-4 text-left cursor-default overflow-hidden"
                         >
                           <div className="flex justify-center pb-2">
-                            <div className="flex items-center justify-between bg-gray-50/80 dark:bg-white/5 p-1.5 rounded-xl border border-gray-100 dark:border-white/10 shadow-sm w-full">
-                              <button
-                                onClick={() => updateAlertStatus(alert._id, "unresolved")}
-                                className={`flex items-center justify-center flex-1 py-1.5 rounded-lg transition-all ${alert.status === "unresolved" ? "bg-red-100 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 shadow-sm" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0 hover:bg-red-50 dark:hover:bg-white/5"
-                                  }`}
-                                title="Mark Unresolved"
-                              >
-                                <FlagIcon className={`w-4 h-4 ${alert.status === "unresolved" ? "text-red-500" : "text-gray-400"}`} />
-                              </button>
-
-                              <button
-                                onClick={() => updateAlertStatus(alert._id, "in progress")}
-                                className={`flex items-center justify-center flex-1 mx-1.5 py-1.5 rounded-lg transition-all ${alert.status === "in progress" ? "bg-yellow-100 dark:bg-yellow-500/20 border border-yellow-200 dark:border-yellow-500/30 shadow-sm" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0 hover:bg-yellow-50 dark:hover:bg-white/5"
-                                  }`}
-                                title="Start Progress"
-                              >
-                                <FlagIcon className={`w-4 h-4 ${alert.status === "in progress" ? "text-yellow-500" : "text-gray-400"}`} />
-                              </button>
-
-                              <button
-                                onClick={() => updateAlertStatus(alert._id, "resolved")}
-                                className={`flex items-center justify-center flex-1 py-1.5 rounded-lg transition-all ${alert.status === "resolved" ? "bg-green-100 dark:bg-green-500/20 border border-green-200 dark:border-green-500/30 shadow-sm" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0 hover:bg-green-50 dark:hover:bg-white/5"
-                                  }`}
-                                title="Mark Resolved"
-                              >
-                                <FlagIcon className={`w-4 h-4 ${alert.status === "resolved" ? "text-green-500" : "text-gray-400"}`} />
-                              </button>
+                            <div className="flex items-center gap-2 bg-gray-50/80 dark:bg-white/5 p-1.5 rounded-xl border border-gray-100 dark:border-white/10 shadow-sm w-full">
+                              {alert.status === "unresolved" && (
+                                <div className="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-red-100 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 rounded-lg w-full">
+                                  <FlagIcon className="w-4 h-4 text-red-500" />
+                                  <span className="text-[11px] font-extrabold text-red-700 dark:text-red-400 uppercase tracking-wider">Unresolved</span>
+                                </div>
+                              )}
+                              {alert.status === "in progress" && (
+                                <div className="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-yellow-100 dark:bg-yellow-500/20 border border-yellow-200 dark:border-yellow-500/30 rounded-lg w-full">
+                                  <FlagIcon className="w-4 h-4 text-yellow-500" />
+                                  <span className="text-[11px] font-extrabold text-yellow-700 dark:text-yellow-400 uppercase tracking-wider">In Progress</span>
+                                </div>
+                              )}
+                              {alert.status === "resolved" && (
+                                <div className="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-green-100 dark:bg-green-500/20 border border-green-200 dark:border-green-500/30 rounded-lg w-full">
+                                  <FlagIcon className="w-4 h-4 text-green-500" />
+                                  <span className="text-[11px] font-extrabold text-green-700 dark:text-green-400 uppercase tracking-wider">Resolved</span>
+                                </div>
+                              )}
                             </div>
                           </div>
-
-
 
                           <div className="flex flex-wrap gap-2 text-[10px] font-semibold text-gray-500 dark:text-gray-400">
                             <span className="bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-md border border-gray-200/40 dark:border-white/10 flex items-center gap-1">

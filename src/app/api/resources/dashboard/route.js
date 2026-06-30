@@ -47,7 +47,16 @@ export async function GET(request) {
     thirtyDaysBeforeLatest.setDate(thirtyDaysBeforeLatest.getDate() - 30);
 
     // 2. Fetch metric aggregates for utilization and resources
-    const [utilizationStats, costTrendsDaily, costTrendsHourly] = await Promise.all([
+    // Get the 20 most recent unique timestamps from the database
+    const recentTimestamps = await Metric.aggregate([
+      { $match: { resourceId: { $in: resourceIds } } },
+      { $group: { _id: "$timestamp" } },
+      { $sort: { _id: -1 } },
+      { $limit: 20 }
+    ]);
+    const timestampList = recentTimestamps.map((t) => t._id);
+
+    const [utilizationStats, costTrendsDaily, costTrendsHourly, costTrendsLive] = await Promise.all([
       Metric.aggregate([
         {
           $match: {
@@ -145,6 +154,41 @@ export async function GET(request) {
           },
         },
       ]),
+      Metric.aggregate([
+        {
+          $match: {
+            resourceId: { $in: resourceIds },
+            timestamp: { $in: timestampList },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              timestamp: "$timestamp",
+              service: {
+                $cond: [
+                  { $in: ["$resourceId", ec2Ids] }, "EC2",
+                  { $cond: [{ $in: ["$resourceId", s3Ids] }, "S3", "RDS"] }
+                ]
+              }
+            },
+            cost: { $sum: "$costIncurred" },
+            readOps: { $sum: "$readOperations" },
+            writeOps: { $sum: "$writeOperations" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            timestamp: "$_id.timestamp",
+            service: "$_id.service",
+            cost: 1,
+            readOps: 1,
+            writeOps: 1,
+          },
+        },
+        { $sort: { timestamp: 1 } },
+      ]),
     ]);
 
     // Format utilization details map
@@ -197,6 +241,7 @@ export async function GET(request) {
       costTrends: {
         daily: costTrendsDaily,
         hourly: costTrendsHourly,
+        live: costTrendsLive,
       },
       serviceCounts,
     });
