@@ -13,6 +13,7 @@ export default function ActiveAlerts() {
   const [sortOption, setSortOption] = useState("Critical");
   const [isEnvOpen, setIsEnvOpen] = useState(false);
   const [envFilter, setEnvFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const sortRef = useRef(null);
   const envRef = useRef(null);
 
@@ -63,11 +64,18 @@ export default function ActiveAlerts() {
       "In progress": "in progress",
       "Unresolved": "unresolved"
     };
-    const currentFiltered = alerts.filter(alert => alert.status === tabStatusMap[activeTab]);
+    const baseAlerts = searchQuery ? alerts : alerts.filter(alert => alert.status === tabStatusMap[activeTab]);
     const severityOrder = { "Critical": 0, "High": 1, "Medium": 2, "Low": 3 };
-    const currentSorted = currentFiltered
-      .filter(a => sortOption === "All" || a.severity === sortOption)
-      .filter(a => envFilter === "All" || a.environment === envFilter)
+    const currentSorted = [...baseAlerts]
+      .filter(a => searchQuery ? true : (sortOption === "All" || a.severity === sortOption))
+      .filter(a => searchQuery ? true : (envFilter === "All" || a.environment === envFilter))
+      .filter(a => {
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return a.message?.toLowerCase().includes(q) || 
+               a.resourceId?.toLowerCase().includes(q) || 
+               a.type?.toLowerCase().includes(q);
+      })
       .sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
 
     if (currentSorted.length > 0) {
@@ -78,7 +86,7 @@ export default function ActiveAlerts() {
     } else {
       setSelectedAlert(null);
     }
-  }, [activeTab, sortOption, envFilter, alerts, isLoading]);
+  }, [activeTab, sortOption, envFilter, searchQuery, alerts, isLoading]);
 
   const updateAlertStatus = async (alertId, newStatus) => {
     try {
@@ -106,12 +114,19 @@ export default function ActiveAlerts() {
     "Unresolved": "unresolved"
   };
 
-  const filteredAlerts = alerts.filter(alert => alert.status === tabStatusMap[activeTab]);
+  const baseAlerts = searchQuery ? alerts : alerts.filter(alert => alert.status === tabStatusMap[activeTab]);
 
   const severityOrder = { "Critical": 0, "High": 1, "Medium": 2, "Low": 3 };
-  const sortedAlerts = [...filteredAlerts]
-    .filter(a => sortOption === "All" || a.severity === sortOption)
-    .filter(a => envFilter === "All" || a.environment === envFilter)
+  const sortedAlerts = [...baseAlerts]
+    .filter(a => searchQuery ? true : (sortOption === "All" || a.severity === sortOption))
+    .filter(a => searchQuery ? true : (envFilter === "All" || a.environment === envFilter))
+    .filter(a => {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return a.message?.toLowerCase().includes(q) || 
+             a.resourceId?.toLowerCase().includes(q) || 
+             a.type?.toLowerCase().includes(q);
+    })
     .sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
 
   return (
@@ -271,6 +286,31 @@ export default function ActiveAlerts() {
 
         {/* Right Side: List and Filters */}
         <div className="order-1 md:order-2 flex-grow flex-1 flex flex-col pt-4 md:pt-0">
+          <div className="mb-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search alerts by message, resource ID, or type..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white dark:bg-[#111844]/50 border border-gray-200 dark:border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#792CA2]/50 transition-shadow"
+              />
+              {searchQuery ? (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              ) : (
+                <svg className="w-4 h-4 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              )}
+            </div>
+          </div>
           <div className="flex flex-col lg:flex-row justify-between items-center gap-4 mb-4">
             <div className="flex gap-1.5 bg-gray-100/50 dark:bg-white/5 p-1 rounded-xl w-fit flex-nowrap whitespace-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {tabs.map((tab) => {
@@ -401,7 +441,14 @@ export default function ActiveAlerts() {
                   >
                     <div className="flex flex-col gap-1.5 w-full">
                       <div className="flex items-start justify-between w-full">
-                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-[#792CA2] dark:group-hover:text-white transition-colors line-clamp-1">{alert.message}</span>
+                        <div className="flex items-center gap-2">
+                          <FlagIcon className={`w-4 h-4 flex-shrink-0 ${
+                            alert.status === 'unresolved' ? 'text-red-500' : 
+                            alert.status === 'in progress' ? 'text-yellow-500' : 
+                            'text-green-500'
+                          }`} />
+                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-[#792CA2] dark:group-hover:text-white transition-colors line-clamp-1">{alert.message}</span>
+                        </div>
                         <ChevronDownIcon className={`w-4 h-4 text-gray-300 dark:text-gray-500 transition-transform flex-shrink-0 mt-0.5 ${selectedAlert?._id === alert._id ? 'rotate-0 text-[#792CA2] dark:text-[#9A4DCC]' : '-rotate-90 group-hover:translate-x-1'
                           }`} />
                       </div>
