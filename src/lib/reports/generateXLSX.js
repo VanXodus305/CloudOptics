@@ -94,19 +94,72 @@ function addBrandedTitle(sheet, title, subtitle, colCount) {
   return 4; // next data starts at row 4
 }
 
-export async function generateXLSX({
-  summaryData,
-  kpiTrends,
-  donutData,
-  donutFilter,
-  resourcesData,
-  formattedAlerts,
-  currentChartData,
-  chartTimeframe,
-  trendsData,
-}) {
+export async function generateXLSX() {
   const ExcelJS = (await import("exceljs")).default;
   const { saveAs } = await import("file-saver");
+
+  // ── Fetch all data from APIs ────────────────────────────────────────────────
+  let summaryData = null, trendsData = [], donutData = [], resourcesData = [], formattedAlerts = [], recommendations = [];
+  const donutFilter = "All";
+
+  try {
+    const [summaryRes, trendsRes, servicesRes, resourcesRes, alertsRes, recsRes] = await Promise.allSettled([
+      fetch("/api/dashboard/summary"),
+      fetch("/api/dashboard/trends"),
+      fetch("/api/dashboard/services"),
+      fetch("/api/resources"),
+      fetch("/api/optimization/alerts"),
+      fetch("/api/recommendations"),
+    ]);
+
+    if (summaryRes.status === "fulfilled" && summaryRes.value.ok) {
+      summaryData = await summaryRes.value.json();
+    }
+    if (trendsRes.status === "fulfilled" && trendsRes.value.ok) {
+      trendsData = await trendsRes.value.json();
+    }
+    if (servicesRes.status === "fulfilled" && servicesRes.value.ok) {
+      const servicesJson = await servicesRes.value.json();
+      const totalServiceCost = (servicesJson || []).reduce((sum, s) => sum + (s.value || 0), 0);
+      donutData = (servicesJson || []).map((s, i) => ({
+        name: s.service || s._id || `Service ${i + 1}`,
+        value: totalServiceCost > 0 ? Math.round((s.value / totalServiceCost) * 1000) / 10 : 0,
+        rawCost: s.value || 0,
+      }));
+    }
+    if (resourcesRes.status === "fulfilled" && resourcesRes.value.ok) {
+      resourcesData = await resourcesRes.value.json();
+    }
+    if (alertsRes.status === "fulfilled" && alertsRes.value.ok) {
+      const alertsJson = await alertsRes.value.json();
+      formattedAlerts = Array.isArray(alertsJson) ? alertsJson : (alertsJson.alerts || []);
+    }
+    if (recsRes.status === "fulfilled" && recsRes.value.ok) {
+      const recsJson = await recsRes.value.json();
+      recommendations = recsJson.recommendations || [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch report data:", err);
+  }
+
+  // ── Compute KPI trends from trends data ─────────────────────────────────────
+  const calcTrend = (key) => {
+    if (!trendsData || trendsData.length < 14) return { trend: "—", label: "vs last week" };
+    const week4 = trendsData.slice(-7).reduce((s, t) => s + (t[key] || 0), 0);
+    const week3 = trendsData.slice(-14, -7).reduce((s, t) => s + (t[key] || 0), 0);
+    if (week3 === 0) return { trend: "0.0%", label: "vs last week" };
+    const pct = ((week4 - week3) / week3) * 100;
+    return { trend: `${pct > 0 ? "+" : ""}${pct.toFixed(1)}%`, label: "vs last week" };
+  };
+  const kpiTrends = {
+    totalSpend:   calcTrend("spend"),
+    computeSpend: calcTrend("computeSpend"),
+    storageSpend: calcTrend("storageSpend"),
+    totalSavings: {
+      trend: summaryData?.totalSpend > 0 ? `${((summaryData.totalSavings / summaryData.totalSpend) * 100).toFixed(1)}%` : "0.0%",
+      label: "of spend"
+    },
+  };
 
   const wb = new ExcelJS.Workbook();
   wb.creator  = "CloudOptics";
@@ -116,7 +169,8 @@ export async function generateXLSX({
 
   const now     = new Date();
   const dateStr = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-  const subtitle = `Environment: ${donutFilter || "All"}   ·   Generated: ${dateStr}   ·   CloudOptics Cloud Cost Intelligence`;
+  const subtitle = `Environment: All   ·   Generated: ${dateStr}   ·   CloudOptics Cloud Cost Intelligence`;
+
 
   // ─────────────────────────────────────────────────────────────────────────────
   // SHEET 1 — KPI SUMMARY
@@ -256,7 +310,7 @@ export async function generateXLSX({
     { key: "cost",   width: 20 },
   ];
 
-  startRow = addBrandedTitle(s3, `Cost Trends (${chartTimeframe})`, subtitle, 2);
+  startRow = addBrandedTitle(s3, "Cost Trends (Monthly)", subtitle, 2);
 
   const hRow3 = s3.getRow(startRow++);
   ["Period", "Total Cost (USD)"].forEach((h, i) => {
@@ -266,8 +320,12 @@ export async function generateXLSX({
   });
   hRow3.height = 20;
 
-  // Write current chart timeframe data
-  (currentChartData || []).forEach((item, idx) => {
+  // Write last 30 days of trend data from trendsData
+  const monthlyChartData = (trendsData || []).slice(-30).map((t, i, arr) => ({
+    label: t.date ? new Date(t.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : `Day ${i + 1}`,
+    value: t.spend || 0,
+  }));
+  monthlyChartData.forEach((item, idx) => {
     const row = s3.getRow(startRow++);
     row.height = 20;
     const c0 = row.getCell(1);
@@ -408,7 +466,14 @@ export async function generateXLSX({
     const row = s5.getRow(startRow++);
     row.height = 20;
 
-    const values = [a.title, a.severity, a.category, a.status, a.desc];
+    const values = [
+      `${a.type || "—"} — ${a.resourceId || "—"}`,
+      a.severity || "—",
+      a.type || "—",
+      a.status || "unresolved",
+      a.message || "—",
+    ];
+
     values.forEach((val, i) => {
       const cell = row.getCell(i + 1);
       cell.value = val;
@@ -423,6 +488,81 @@ export async function generateXLSX({
       }
     });
   });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SHEET 6 — RECOMMENDATIONS
+  // ─────────────────────────────────────────────────────────────────────────────
+  if (recommendations.length > 0) {
+    const s6 = wb.addWorksheet("Recommendations", { properties: { tabColor: { argb: "FF792CA2" } } });
+    s6.views = [{ state: "frozen", ySplit: 4 }];
+    s6.columns = [
+      { key: "title",            width: 32 },
+      { key: "service",          width: 14 },
+      { key: "category",         width: 16 },
+      { key: "impact",           width: 14 },
+      { key: "potentialSavings", width: 20 },
+      { key: "resourceId",       width: 20 },
+      { key: "description",      width: 55 },
+    ];
+
+    startRow = addBrandedTitle(s6, "AI Cost Optimization Recommendations", subtitle, 7);
+
+    const hRow6 = s6.getRow(startRow++);
+    ["Recommendation", "Service", "Category", "Impact", "Monthly Savings (USD)", "Resource ID", "Description / Steps"].forEach((h, i) => {
+      const cell = hRow6.getCell(i + 1);
+      cell.value = h;
+      setStyle(cell, subHeaderStyle());
+    });
+    hRow6.height = 20;
+
+    const impactFills = {
+      High:   "FFFEE2E2",
+      Medium: "FFFFF7ED",
+      Low:    "FFF0FDF4",
+    };
+    const impactColors = {
+      High:   "FFDC2626",
+      Medium: "FFEA580C",
+      Low:    "FF16A34A",
+    };
+
+    recommendations.forEach((r, idx) => {
+      const row = s6.getRow(startRow++);
+      row.height = 20;
+
+      const values = [
+        r.title || "—",
+        r.service || "—",
+        r.category || "—",
+        r.impact || "—",
+        r.potentialSavings ?? 0,
+        r.resourceId || "—",
+        r.description || r.actionableSteps || "—"
+      ];
+
+      values.forEach((val, i) => {
+        const cell = row.getCell(i + 1);
+        if (i === 4) {
+          cell.value = val;
+          cell.numFmt = '"$"#,##0.00';
+          cell.alignment = { horizontal: "right" };
+          cell.font = { bold: true, size: 9 };
+        } else {
+          cell.value = val;
+          cell.font = { size: 9, bold: i === 0 };
+          cell.alignment = { vertical: "middle", wrapText: i === 6 };
+        }
+        
+        if (idx % 2 === 0) cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF9F5FF" } };
+
+        if (i === 3 && impactColors[val]) {
+          cell.font = { bold: true, size: 9, color: { argb: impactColors[val] } };
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: impactFills[val] } };
+          cell.alignment = { horizontal: "center" };
+        }
+      });
+    });
+  }
 
   // ─────────────────────────────────────────────────────────────────────────────
   // WRITE FILE

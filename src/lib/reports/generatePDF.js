@@ -67,16 +67,7 @@ function sectionTitle(doc, text, y) {
   return y + 16;
 }
 
-export async function generatePDF({
-  summaryData,
-  kpiTrends,
-  donutData,
-  donutFilter,
-  resourcesData,
-  formattedAlerts,
-  currentChartData,
-  chartTimeframe,
-}) {
+export async function generatePDF() {
   const { default: jsPDF }        = await import("jspdf");
   const { default: autoTable }    = await import("jspdf-autotable");
 
@@ -86,7 +77,73 @@ export async function generatePDF({
   const now        = new Date();
   const dateStr    = now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
   const timeStr    = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-  const TOTAL_PAGES = 5; // will be patched below
+
+  // ── Fetch all data from APIs ─────────────────────────────────────────────────
+  let summaryData = null, trendsData = [], donutData = [], resourcesData = [], formattedAlerts = [], recommendations = [];
+  const donutFilter = "All";
+
+  try {
+    const [summaryRes, trendsRes, servicesRes, resourcesRes, alertsRes, recsRes] = await Promise.allSettled([
+      fetch("/api/dashboard/summary"),
+      fetch("/api/dashboard/trends"),
+      fetch("/api/dashboard/services"),
+      fetch("/api/resources"),
+      fetch("/api/optimization/alerts"),
+      fetch("/api/recommendations"),
+    ]);
+
+    if (summaryRes.status === "fulfilled" && summaryRes.value.ok) {
+      summaryData = await summaryRes.value.json();
+    }
+    if (trendsRes.status === "fulfilled" && trendsRes.value.ok) {
+      trendsData = await trendsRes.value.json();
+    }
+    if (servicesRes.status === "fulfilled" && servicesRes.value.ok) {
+      const servicesJson = await servicesRes.value.json();
+      const totalServiceCost = (servicesJson || []).reduce((sum, s) => sum + (s.value || 0), 0);
+      donutData = (servicesJson || []).map((s, i) => ({
+        name: s.service || s._id || `Service ${i + 1}`,
+        value: totalServiceCost > 0 ? Math.round((s.value / totalServiceCost) * 1000) / 10 : 0,
+        rawCost: s.value || 0,
+        colorHex: ["792CA2", "9A4DCC", "C084FC", "6B21A8", "A855F7"][i % 5],
+      }));
+    }
+    if (resourcesRes.status === "fulfilled" && resourcesRes.value.ok) {
+      resourcesData = await resourcesRes.value.json();
+    }
+    if (alertsRes.status === "fulfilled" && alertsRes.value.ok) {
+      const alertsJson = await alertsRes.value.json();
+      formattedAlerts = Array.isArray(alertsJson) ? alertsJson : (alertsJson.alerts || []);
+    }
+    if (recsRes.status === "fulfilled" && recsRes.value.ok) {
+      const recsJson = await recsRes.value.json();
+      recommendations = recsJson.recommendations || [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch report data:", err);
+  }
+
+  // ── Compute KPI trends from trends data ──────────────────────────────────────
+  const calcTrend = (key) => {
+    if (!trendsData || trendsData.length < 14) return { trend: "—", label: "vs last week" };
+    const week4 = trendsData.slice(-7).reduce((s, t) => s + (t[key] || 0), 0);
+    const week3 = trendsData.slice(-14, -7).reduce((s, t) => s + (t[key] || 0), 0);
+    if (week3 === 0) return { trend: "0.0%", label: "vs last week" };
+    const pct = ((week4 - week3) / week3) * 100;
+    return { trend: `${pct > 0 ? "+" : ""}${pct.toFixed(1)}%`, label: "vs last week" };
+  };
+  const kpiTrends = {
+    totalSpend:   calcTrend("spend"),
+    computeSpend: calcTrend("computeSpend"),
+    storageSpend: calcTrend("storageSpend"),
+    totalSavings: {
+      trend: summaryData?.totalSpend > 0 ? `${((summaryData.totalSavings / summaryData.totalSpend) * 100).toFixed(1)}%` : "0.0%",
+      label: "of spend"
+    },
+  };
+
+  const TOTAL_PAGES = recommendations.length > 0 ? 6 : 5;
+
 
   // ── PAGE 1: COVER ───────────────────────────────────────────────────────────
   // Full purple cover background
@@ -293,11 +350,11 @@ export async function generatePDF({
   y = sectionTitle(doc, "Optimization Alerts", y);
 
   const alertRows = (formattedAlerts || []).slice(0, 40).map((a) => [
-    a.title || "—",
+    `${a.type || "—"} — ${a.resourceId || "—"}`,
     a.severity || "—",
-    a.category || "—",
-    a.status || "Active",
-    a.desc || "—",
+    a.type || "—",
+    a.status || "unresolved",
+    a.message || "—",
   ]);
 
   const severityColor = (s) => {
@@ -329,6 +386,54 @@ export async function generatePDF({
       }
     },
   });
+
+  // ── PAGE 6: RECOMMENDATIONS ──────────────────────────────────────────────────
+  if (recommendations.length > 0) {
+    doc.addPage();
+    drawPageFrame(doc, 6, TOTAL_PAGES, "Optimization Recommendations");
+
+    y = 42;
+    y = sectionTitle(doc, "Cost Optimization Recommendations", y);
+
+    const recommendationRows = recommendations.map((r) => [
+      r.title || "—",
+      r.category || "—",
+      r.impact || "—",
+      `$${(r.potentialSavings ?? 0).toFixed(2)}`,
+      r.resourceId || "—",
+      r.description || "—",
+    ]);
+
+    const impactColor = (i) => {
+      if (i === "High") return [220, 38, 38];
+      if (i === "Medium") return [202, 138, 4];
+      return [22, 163, 74];
+    };
+
+    autoTable(doc, {
+      startY: y,
+      head: [["Recommendation", "Category", "Impact", "Savings/mo", "Resource ID", "Description"]],
+      body: recommendationRows,
+      margin: { left: 14, right: 14 },
+      styles: { fontSize: 7.5, cellPadding: 3, overflow: "linebreak" },
+      headStyles: { fillColor: BRAND_PURPLE, textColor: WHITE, fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [248, 244, 255] },
+      columnStyles: {
+        0: { fontStyle: "bold", textColor: DARK_NAVY, cellWidth: 35 },
+        1: { cellWidth: 20 },
+        2: { halign: "center", cellWidth: 16 },
+        3: { halign: "right", cellWidth: 22 },
+        4: { cellWidth: 32 },
+        5: { cellWidth: "auto" },
+      },
+      didParseCell(data) {
+        if (data.section === "body" && data.column.index === 2) {
+          data.cell.styles.textColor = impactColor(data.cell.text[0]);
+          data.cell.styles.fontStyle = "bold";
+        }
+      },
+    });
+  }
 
   // Save
   const filename = `CloudOptics_Report_${now.toISOString().slice(0, 10)}.pdf`;

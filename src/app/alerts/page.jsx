@@ -11,6 +11,8 @@ import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
 import RestrictedOverlay from "../components/common/RestrictedOverlay";
+import { generatePDF } from "../../lib/reports/generatePDF";
+import { generateXLSX } from "../../lib/reports/generateXLSX";
 
 // Alerts Components
 import ActiveAlerts from "./components/ActiveAlerts";
@@ -80,6 +82,9 @@ export default function AlertsPage() {
     }, 1500);
   };
 
+  const handleDownloadPDF = async () => { await generatePDF(); };
+  const handleDownloadXLSX = async () => { await generateXLSX(); };
+
   if (status === "loading" || (status === "unauthenticated" && !isSigningOut)) {
     return (
       <div className="min-h-screen bg-[#F9F7F7] dark:bg-[#080A1A] flex items-center justify-center">
@@ -132,6 +137,8 @@ export default function AlertsPage() {
         handleSignOut={handleSignOut}
         profileRef={profileRef}
         session={session}
+        onDownloadPDF={handleDownloadPDF}
+        onDownloadXLSX={handleDownloadXLSX}
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">

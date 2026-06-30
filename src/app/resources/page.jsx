@@ -11,6 +11,8 @@ import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
 import RestrictedOverlay from "../components/common/RestrictedOverlay";
+import { generatePDF } from "../../lib/reports/generatePDF";
+import { generateXLSX } from "../../lib/reports/generateXLSX";
 
 // Resources Components
 import MostlyUsedChart from "./components/MostlyUsedChart";
@@ -258,6 +260,8 @@ export default function ResourcesPage() {
         handleSignOut={handleSignOut}
         profileRef={profileRef}
         session={session}
+        onDownloadPDF={async () => generatePDF()}
+        onDownloadXLSX={async () => generateXLSX()}
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">

@@ -85,30 +85,11 @@ export default function DashboardPage() {
   };
 
   const handleDownloadPDF = async () => {
-    await generatePDF({
-      summaryData,
-      kpiTrends,
-      donutData,
-      donutFilter,
-      resourcesData,
-      formattedAlerts,
-      currentChartData,
-      chartTimeframe,
-    });
+    await generatePDF();
   };
 
   const handleDownloadXLSX = async () => {
-    await generateXLSX({
-      summaryData,
-      kpiTrends,
-      donutData,
-      donutFilter,
-      resourcesData,
-      formattedAlerts,
-      currentChartData,
-      chartTimeframe,
-      trendsData,
-    });
+    await generateXLSX();
   };
 
   // Cost Timeframes & Donut Resource filter state

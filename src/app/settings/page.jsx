@@ -9,6 +9,8 @@ import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import Footer from "../landing/components/Footer";
+import { generatePDF } from "../../lib/reports/generatePDF";
+import { generateXLSX } from "../../lib/reports/generateXLSX";
 
 // Settings Components
 import AdminAccountDetails from "./components/AdminAccountDetails";
@@ -133,6 +135,8 @@ export default function SettingsPage() {
         handleSignOut={handleSignOut}
         profileRef={profileRef}
         session={session}
+        onDownloadPDF={async () => generatePDF()}
+        onDownloadXLSX={async () => generateXLSX()}
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">
