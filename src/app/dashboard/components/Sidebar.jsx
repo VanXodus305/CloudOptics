@@ -24,7 +24,9 @@ export default function Sidebar({
   setIsAlertsModalOpen,
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [isNavigatingTo, setIsNavigatingTo] = useState(null);
   const router = useRouter();

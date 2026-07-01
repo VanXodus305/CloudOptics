@@ -432,7 +432,7 @@ export default function HeroSection() {
       items-center
       px-8
       pt-28
-      pb-36
+      pb-48
       md:pt-7
       md:pb-36
       relative

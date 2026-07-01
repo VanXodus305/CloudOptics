@@ -25,7 +25,8 @@ export default function Home() {
         className="
           relative
           z-10
-          -mt-20
+          -mt-12
+          md:-mt-20
           "
       >
         <ScrollReveal>
@@ -42,7 +43,8 @@ export default function Home() {
         className="
           relative
           z-20
-          -mt-20
+          mt-0
+          md:-mt-20
           "
       >
         <ScrollReveal>

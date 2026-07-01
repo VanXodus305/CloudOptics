@@ -93,7 +93,7 @@ export default function DashboardPage() {
   };
 
   // Cost Timeframes & Donut Resource filter state
-  const [chartTimeframe, setChartTimeframe] = useState("Monthly");
+  const [chartTimeframe, setChartTimeframe] = useState("Daily");
   const [hoveredBar, setHoveredBar] = useState(null);
   const [donutFilter, setDonutFilter] = useState("All");
   const [donutHoveredSegment, setDonutHoveredSegment] = useState(null);

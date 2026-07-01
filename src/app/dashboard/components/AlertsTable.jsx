@@ -3,6 +3,23 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading }) {
+  const renderLegend = (className) => (
+    <div className={`flex items-center gap-2 text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider ${className}`}>
+      <span className="flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Critical
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> High
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> Medium
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Low
+      </span>
+    </div>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -18,11 +35,12 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
         </div>
       )}
       <div className="flex justify-between items-start mb-2">
-        <div>
+        <div className="flex flex-col gap-1.5">
           <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-1.5 gap-y-0.5">
             <span>Optimization</span>
             <span>Alerts</span>
           </h3>
+          {renderLegend("md:hidden mt-0.5")}
         </div>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
           <button
@@ -31,21 +49,8 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
           >
             View All
           </button>
-          {/* Color Symbols Legend for Alerts Category */}
-          <div className="flex items-center gap-2 text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Critical
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> High
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> Medium
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Low
-            </span>
-          </div>
+          {/* Color Symbols Legend for Alerts Category (Desktop) */}
+          {renderLegend("hidden md:flex")}
         </div>
       </div>
 
