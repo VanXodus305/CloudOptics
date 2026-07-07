@@ -1,4 +1,4 @@
-# <div align="center">☁️ CloudOptics</div>
+# <div align="center"> CloudOptics</div>
 
 <div align="center">
   <p align="center">
@@ -8,7 +8,7 @@
 
 ---
 
-## ⚡ Core Features
+##  Core Features
 
 - **Real-Time Monitoring**: Track your active compute, database, and storage cloud spend as it incurs.
 - **Automated Optimizations**: Scan connected infrastructures to terminate idle machines and flag oversized disk partitions.
@@ -20,7 +20,7 @@
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Frontend
 The frontend is built for a highly interactive and dynamic user experience, utilizing modern web development practices.
@@ -43,11 +43,11 @@ The backend is designed for high-performance data processing, ensuring real-time
 
 ---
 
-## 🚀 Deployment & Repository
+##  Deployment & Repository
 - **GitHub**: The source code is hosted on GitHub.
 - **Vercel**: The application is deployed on Vercel for seamless hosting and CI/CD integration.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Prerequisites
 
