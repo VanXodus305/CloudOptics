@@ -79,7 +79,7 @@ export default function Navigationbar() {
     const element = document.getElementById(id);
     if (!element) return;
 
-    const offset = 90; // height of the floating navbar + top margin spacing
+    const offset = 90; 
     const bodyRect = document.body.getBoundingClientRect().top;
     const elementRect = element.getBoundingClientRect().top;
     const elementPosition = elementRect - bodyRect;
@@ -146,7 +146,7 @@ export default function Navigationbar() {
         </div>
       </NavbarBrand>
 
-      {/* DESKTOP CENTER NAVIGATION LINKS */}
+      {/* Navigation Links */}
       <NavbarContent
         justify="center"
         className="
@@ -190,7 +190,7 @@ export default function Navigationbar() {
         ))}
       </NavbarContent>
 
-      {/* DESKTOP RIGHT ITEMS (THEME TOGGLE + SIGN IN) */}
+      {/* Toggle for theme change and sign in button */}
       <NavbarContent
         justify="end"
         className="
@@ -228,7 +228,7 @@ export default function Navigationbar() {
             `}
             title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
           >
-            {/* Background elements like clouds or stars */}
+            
             <div className="absolute inset-0 w-full h-full pointer-events-none opacity-40">
               {theme === "light" ? (
                 // Clouds
@@ -244,7 +244,7 @@ export default function Navigationbar() {
               )}
             </div>
 
-            {/* Sliding Knob */}
+            {/* Sliding button */}
             <motion.div
               layout
               transition={{ type: "spring", stiffness: 500, damping: 25 }}
@@ -322,7 +322,7 @@ export default function Navigationbar() {
         </NavbarItem>
       </NavbarContent>
 
-      {/* Hamburger Menu Toggle (Mobile) */}
+      {/* Hamburger Menu Toggle for Mobile */}
       <NavbarContent className="md:hidden pr-2" justify="end">
         <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} className="dark:text-white" />
       </NavbarContent>

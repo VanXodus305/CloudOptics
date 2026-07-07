@@ -65,7 +65,7 @@ const widgets = [
   }
 ];
 
-// Helper to duplicate array for seamless looping
+
 const row1Widgets = [...widgets, ...widgets].sort(() => Math.random() - 0.5);
 const row2Widgets = [...widgets, ...widgets].sort(() => Math.random() - 0.5);
 
@@ -252,7 +252,7 @@ export default function FloatingShowcase() {
   return (
     <div className="py-24 relative overflow-hidden bg-transparent">
       
-      {/* Decorative Blur Backgrounds */}
+     
       <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#792CA2]/10 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none" />
       <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-[#B770FF]/10 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none" />
 
@@ -265,7 +265,7 @@ export default function FloatingShowcase() {
         </p>
       </div>
 
-      {/* Marquee Row 1 - Scrolling Left */}
+      
       <div className="relative flex overflow-hidden group pb-8">
         <motion.div
           animate={{ x: ["0%", "-50%"] }}
@@ -282,7 +282,7 @@ export default function FloatingShowcase() {
         </motion.div>
       </div>
 
-      {/* Marquee Row 2 - Scrolling Right */}
+      
       <div className="relative flex overflow-hidden group">
         <motion.div
           animate={{ x: ["-50%", "0%"] }}
@@ -299,7 +299,7 @@ export default function FloatingShowcase() {
         </motion.div>
       </div>
 
-      {/* Gradient Mask for fading edges */}
+     
       <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#F9F7F7] dark:from-[#05050F] to-transparent pointer-events-none z-10" />
       <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#F9F7F7] dark:from-[#05050F] to-transparent pointer-events-none z-10" />
     </div>

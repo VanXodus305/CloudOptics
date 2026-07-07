@@ -68,7 +68,7 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
           }}
           className={`relative bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-lg border border-slate-200/60 dark:border-slate-800/80 border-t-4 ${card.borderClass} flex flex-col justify-between min-h-[110px] md:min-h-[160px]`}
         >
-          {/* Subtle loading overlay */}
+          
           {isLoading && (
             <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-2xl md:rounded-3xl flex items-center justify-center z-10 backdrop-blur-[0.5px]">
               <div className="w-5 h-5 border-2 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -80,7 +80,7 @@ export default function KPICards({ summaryData, kpiTrends, isLoading }) {
               <h3 className="text-[9px] md:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 {card.title}
               </h3>
-              {/* Trend Badge and Label */}
+              {/* Trends-Postive or negative*/}
               <div className="flex flex-col items-center">
                 <span
                   className={`text-[8px] md:text-[9.5px] px-1.5 py-0.5 rounded-full font-bold select-none ${

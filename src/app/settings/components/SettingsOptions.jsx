@@ -132,7 +132,7 @@ export default function SettingsOptions() {
   ];
 
   useEffect(() => {
-    // Sync Google Translate combo box with stored language on mount
+    // Syncing Google Translate
     const storedLang = localStorage.getItem("language") || "en";
     setCurrentLanguage(storedLang);
 
@@ -140,7 +140,7 @@ export default function SettingsOptions() {
       const googleSelect = document.querySelector("select.goog-te-combo");
       if (googleSelect) {
         let targetVal = storedLang;
-        // Google combo box uses "" for original language (English)
+        // by default set to english
         if (storedLang === "en") {
           targetVal = "";
         }
@@ -170,7 +170,7 @@ export default function SettingsOptions() {
     localStorage.setItem("language", langCode);
     
     if (langCode === "en") {
-      // Reverting to the original source language requires a page refresh to clear Google Translate's modifications.
+      // For the original language,the user can just refresh the page
       window.location.reload();
     } else {
       // Soft translation refresh without page reloading
@@ -197,7 +197,7 @@ export default function SettingsOptions() {
       transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.1 }}
       className="mt-6 flex flex-col gap-3"
     >
-      {/* ── LANGUAGE OPTION ── */}
+      {/*  LANGUAGE OPTION  */}
       <div className="bg-white/70 dark:bg-[#0F122B]/60 backdrop-blur-xl border border-white dark:border-white/5 rounded-2xl shadow-lg overflow-hidden transition-all duration-300">
         <button
           onClick={() => handleOptionClick("language")}
@@ -274,7 +274,7 @@ export default function SettingsOptions() {
         </AnimatePresence>
       </div>
 
-      {/* ── THEME OPTION ── */}
+      {/*  THEME OPTION  */}
       <div className="bg-white/70 dark:bg-[#0F122B]/60 backdrop-blur-xl border border-white dark:border-white/5 rounded-2xl shadow-lg overflow-hidden transition-all duration-300">
         <button
           onClick={() => handleOptionClick("theme")}
@@ -332,7 +332,7 @@ export default function SettingsOptions() {
         </AnimatePresence>
       </div>
 
-      {/* ── LOGOUT OPTION ── */}
+      {/*  LOGOUT OPTION  */}
       <motion.button
         whileHover={{ scale: 1.01, x: 2 }}
         whileTap={{ scale: 0.99 }}

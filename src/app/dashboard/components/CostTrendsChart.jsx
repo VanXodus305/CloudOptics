@@ -19,7 +19,7 @@ export default function CostTrendsChart({
       transition={{ duration: 0.6 }}
       className="bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 dark:border-white/5 relative"
     >
-      {/* Subtle loading overlay */}
+      
       {isLoading && (
         <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -68,9 +68,9 @@ export default function CostTrendsChart({
           );
         })}
 
-        {/* Chart Canvas */}
+       
         <div className="absolute left-12 right-0 top-0 bottom-0 border-b border-gray-100">
-          {/* Gridlines */}
+         
           {[0.25, 0.5, 0.75, 1.0].map((ratio) => (
             <div
               key={ratio}
@@ -93,8 +93,7 @@ export default function CostTrendsChart({
                   onMouseEnter={() => setHoveredBar(index)}
                   onMouseLeave={() => setHoveredBar(null)}
                 >
-                  {/* Tooltip: on the column div so scaleX never affects it.
-                      bottom = bar height% + 8px gap, centered via left-1/2 */}
+                  
                   <AnimatePresence>
                     {isHovered && (
                       <motion.div

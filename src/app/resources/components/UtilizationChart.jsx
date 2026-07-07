@@ -212,11 +212,11 @@ export default function UtilizationChart({
     }
   }
 
-  // Generate LineChart data if Level 2 drilldown is active
+  // Generate LineChart data if Level 2 drilldown is clicked
   const getTrendData = () => {
     if (!drilldownServer || !drilldownMetric) return [];
 
-    // Use on-demand fetched trend data grouped by the appropriate frequency
+    // generate the data from the backend
     const serverTrends =
       timeFilter === "Hourly" ? activeTrends.hourly : activeTrends.daily;
 
@@ -393,7 +393,7 @@ export default function UtilizationChart({
           }
         }
       `}</style>
-      {/* Subtle loading overlay */}
+
       {(isLoading || isTrendsLoading) && (
         <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>

@@ -182,7 +182,7 @@ export default function CostResourceChart({
   const data = getChartData();
   const drilldownTrendData = getTrendData();
 
-  // Dynamic calculations for drilldown KPIs
+  // calculations for drilldown KPIs
   const serviceResources = resources.filter((r) => r.service === drilldownResource);
   const activeCount = serviceResources.filter((r) => r.status === "Running" || r.status === "running").length;
   const avgLoad = serviceResources.length > 0 ? serviceResources.reduce((sum, r) => sum + (r.cpu || 0), 0) / serviceResources.length : 0;
@@ -203,7 +203,7 @@ export default function CostResourceChart({
           }
         }
       `}</style>
-      {/* Subtle loading overlay */}
+  
       {isLoading && (
         <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>

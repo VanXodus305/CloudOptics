@@ -42,7 +42,6 @@ export default function TotalInsights({ totalActions = 0, totalSavings = 0, isLo
       whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(121,44,162,0.15)" }}
       className="relative overflow-hidden bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white flex flex-col justify-between min-h-[220px] h-full"
     >
-      {/* Background glowing blob */}
       <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#9A4DCC]/20 rounded-full blur-3xl pointer-events-none" />
       
       <div className="flex items-start justify-between relative z-10">

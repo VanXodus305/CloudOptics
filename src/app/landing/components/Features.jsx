@@ -325,7 +325,7 @@ function interpolate(p, isMobile) {
     }
   }
 
-  // Desktop 3D Coverflow Keypoints
+  
   const points = [
     {
       p: -2,
@@ -496,7 +496,7 @@ function FeatureCard({
             </p>
           </div>
 
-          {/* Mockup visual representing functionality */}
+          
           <div className="mt-auto">{feature.mockup}</div>
         </CardBody>
       </Card>
@@ -530,7 +530,7 @@ export default function FeaturesCarousel() {
     });
   }, [startIndex, activeIndexVal]);
 
-  // Auto-switch cards on mobile every 3 seconds
+ 
   useEffect(() => {
     if (!isMobile) return;
     const interval = setInterval(() => {
@@ -539,20 +539,20 @@ export default function FeaturesCarousel() {
     return () => clearInterval(interval);
   }, [isMobile, startIndex]);
 
-  // Handle trackpad two-finger horizontal swipe/scroll
+  // Scrolling with two fingers
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleWheel = (e) => {
-      // If horizontal scrolling is dominant
+      //for horizontal scrolling
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         e.preventDefault();
 
         scrollAccum.current += e.deltaX;
 
         const slideWidth = isMobile ? 280 : 270;
-        // Sensitivity divider: slideWidth * 2 makes trackpad swiping smooth and controlled
+        
         const progress = startIndex + scrollAccum.current / (slideWidth * 2);
         const clampedProgress = Math.max(
           0,
@@ -581,7 +581,7 @@ export default function FeaturesCarousel() {
           }
 
           scrollAccum.current = 0;
-        }, 150); // Snapping debounce
+        }, 150); 
       }
     };
 
@@ -610,11 +610,11 @@ export default function FeaturesCarousel() {
       id="features"
       className="py-28 bg-[#FFFFFF] dark:bg-[#070919] rounded-t-[50px] relative overflow-hidden transition-colors duration-500"
     >
-      {/* Background Decorative patterns */}
+      
       <div className="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-[#792CA2]/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[10%] left-[-10%] w-[30vw] h-[30vw] rounded-full bg-[#B770FF]/5 blur-[100px] pointer-events-none" />
 
-      {/* Interactive Cyber grid */}
+      
       <div className="absolute inset-0 opacity-[0.015] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -649,7 +649,7 @@ export default function FeaturesCarousel() {
             ←
           </button>
 
-          {/* 3D Coverflow Perspective Container */}
+          
           <motion.div
             ref={containerRef}
             drag="x"

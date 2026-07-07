@@ -38,10 +38,11 @@ export default function AlertHistory() {
     fetchAlerts();
   }, []);
 
-  const totalAlerts = alerts.length;
   const unresolvedAlerts = alerts.filter(a => a.status === "unresolved").length;
   const inProgressAlerts = alerts.filter(a => a.status === "in progress").length;
   const resolvedAlerts = alerts.filter(a => a.status === "resolved" || a.status === "archived").length;
+  
+  const activeAlerts = unresolvedAlerts + inProgressAlerts;
 
   const envDataMap = {};
   alerts.forEach(a => {
@@ -104,8 +105,8 @@ export default function AlertHistory() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           <div className="bg-white/80 dark:bg-white/5 border border-gray-150 dark:border-white/10 p-4 rounded-2xl shadow-sm text-center">
-            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Total Alerts</p>
-            <p className="text-2xl font-black text-[#111844] dark:text-white mt-1">{totalAlerts}</p>
+            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Active Alerts</p>
+            <p className="text-2xl font-black text-[#111844] dark:text-white mt-1">{activeAlerts}</p>
           </div>
           <div className="bg-white/80 dark:bg-white/5 border border-gray-150 dark:border-white/10 p-4 rounded-2xl shadow-sm text-center">
             <div className="flex items-center justify-center gap-1.5">
@@ -164,7 +165,7 @@ export default function AlertHistory() {
                 <h5 className="text-[11px] font-black text-[#111844] dark:text-white uppercase tracking-wider ml-auto">{selectedEnv} Environment Alerts</h5>
               </div>
               <div className="flex flex-col gap-3">
-                {alerts.filter(a => a.environment === selectedEnv).map((alert, index) => (
+                {alerts.filter(a => a.environment === selectedEnv && a.status !== "archived").map((alert, index) => (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}

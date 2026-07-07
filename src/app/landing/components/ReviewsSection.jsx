@@ -181,7 +181,7 @@ export default function ReviewsSection() {
       `}} />
 
       <div className="max-w-7xl mx-auto relative z-10 text-center">
-        {/* Section Heading */}
+        
         <div className="mb-16 flex flex-col items-center">
           
           <p className="mt-4 text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl font-medium">
@@ -189,7 +189,7 @@ export default function ReviewsSection() {
           </p>
         </div>
 
-        {/* Scrolling Columns Container */}
+        
         <div 
           className="w-full max-w-6xl mx-auto h-[520px] overflow-hidden relative grid grid-cols-1 md:grid-cols-3 gap-6 px-4 md:px-8"
           style={{

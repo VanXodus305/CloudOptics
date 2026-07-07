@@ -46,16 +46,15 @@ export default function Footer({ reduced = false }) {
 
   return (
     <footer className="relative bg-gradient-to-br from-[#111844] via-[#0E0C24] to-[#1F1235] text-white pt-20 pb-10 overflow-hidden border-t border-white/5">
-      {/* Background Cyber-grid Overlay */}
+      
       <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none" />
 
-      {/* Glowing Mesh Orbs */}
       <div className="absolute top-0 left-1/4 w-[30vw] h-[30vw] rounded-full bg-[#792CA2]/12 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[25vw] h-[25vw] rounded-full bg-[#B770FF]/8 blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pb-16 items-start">
-          {/* Brand Info */}
+          {/* Cloud Optics content */}
           <div className="flex flex-col justify-start">
             <h3 className="text-3xl font-black bg-gradient-to-r from-white via-[#DCCBFF] to-[#B770FF] bg-clip-text text-transparent tracking-wide">
               CloudOptics
@@ -65,7 +64,7 @@ export default function Footer({ reduced = false }) {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Links */}
           <div className="flex flex-col md:items-end">
             <div className="w-fit">
               <h4 className="text-xs font-black uppercase tracking-widest text-[#B770FF] mb-5">
@@ -88,10 +87,10 @@ export default function Footer({ reduced = false }) {
           </div>
         </div>
 
-        {/* Bottom Bar Divider */}
+        {/* Bottom Bar*/}
         <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent my-4" />
 
-        {/* Footer Bottom */}
+        {/* Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-4 text-xs text-gray-500 gap-4">
           <p>© {currentYear} CloudOptics. All rights reserved.</p>
           <div className="flex items-center gap-6">

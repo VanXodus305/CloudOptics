@@ -20,7 +20,7 @@ export default function ParticleBackground() {
       for (let i = 0; i < particles.length; i++) {
         particles[i].draw();
 
-        // draw connections
+        
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
@@ -53,10 +53,10 @@ export default function ParticleBackground() {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.4; // slow drift
+        this.vx = (Math.random() - 0.5) * 0.4; 
         this.vy = (Math.random() - 0.5) * 0.4;
         this.radius = Math.random() * 2 + 1;
-        this.color = "rgba(121, 44, 162, 0.12)"; // matching landing page purple theme
+        this.color = "rgba(121, 44, 162, 0.12)"; 
       }
 
       update() {
@@ -86,7 +86,7 @@ export default function ParticleBackground() {
         particles[i].update();
         particles[i].draw();
 
-        // draw connections
+        
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;

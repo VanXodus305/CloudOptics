@@ -32,7 +32,7 @@ export default function CostDistributionChart({
       transition={{ duration: 0.6, delay: 0.1 }}
       className="bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 dark:border-white/5 flex flex-col justify-between relative"
     >
-      {/* Subtle loading overlay */}
+      
       {isLoading && (
         <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -82,7 +82,7 @@ export default function CostDistributionChart({
         </Dropdown>
       </div>
 
-      {/* Information Banner */}
+      {/* Information Content*/}
       {(() => {
         const primaryService = donutData && donutData.length > 0
           ? [...donutData].sort((a, b) => b.value - a.value)[0]
@@ -109,14 +109,14 @@ export default function CostDistributionChart({
       })()}
 
       <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-4">
-        {/* Donut — bigger (w-48/h-48) and hover-safe: only the arc strokes receive pointer events */}
+        
         <div className="relative w-48 h-48 flex-shrink-0 flex items-center justify-center">
           <svg
             className="w-full h-full transform -rotate-90"
             viewBox="0 0 100 100"
             style={{ pointerEvents: "none" }}
           >
-            {/* Decorative rings — no events */}
+            
             <circle
               cx="50" cy="50" r={donutRadius + 7}
               fill="transparent"
@@ -131,7 +131,7 @@ export default function CostDistributionChart({
               strokeWidth="0.75"
               strokeDasharray="2 2"
             />
-            {/* Track ring */}
+            
             <circle
               cx="50" cy="50" r={donutRadius}
               fill="transparent"
@@ -160,7 +160,7 @@ export default function CostDistributionChart({
                     strokeDashoffset={0}
                     transform={`rotate(${rotation} 50 50)`}
                     style={{
-                      /* re-enable events only on the arc itself */
+                      
                       pointerEvents: "stroke",
                       cursor: "pointer",
                     }}
@@ -182,7 +182,7 @@ export default function CostDistributionChart({
             })()}
           </svg>
 
-          {/* Centre label — sits above the SVG */}
+          
           <div className="absolute flex flex-col items-center text-center pointer-events-none">
             <span className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
               {donutSelectedSegment !== null

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
-// Shared Components
+
 import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
@@ -14,7 +14,7 @@ import RestrictedOverlay from "../components/common/RestrictedOverlay";
 import { generatePDF } from "../../lib/reports/generatePDF";
 import { generateXLSX } from "../../lib/reports/generateXLSX";
 
-// Resources Components
+
 import MostlyUsedChart from "./components/MostlyUsedChart";
 import TopCostChart from "./components/TopCostChart";
 import CostResourceChart from "./components/CostResourceChart";
@@ -94,7 +94,7 @@ export default function ResourcesPage() {
   const [dashboardData, setDashboardData] = useState(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
-  // Live Simulation state
+  // Live Simulation 
   const [isLiveSimulation, setIsLiveSimulation] = useState(false);
   useEffect(() => {
     const saved = localStorage.getItem("isLiveSimulation") === "true";
@@ -205,7 +205,7 @@ export default function ResourcesPage() {
 
   return (
     <div className="h-screen relative overflow-hidden bg-[#F9F7F7] dark:bg-[#080A1A] text-[#111844] dark:text-[#F9F7F7] transition-colors duration-300 flex flex-col dashboard-layout">
-      {/* SIGN OUT TRANSITION SCREEN */}
+      {/* Sign Out Transition Screen */}
       <AnimatePresence>
         {isSigningOut && (
           <motion.div
@@ -231,7 +231,7 @@ export default function ResourcesPage() {
 
       <ParticleBackground />
 
-      {/* ANIMATED BACKDROP BLOBS */}
+      {/* Animated Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ scale: [1, 1.15, 1], x: [0, 30, 0], y: [0, -20, 0] }}
@@ -250,7 +250,7 @@ export default function ResourcesPage() {
         />
       </div>
 
-      {/* NAVBAR */}
+      {/* Navigation Bar */}
       <Topbar
         userName={userName}
         userImage={userImage}
@@ -265,7 +265,7 @@ export default function ResourcesPage() {
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">
-        {/* SIDEBAR */}
+        {/* Sidebar */}
         <Sidebar
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
@@ -276,12 +276,12 @@ export default function ResourcesPage() {
           setIsAlertsModalOpen={() => {}}
         />
 
-        {/* MAIN CONTENT AREA */}
+        {/* Main content area */}
         <div className={`flex-grow flex flex-col h-full overflow-x-hidden relative p-4 pb-24 md:p-8 ${session?.user?.role === "Viewer" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
           {session?.user?.role === "Viewer" && (
             <RestrictedOverlay pageName="Resource Center" />
           )}
-              {/* ── HERO HEADER ── */}
+              {/* Hero Header */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 relative z-50 max-w-[1600px] mx-auto w-full">
                 <motion.div
                   initial={{ opacity: 0, y: -16 }}
@@ -289,7 +289,7 @@ export default function ResourcesPage() {
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="flex items-center gap-4"
                 >
-                  {/* Animated Icon Badge */}
+                  {/* Animated Icon */}
                   <motion.div
                     whileHover={{ scale: 1.1, rotate: 6 }}
                     transition={{ type: "spring", stiffness: 300, damping: 15 }}
@@ -351,7 +351,7 @@ export default function ResourcesPage() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Mobile Horizontal Scroll Buttons */}
+                  {/* Horizontal Scroll Buttons for Mobile Responsiveness*/}
                   <div className="flex sm:hidden overflow-x-auto gap-2 pb-2 scrollbar-hide snap-x w-full">
                     {ENVIRONMENTS.map((env) => (
                       <button
@@ -370,10 +370,10 @@ export default function ResourcesPage() {
                 </motion.div>
               </div>
 
-              {/* ── CHARTS GRID ── */}
+              {/* CHARTS GRID  */}
               <div className="flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
 
-                {/* Top Chart — full width */}
+                {/* Top Chart */}
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}

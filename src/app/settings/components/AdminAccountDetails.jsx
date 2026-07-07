@@ -10,7 +10,7 @@ export default function AdminAccountDetails() {
   const userEmail = session?.user?.email || "admin@cloudoptics.io";
   const isViewer = session?.user?.role === "Viewer";
 
-  // Modal & Editing state
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
@@ -132,7 +132,7 @@ export default function AdminAccountDetails() {
       className="relative flex-grow flex flex-col"
     >
       <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-8 shadow-lg border border-white dark:border-white/5 flex flex-col items-center flex-grow relative z-0 overflow-hidden min-h-[400px]">
-        {/* Background glow */}
+       
         <div className="absolute top-0 right-0 w-48 h-48 bg-[#792CA2]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#9A4DCC]/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -187,7 +187,7 @@ export default function AdminAccountDetails() {
         </div>
       </div>
 
-      {/* ── PROFILE EDIT MODAL ── */}
+      {/*PROFILE EDIT*/}
       <AnimatePresence>
         {showEditModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111844]/65 backdrop-blur-md">

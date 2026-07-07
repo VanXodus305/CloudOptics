@@ -41,7 +41,7 @@ function RadarAnimation() {
       const cy = canvas.height / 2;
       const maxRadius = Math.min(canvas.width, canvas.height) * 0.45;
 
-      // Draw radar grid concentric rings (light theme purple)
+      
       ctx.strokeStyle = "rgba(121, 44, 162, 0.08)";
       ctx.lineWidth = 1;
       for (let r = maxRadius / 4; r <= maxRadius; r += maxRadius / 4) {
@@ -50,7 +50,7 @@ function RadarAnimation() {
         ctx.stroke();
       }
 
-      // Draw crosshairs
+      
       ctx.strokeStyle = "rgba(121, 44, 162, 0.04)";
       ctx.beginPath();
       ctx.moveTo(cx - maxRadius, cy);
@@ -60,7 +60,7 @@ function RadarAnimation() {
       ctx.stroke();
 
       if (!isMobile) {
-        // Draw rotating sweep
+       
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(angle);
@@ -76,7 +76,6 @@ function RadarAnimation() {
         ctx.closePath();
         ctx.fill();
 
-        // Draw sweep sweep line
         ctx.strokeStyle = "rgba(121, 44, 162, 0.25)";
         ctx.lineWidth = 1.5;
         ctx.beginPath();
@@ -90,7 +89,7 @@ function RadarAnimation() {
         angle += 0.006;
       }
 
-      // Draw radar dots/targets
+     
       targets.forEach((t) => {
         const tx = cx + t.x;
         const ty = cy + t.y;
@@ -109,7 +108,7 @@ function RadarAnimation() {
         // Reset shadow
         ctx.shadowBlur = 0;
 
-        // Label and Cost Metric (Darker text for light mode legibility)
+        // Label and Cost Metric 
         ctx.fillStyle = "rgba(17, 24, 68, 0.6)";
         ctx.font = "9px monospace";
         ctx.fillText(t.name, tx + 8, ty - 2);
@@ -146,14 +145,14 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F9F7F7] via-[#EEEEEE] to-[#DCCBFF] text-[#111844] flex flex-col justify-between overflow-hidden relative font-sans">
       
-      {/* Dynamic Glowing backdrop blobs */}
+      
       <div className="absolute top-[10%] left-[10%] w-[40vw] h-[40vw] rounded-full bg-[#792CA2]/8 blur-[100px] pointer-events-none z-0" />
       <div className="absolute bottom-[10%] right-[10%] w-[45vw] h-[45vw] rounded-full bg-[#B770FF]/8 blur-[110px] pointer-events-none z-0" />
 
-      {/* Radar scanning background */}
+     
       <RadarAnimation />
 
-      {/* Header bar */}
+      
       <header className="w-full h-20 px-8 flex items-center justify-between relative z-10">
         <Link href="/">
           <img
@@ -188,7 +187,7 @@ export default function NotFound() {
             justify-center
           "
         >
-          {/* Glitching 404 Heading */}
+          {/* 404 Heading */}
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: [1, 1.05, 1] }}

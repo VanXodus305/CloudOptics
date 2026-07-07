@@ -204,7 +204,7 @@ const slides = [
   },
 ];
 
-// Word wrapper component to animate each word individually with 3D effects
+
 const WordWrapper = ({
   text,
   delayOffset = 0,
@@ -236,7 +236,7 @@ const WordWrapper = ({
   );
 };
 
-// 3D Flip & Stagger Animations for Slide contents
+
 const containerVariants = {
   hidden: { opacity: 1 },
   visible: {
@@ -288,7 +288,7 @@ const wordVariants = {
     transition: {
       type: "spring",
       stiffness: 140,
-      damping: 11, // low damping for lively overshoot/bounce
+      damping: 11, 
       mass: 0.8,
       delay: custom.index * 0.07 + custom.delayOffset,
     },
@@ -392,7 +392,6 @@ export default function HeroSection() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Auto-play controller for inner & macro carousels
   useEffect(() => {
     if (isPaused) return;
 
@@ -441,14 +440,13 @@ export default function HeroSection() {
     >
       <ParticleBackground />
 
-      {/* Grid pattern overlay */}
+     
       <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none z-0" />
 
-      {/* Floating Glowing Blobs */}
       <div className="absolute top-[10%] left-[10%] w-[35vw] h-[35vw] rounded-full bg-[#792CA2]/6 blur-[100px] animate-[pulse_10s_infinite_alternate] pointer-events-none z-0" />
       <div className="absolute bottom-[10%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-[#B770FF]/6 blur-[110px] animate-[pulse_8s_infinite_alternate_2s] pointer-events-none z-0" />
 
-      {/* Cybernetic concentric circles in the background */}
+      
       <div className="absolute top-1/2 left-[5%] w-[450px] h-[450px] opacity-[0.05] dark:opacity-[0.1] pointer-events-none z-0">
         <motion.div
           animate={{ rotate: 360 }}
@@ -462,7 +460,7 @@ export default function HeroSection() {
         />
       </div>
 
-      {/* Left/Right Navigation Arrows for Macro Carousel */}
+      {/* Arrwos for Carousel */}
       <button
         onClick={() => {
           setCurrentMacroSlide((prev) => {
@@ -514,7 +512,7 @@ export default function HeroSection() {
                 w-full
                 "
           >
-            {/* Slide 1 Left Column: Cloud Optics branding & Widgets */}
+            {/* Slide 1 Left Column: Cloud Optics name*/}
             <div>
               <motion.h1
                 initial={{
@@ -598,7 +596,7 @@ export default function HeroSection() {
                 Cloud Cost Optimization & Monitoring
               </motion.p>
 
-              {/* Floating Widgets Cluster */}
+              {/* Floating Widgets*/}
               <div className="mt-8 relative h-[320px] w-full hidden md:block">
                 {/* Widget 1: Savings */}
                 <motion.div
@@ -638,19 +636,19 @@ export default function HeroSection() {
                       className="mt-3 pt-3 border-t border-gray-150/50 dark:border-slate-800 space-y-1 text-[10px] text-gray-600 dark:text-slate-300"
                     >
                       <div className="flex justify-between font-semibold">
-                        <span>☁ Compute (EC2):</span>
+                        <span> Compute (EC2):</span>
                         <span className="text-emerald-600 dark:text-emerald-400">
                           $3,200
                         </span>
                       </div>
                       <div className="flex justify-between font-semibold">
-                        <span>💾 Storage (S3):</span>
+                        <span> Storage (S3):</span>
                         <span className="text-emerald-600 dark:text-emerald-400">
                           $2,850
                         </span>
                       </div>
                       <div className="flex justify-between font-semibold">
-                        <span>🗄 Databases (RDS):</span>
+                        <span> Databases (RDS):</span>
                         <span className="text-emerald-600 dark:text-emerald-400">
                           $2,400
                         </span>
@@ -730,7 +728,7 @@ export default function HeroSection() {
                     stiffness: 220,
                     damping: 24,
                   }}
-                  className="absolute bottom-24 left-10 md:left-14 p-4 bg-[#792CA2] dark:bg-[#5E1A86] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
+                  className="absolute top-[158px] left-10 md:left-14 p-4 bg-[#792CA2] dark:bg-[#5E1A86] text-white rounded-2xl shadow-xl w-60 overflow-hidden cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/10 rounded-xl">
@@ -773,13 +771,13 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* Slide 1 Right Column: Text Highlights Slider */}
+            {/* Slide 1 Right Column: Cloud Optics Content */}
             <div
               className="w-full flex flex-col justify-center relative p-6 md:p-10 rounded-3xl bg-white/10 dark:bg-slate-950/20 border border-white/30 dark:border-white/5 backdrop-blur-[2px] shadow-[0_8px_30px_rgba(121,44,162,0.02)] overflow-visible"
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
             >
-              {/* Subtle background image that bleeds outside the card edges, extending leftward */}
+              
               <div className="absolute top-20 -bottom-20 -right-5 -left-12 sm:-left-16 md:-left-20 lg:-left-[420px] xl:-left-[520px] -z-10 opacity-[0.20] dark:opacity-[0.15] pointer-events-none overflow-hidden rounded-3xl md:rounded-l-[50px] md:rounded-r-3xl">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -802,7 +800,7 @@ export default function HeroSection() {
                 </AnimatePresence>
               </div>
 
-              {/* Automatic transitioning carousel for headings & descriptions */}
+              {/* Automatic transitioning carousel */}
               <div
                 className="min-h-[340px] flex flex-col justify-center relative z-10"
                 style={{ perspective: "1200px", transformStyle: "preserve-3d" }}

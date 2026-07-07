@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Shared Components
+
 import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
@@ -12,7 +12,6 @@ import Footer from "../landing/components/Footer";
 import { generatePDF } from "../../lib/reports/generatePDF";
 import { generateXLSX } from "../../lib/reports/generateXLSX";
 
-// Settings Components
 import AdminAccountDetails from "./components/AdminAccountDetails";
 import SettingsOptions from "./components/SettingsOptions";
 import UserAccessManagement from "./components/UserAccessManagement";
@@ -30,7 +29,7 @@ export default function SettingsPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [currentDate, setCurrentDate] = useState("");
 
-  // Live Simulation state
+  // Live Simulation 
   const [isLiveSimulation, setIsLiveSimulation] = useState(false);
   useEffect(() => {
     const saved = localStorage.getItem("isLiveSimulation") === "true";
@@ -55,7 +54,7 @@ export default function SettingsPage() {
     );
   }, []);
 
-  // Close dropdowns on click-away
+  
   useEffect(() => {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -93,7 +92,7 @@ export default function SettingsPage() {
 
   return (
     <div className="h-screen relative overflow-hidden bg-[#F9F7F7] dark:bg-[#080A1A] text-[#111844] dark:text-[#F9F7F7] transition-colors duration-300 flex flex-col dashboard-layout">
-      {/* SIGN OUT TRANSITION SCREEN */}
+      {/* Sign Out Transition Screen  */}
       <AnimatePresence>
         {isSigningOut && (
           <motion.div
@@ -119,13 +118,13 @@ export default function SettingsPage() {
 
       <ParticleBackground />
 
-      {/* DYNAMIC BACKDROP BLOBS */}
+      {/* Dynamic Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#792CA2]/15 blur-[120px]" />
         <div className="absolute bottom-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-[#DCCBFF]/20 blur-[120px]" />
       </div>
 
-      {/* NAVBAR */}
+      {/* Navbar */}
       <Topbar
         userName={userName}
         userImage={userImage}
@@ -140,7 +139,7 @@ export default function SettingsPage() {
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">
-        {/* SIDEBAR */}
+        {/* Sidebar */}
         <Sidebar
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
@@ -151,11 +150,11 @@ export default function SettingsPage() {
           setIsAlertsModalOpen={() => {}}
         />
 
-        {/* MAIN CONTENT AREA */}
+        {/* Main Content Area */}
         <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative">
           <main className="flex-grow p-4 md:p-6 pb-24 md:pb-8 relative">
             <div className="flex flex-col flex-grow max-w-[1600px] mx-auto w-full">
-            {/* Page Header */}
+            
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -185,20 +184,20 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow pt-4">
               
-              {/* Left Column (Profile details & Options) */}
+              {/* Left Column */}
               <div className="lg:col-span-4 flex flex-col h-full">
                 <AdminAccountDetails />
                 <SettingsOptions />
               </div>
 
-              {/* Right Column (User Management or Restricted state) */}
+              {/* Right Column  */}
               <div className="lg:col-span-8 flex flex-col h-full">
                 <div className="flex-1 min-h-[400px]">
                   {isAdmin ? (
                     <UserAccessManagement />
                   ) : (
                     <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white dark:border-white/5 rounded-3xl p-8 md:p-12 text-center h-full flex flex-col items-center justify-center shadow-xl relative overflow-hidden min-h-[400px]">
-                      {/* Glow */}
+                      
                       <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
                       <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
                       

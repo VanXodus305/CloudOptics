@@ -34,7 +34,7 @@ export default function Modals({
               exit={{ scale: 0.95, y: 20 }}
               className="bg-[#ffffff] dark:bg-[#0F122B] rounded-3xl shadow-2xl max-w-4xl w-full border border-gray-100 dark:border-white/5 max-h-[85vh] overflow-hidden flex flex-col"
             >
-              {/* Sticky header */}
+              
               <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100 dark:border-white/5 flex-shrink-0">
                 <div>
                   <h3 className="text-lg md:text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-1.5 gap-y-0.5">
@@ -51,7 +51,7 @@ export default function Modals({
                 </button>
               </div>
 
-              {/* Scrollable body — scrollbar stays inside rounded corners */}
+              
               <div className="overflow-y-auto flex-1 px-6 py-4">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -148,7 +148,7 @@ export default function Modals({
               exit={{ scale: 0.95, y: 20 }}
               className="bg-[#ffffff] dark:bg-[#0F122B] rounded-3xl shadow-2xl max-w-4xl w-full border border-gray-100 dark:border-white/5 max-h-[85vh] overflow-hidden flex flex-col"
             >
-              {/* Sticky header */}
+              
               <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100 dark:border-white/5 flex-shrink-0">
                 <div>
                   <h3 className="text-lg md:text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#111844] via-[#1F215D] to-[#792CA2] dark:from-white dark:via-[#DCCBFF] dark:to-[#9A4DCC] flex flex-wrap gap-x-1.5 gap-y-0.5">
@@ -165,7 +165,7 @@ export default function Modals({
                 </button>
               </div>
 
-              {/* Scrollable body — scrollbar stays inside rounded corners */}
+              
               <div className="overflow-y-auto flex-1 px-6 py-4">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">

@@ -19,7 +19,7 @@ export default function RestrictedOverlay({ pageName = "this page" }) {
         transition={{ type: "spring", stiffness: 100, damping: 15 }}
         className="mb-20 md:my-auto bg-white/45 dark:bg-slate-950/20 backdrop-blur-xl border border-white dark:border-white/5 p-8 md:p-12 rounded-3xl text-center max-w-lg w-full shadow-2xl relative z-10 flex flex-col items-center"
       >
-        {/* Floating Locked Icon Shield */}
+        {/* Floating Icon*/}
         <motion.div
           animate={{ y: [0, -8, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}

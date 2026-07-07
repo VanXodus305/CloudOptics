@@ -28,7 +28,7 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
       transition={{ duration: 0.6, delay: 0.1 }}
       className="bg-white/80 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/60 dark:border-white/5 relative"
     >
-      {/* Subtle loading overlay */}
+      
       {isLoading && (
         <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-30 backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -49,7 +49,7 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
           >
             View All
           </button>
-          {/* Color Symbols Legend for Alerts Category (Desktop) */}
+          {/* Colored Legends for Alerts*/}
           {renderLegend("hidden md:flex")}
         </div>
       </div>
@@ -63,7 +63,7 @@ export default function AlertsTable({ alerts, setIsAlertsModalOpen, isLoading })
             <div className="p-3 flex justify-between items-center flex-grow">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  {/* Alert bullet representing severity category colour */}
+                  {/* Colored bullets describing the severity*/}
                   <span
                     className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
                       alert.severity === "Critical"

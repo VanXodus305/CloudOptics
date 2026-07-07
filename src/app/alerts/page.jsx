@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
 
-// Shared Components
 import ParticleBackground from "../dashboard/components/ParticleBackground";
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
@@ -14,7 +13,6 @@ import RestrictedOverlay from "../components/common/RestrictedOverlay";
 import { generatePDF } from "../../lib/reports/generatePDF";
 import { generateXLSX } from "../../lib/reports/generateXLSX";
 
-// Alerts Components
 import ActiveAlerts from "./components/ActiveAlerts";
 import AlertHistory from "./components/AlertHistory";
 
@@ -31,7 +29,7 @@ export default function AlertsPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [currentDate, setCurrentDate] = useState("");
 
-  // Live Simulation state
+  //Live Simulation
   const [isLiveSimulation, setIsLiveSimulation] = useState(false);
   useEffect(() => {
     const saved = localStorage.getItem("isLiveSimulation") === "true";
@@ -56,7 +54,7 @@ export default function AlertsPage() {
     );
   }, []);
 
-  // Close dropdowns on click-away
+  
   useEffect(() => {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -95,7 +93,7 @@ export default function AlertsPage() {
 
   return (
     <div className="h-screen relative overflow-hidden bg-[#F9F7F7] dark:bg-[#080A1A] text-[#111844] dark:text-[#F9F7F7] transition-colors duration-300 flex flex-col dashboard-layout">
-      {/* SIGN OUT TRANSITION SCREEN */}
+      {/* Sign Out Transition Screen */}
       <AnimatePresence>
         {isSigningOut && (
           <motion.div
@@ -121,13 +119,13 @@ export default function AlertsPage() {
 
       <ParticleBackground />
 
-      {/* DYNAMIC BACKDROP BLOBS */}
+      {/* Dynamic Background*/}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#792CA2]/15 blur-[120px]" />
         <div className="absolute bottom-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-[#DCCBFF]/20 blur-[120px]" />
       </div>
 
-      {/* NAVBAR */}
+      {/* Navbar */}
       <Topbar
         userName={userName}
         userImage={userImage}
@@ -142,7 +140,7 @@ export default function AlertsPage() {
       />
 
       <div className="flex flex-grow w-full overflow-hidden relative">
-        {/* SIDEBAR */}
+        {/* Sidebar */}
         <Sidebar
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}

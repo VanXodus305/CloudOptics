@@ -48,7 +48,7 @@ export default function DashboardPreview() {
           items-center
           "
         >
-          {/* SaaS Dashboard Mockup Panel */}
+          {/* Dashboard*/}
           <div
             className="
             min-h-[480px]
@@ -71,7 +71,7 @@ export default function DashboardPreview() {
             duration-500
             "
           >
-            {/* Dashboard Header (Mini Topbar) */}
+            {/* Dashboard Header */}
             <div className="bg-white/70 dark:bg-slate-950/70 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800/80 px-4 py-3 flex items-center justify-between z-10 transition-colors duration-500">
               <div className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
@@ -82,12 +82,12 @@ export default function DashboardPreview() {
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                {/* Date Badge */}
+                {/* Date */}
                 <div className="hidden xs:flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-900 border border-gray-200/50 dark:border-slate-800/50 text-[9px] font-bold text-gray-500 dark:text-slate-400">
                   <span className="text-[#792CA2] dark:text-[#B770FF]">📅</span>
                   <span>June 16, 2026</span>
                 </div>
-                {/* User image badge */}
+                {/* User profile image */}
                 <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#792CA2] to-[#DCCBFF] p-0.5 shadow-sm">
                   <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-[8px] font-black text-[#792CA2]">
                     U
@@ -96,12 +96,12 @@ export default function DashboardPreview() {
               </div>
             </div>
 
-            {/* Dashboard Body */}
+            {/* Dashboard content*/}
             <div className="flex-grow p-3.5 grid grid-cols-12 gap-3.5 bg-[#F9F7F7] dark:bg-[#080A1A] z-10 transition-colors duration-500">
-              {/* Mockup Sidebar (Dark Sidebar) */}
+              {/* Sidebar */}
               <div className="hidden sm:flex col-span-3 bg-[#111844] rounded-2xl p-2.5 flex-col justify-between border border-[#1F215D]/20 shadow-md">
                 <div>
-                  {/* Brand name representation */}
+                  {/* Cloud Optics */}
                   <div className="flex items-center gap-1 px-1 mb-3">
                     <div className="w-3.5 h-3.5 rounded bg-gradient-to-tr from-[#792CA2] to-[#DCCBFF] flex items-center justify-center text-[7px] font-black text-white">
                       CO
@@ -111,7 +111,7 @@ export default function DashboardPreview() {
                     </span>
                   </div>
 
-                  {/* Navigation title */}
+                  {/* Navigation */}
                   <div className="text-[5.5px] font-bold text-gray-500 uppercase tracking-widest px-1 mb-1.5">
                     Navigation
                   </div>
@@ -225,7 +225,7 @@ export default function DashboardPreview() {
                   </div>
                 </div>
 
-                {/* Bottom items */}
+               
                 <div className="space-y-1">
                   {/* Settings */}
                   <div className="h-5 bg-transparent hover:bg-white/5 rounded-lg w-full flex items-center px-2 gap-1.5 transition-colors">
@@ -270,11 +270,11 @@ export default function DashboardPreview() {
                 </div>
               </div>
 
-              {/* Main Contents */}
+              
               <div className="col-span-12 sm:col-span-9 flex flex-col gap-3 relative">
                 {/* Mini Welcome Banner */}
                 <div className="rounded-2xl p-3 bg-gradient-to-r from-[#792CA2] via-[#9A4DCC] to-[#1F215D] text-white shadow-md relative overflow-hidden flex justify-between items-center">
-                  {/* Custom Dot Pattern Background */}
+              
                   <div className="absolute inset-0 opacity-15 pointer-events-none">
                     <svg
                       className="w-full h-full"
@@ -298,7 +298,7 @@ export default function DashboardPreview() {
                     </svg>
                   </div>
 
-                  {/* Rotating Orbital graphics */}
+ 
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 pointer-events-none opacity-40">
                     <motion.div
                       animate={{ rotate: 360 }}
@@ -409,7 +409,7 @@ export default function DashboardPreview() {
                   </div>
                 </div>
 
-                {/* 2 Charts Grid */}
+              
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
                   {/* Cost Trends Chart */}
                   <div className="bg-white/80 dark:bg-slate-900/80 border border-white/60 dark:border-slate-800/40 p-3 rounded-2xl shadow-sm flex flex-col justify-between transition-colors duration-500">
@@ -423,7 +423,6 @@ export default function DashboardPreview() {
                       </div>
                     </div>
 
-                    {/* Graph bars container with Y-Axis and Grid Lines */}
                     <div className="flex-grow flex gap-1.5 mt-3 relative">
                       {/* Y-Axis Labels */}
                       <div className="flex flex-col justify-between text-[6px] text-gray-400 dark:text-slate-500 font-bold h-full pb-3.5 pr-0.5 font-mono select-none">
@@ -433,7 +432,7 @@ export default function DashboardPreview() {
                         <span>$0</span>
                       </div>
 
-                      {/* Grid Lines & Bars Area */}
+                      
                       <div className="flex-grow relative h-full flex items-end justify-between px-0.5">
                         {/* Grid Lines */}
                         <div className="absolute inset-0 pb-3 flex flex-col justify-between pointer-events-none select-none">
@@ -478,13 +477,13 @@ export default function DashboardPreview() {
                     </div>
 
                     <div className="flex-grow flex items-center justify-around mt-3">
-                      {/* Mini Donut Circle */}
+                      {/* Donut Circle */}
                       <div className="relative w-20 h-20 flex items-center justify-center flex-shrink-0">
                         <svg
                           className="w-full h-full transform -rotate-90"
                           viewBox="0 0 100 100"
                         >
-                          {/* Inner / outer dotted lines */}
+                          
                           <circle
                             cx="50"
                             cy="50"
@@ -504,8 +503,7 @@ export default function DashboardPreview() {
                             strokeDasharray="2 2"
                           />
 
-                          {/* Segments */}
-                          {/* Compute: 45% (Color: #792CA2) */}
+                         
                           <circle
                             cx="50"
                             cy="50"
@@ -516,7 +514,7 @@ export default function DashboardPreview() {
                             strokeDasharray={`${0.45 * 238.7} 238.7`}
                             strokeDashoffset="0"
                           />
-                          {/* Storage: 25% (Color: #9A4DCC) -> starts at 45% */}
+                          
                           <circle
                             cx="50"
                             cy="50"
@@ -527,7 +525,7 @@ export default function DashboardPreview() {
                             strokeDasharray={`${0.25 * 238.7} 238.7`}
                             strokeDashoffset={`-${0.45 * 238.7}`}
                           />
-                          {/* Database: 15% (Color: #1F215D) -> starts at 70% */}
+
                           <circle
                             cx="50"
                             cy="50"
@@ -538,7 +536,7 @@ export default function DashboardPreview() {
                             strokeDasharray={`${0.15 * 238.7} 238.7`}
                             strokeDashoffset={`-${0.7 * 238.7}`}
                           />
-                          {/* Networking: 10% (Color: #111844) -> starts at 85% */}
+  
                           <circle
                             cx="50"
                             cy="50"
@@ -549,7 +547,7 @@ export default function DashboardPreview() {
                             strokeDasharray={`${0.1 * 238.7} 238.7`}
                             strokeDashoffset={`-${0.85 * 238.7}`}
                           />
-                          {/* Other: 5% (Color: #DCCBFF) -> starts at 95% */}
+                          
                           <circle
                             cx="50"
                             cy="50"
@@ -571,7 +569,7 @@ export default function DashboardPreview() {
                         </div>
                       </div>
 
-                      {/* Mini Legend */}
+                      
                       <div className="flex flex-col gap-1 text-[7.5px] font-bold text-gray-500 dark:text-slate-400 leading-tight pr-1">
                         <div className="flex items-center gap-1">
                           <div className="w-1.5 h-1.5 rounded-full bg-[#792CA2] flex-shrink-0" />
@@ -601,7 +599,7 @@ export default function DashboardPreview() {
                     </div>
                   </div>
 
-                  {/* Blurred Overlay when Resources, Recommendations, or Alerts are active */}
+
                   <AnimatePresence>
                     {activeTab !== "dashboard" && (
                       <motion.div
@@ -617,7 +615,7 @@ export default function DashboardPreview() {
                           exit={{ scale: 0.9, y: 10 }}
                           className="max-w-[280px] flex flex-col items-center"
                         >
-                          {/* Interactive Lock Icon */}
+                          
                           <div className="w-9 h-9 rounded-full bg-[#792CA2]/10 dark:bg-[#792CA2]/20 border border-[#792CA2]/30 flex items-center justify-center mb-2.5 text-[#792CA2] dark:text-[#B770FF]">
                             <svg
                               className="w-4 h-4"
@@ -657,11 +655,11 @@ export default function DashboardPreview() {
               </div>
             </div>
 
-            {/* Glowing background inside card */}
+            
             <div className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-64 h-64 rounded-full bg-[#792CA2]/5 dark:bg-[#792CA2]/10 blur-[100px] pointer-events-none" />
           </div>
 
-            {/* Content (Unlock Full Insights side) */}
+            
             <div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111844] dark:text-white mb-6 transition-colors duration-500">
                 Unlock Full Insights
@@ -714,7 +712,7 @@ export default function DashboardPreview() {
             </div>
           </motion.div>
         </div>
-      {/* Floating design elements */}
+     
       <div className="absolute bottom-[-20%] left-[-10%] w-[35vw] h-[35vw] rounded-full bg-[#792CA2]/5 blur-[120px] pointer-events-none z-0" />
     </section>
   );

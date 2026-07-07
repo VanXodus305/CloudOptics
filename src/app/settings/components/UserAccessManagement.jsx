@@ -22,7 +22,6 @@ export default function UserAccessManagement() {
   const [loading, setLoading] = useState(true);
   const [selectedMemberId, setSelectedMemberId] = useState(null);
 
-  // Invite Modal State
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("Viewer");
@@ -30,7 +29,6 @@ export default function UserAccessManagement() {
   const [inviteError, setInviteError] = useState("");
   const [inviteSuccess, setInviteSuccess] = useState(false);
 
-  // Revoke state
   const [revokingId, setRevokingId] = useState(null);
 
   const fetchMembers = async (searchTerm = "") => {
@@ -94,7 +92,7 @@ export default function UserAccessManagement() {
       setInviteEmail("");
       setInviteRole("Viewer");
       
-      // Auto-close modal after success message
+      
       setTimeout(() => {
         setShowInviteModal(false);
         setInviteSuccess(false);
@@ -180,10 +178,10 @@ export default function UserAccessManagement() {
       className="relative flex flex-col h-full"
     >
       <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white dark:border-white/5 flex flex-col flex-grow relative z-0 min-h-[500px]">
-        {/* Glow */}
+       
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Header section */}
+        
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 relative z-10">
           <div className="flex items-center gap-2">
             <div className="bg-[#792CA2]/10 p-2 rounded-lg">
@@ -230,7 +228,7 @@ export default function UserAccessManagement() {
           </button>
         </div>
 
-        {/* Content Body split in two columns */}
+        
         <div className="flex flex-col lg:flex-row gap-6 relative z-10 flex-grow">
           {/* User List Panel */}
           <div className="flex-1 flex flex-col gap-2 max-h-[380px] overflow-y-auto no-scrollbar p-1">
@@ -308,7 +306,7 @@ export default function UserAccessManagement() {
             )}
           </div>
 
-          {/* User Details Inspector */}
+          {/* User Details  */}
           <div className="flex-1 relative mt-4 lg:mt-0 max-h-[380px]">
             <div className="bg-gradient-to-br from-[#F9F7F7] to-white dark:from-slate-900/40 dark:to-slate-800/40 border border-gray-200/60 dark:border-slate-800/80 rounded-2xl p-5 shadow-inner h-full flex flex-col relative overflow-hidden">
               <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#9A4DCC]/10 rounded-full blur-2xl" />
@@ -389,7 +387,7 @@ export default function UserAccessManagement() {
                       </div>
                     </div>
 
-                    {/* Access Actions (Check that it is not self) */}
+
                     <div className="mt-4 pt-4 flex flex-col gap-2">
                       {selectedMember.email !== currentUserEmail && (
                         <button
@@ -432,7 +430,7 @@ export default function UserAccessManagement() {
         </div>
       </div>
 
-      {/* ── INVITATION MODAL ── */}
+      {/* INVITATION */}
       <AnimatePresence>
         {showInviteModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111844]/65 backdrop-blur-md">

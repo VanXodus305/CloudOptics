@@ -10,7 +10,7 @@ export default function WelcomeBanner({ userName }) {
       transition={{ duration: 0.8 }}
       className="rounded-3xl p-6 md:p-8 mb-6 md:mb-8 bg-gradient-to-r from-[#792CA2] via-[#9A4DCC] to-[#1F215D] text-white shadow-xl relative overflow-hidden"
     >
-      {/* Custom Interactive SVG Background Pattern */}
+      
       <div className="absolute inset-0 opacity-15 pointer-events-none">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -39,7 +39,7 @@ export default function WelcomeBanner({ userName }) {
         </svg>
       </div>
 
-      {/* Glowing Orbital graphics filling the empty right banner spot */}
+
       <div className="absolute right-14 top-1/2 -translate-y-1/2 w-28 h-28 hidden md:block pointer-events-none">
         <motion.div
           animate={{ rotate: 360 }}

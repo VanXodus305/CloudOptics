@@ -4,13 +4,6 @@
   <p align="center">
     <strong>Real-time Cloud Cost Optimization & Monitoring Platform</strong>
   </p>
-
-  ![Next.js](https://img.shields.io/badge/Next.js-15.2-black?style=for-the-badge&logo=next.js)
-  ![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-  ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)
-  ![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb)
-  ![Next-Auth](https://img.shields.io/badge/Auth-Next--Auth%20v5-000000?style=for-the-badge&logo=next.js)
-  ![Framer Motion](https://img.shields.io/badge/Animations-Framer_Motion-FF00BF?style=for-the-badge&logo=framer&logoColor=white)
 </div>
 
 ---
@@ -22,8 +15,37 @@
 - **3D Coverflow Highlights**: Interact with core platform modules through a smooth, responsive 3D card layout.
 - **Dynamic Cost Simulation**: Simulate live cost anomalies and budget limits directly within the workspace.
 - **Sliding Dark Mode System**: Transition the interface using a custom glassmorphic theme toggle switch.
+- **AI Integration**: Incorporates **Gemini** (Gemini 1.5 Pro) for intelligent data insights.
+- **AI-Assisted Development**: Built with the help of AI models including **Gemini** (1.5 Pro/Flash), **Claude** (3.5 Sonnet), and **ChatGPT** (GPT-4o) using the **Antigravity IDE**.
 
 ---
+
+## 🛠️ Technology Stack
+
+### Frontend
+The frontend is built for a highly interactive and dynamic user experience, utilizing modern web development practices.
+
+**Tech Stack & Tools:**
+- **Framework**: Next.js 15.2 (React 19.0)
+- **Styling**: Tailwind CSS 3.4
+- **Animations**: Framer Motion
+- **Architecture**: Next.js App Router for streamlined layouts and server components.
+- **Features**: Responsive 3D layouts, glassmorphic UI, dynamic data visualization components, and sliding dark mode toggles.
+
+### Backend
+The backend is designed for high-performance data processing, ensuring real-time metrics aggregation and secure authentication.
+
+**Tech Stack & Tools:**
+- **Database**: MongoDB (via Mongoose)
+- **Authentication**: Next-Auth (Auth.js) v5 with Google OAuth integration
+- **API layer**: Next.js Server Actions & API Routes
+- **Features**: Programmatic APIs for metrics aggregation, automated cost optimization scanning, secure credential management, and simulated budget enforcement.
+
+---
+
+## 🚀 Deployment & Repository
+- **GitHub**: The source code is hosted on GitHub.
+- **Vercel**: The application is deployed on Vercel for seamless hosting and CI/CD integration.
 
 ## 🚀 Quick Start
 

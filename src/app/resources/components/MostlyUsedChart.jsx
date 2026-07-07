@@ -22,7 +22,7 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
   ];
   const total = rawData.reduce((sum, d) => sum + d.count, 0);
 
-  // Enrich data with percentage and color
+
   const data = rawData.map((d, i) => {
     const percentage = total > 0 ? Math.round((d.count / total) * 100) : 0;
     return {
@@ -36,13 +36,12 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
     ? resources.filter((r) => r.service === drilldownService)
     : [];
 
-  // SVG donut params
   const donutRadius = 38;
   const donutCircumference = 2 * Math.PI * donutRadius;
 
   return (
     <div className="bg-white/90 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60 dark:border-white/5 h-[380px] w-full flex flex-col relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-      {/* Subtle loading overlay */}
+     
       {isLoading && (
         <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
@@ -122,17 +121,17 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
           </div>
         ) : (
           <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-around gap-6 sm:gap-2 h-full py-2">
-            {/* Custom SVG Donut */}
+           
             <div className="relative w-40 h-40 sm:w-44 sm:h-44 md:w-48 md:h-48 flex-shrink-0 flex items-center justify-center">
               <svg
                 className="w-full h-full transform -rotate-90"
                 viewBox="0 0 100 100"
                 style={{ pointerEvents: "none" }}
               >
-                {/* Decorative rings */}
+                
                 <circle cx="50" cy="50" r={donutRadius + 7} fill="transparent" stroke="rgba(121, 44, 162, 0.18)" strokeWidth="0.75" strokeDasharray="2 2" />
                 <circle cx="50" cy="50" r={donutRadius - 7} fill="transparent" stroke="rgba(121, 44, 162, 0.18)" strokeWidth="0.75" strokeDasharray="2 2" />
-                {/* Track ring */}
+              
                 <circle cx="50" cy="50" r={donutRadius} fill="transparent" stroke="rgba(200,200,200,0.25)" strokeWidth={10} />
                 
                 {(() => {
@@ -175,7 +174,6 @@ export default function MostlyUsedChart({ environment = "Production", serviceCou
                 })()}
               </svg>
 
-              {/* Center label */}
               <div className="absolute flex flex-col items-center text-center pointer-events-none">
                 <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">
                   {selectedSegment !== null && data[selectedSegment] ? data[selectedSegment].name : "Total"}

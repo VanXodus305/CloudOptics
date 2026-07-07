@@ -55,7 +55,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
         transition={{ duration: 0.4, type: "spring", stiffness: 200, damping: 20 }}
         className="bg-white/40 dark:bg-[#0F122B]/40 backdrop-blur-3xl border-t border-white/60 dark:border-white/5 p-6 md:p-8 flex-grow rounded-b-3xl shadow-2xl relative overflow-hidden flex flex-col min-h-[400px] will-change-transform"
       >
-        {/* Background glow */}
+     
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-[#792CA2]/10 via-[#111844]/5 to-transparent rounded-full blur-[80px] pointer-events-none" />
         
         {isLoading ? (
@@ -90,7 +90,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
           </div>
         ) : (
           <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col gap-4">
-            {/* Search and Impact Summary Container */}
+      
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2 px-1">
               <div className="relative w-full md:w-96 shadow-sm rounded-xl">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -152,7 +152,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                   }`}
                 >
                   <div className="flex gap-4 items-start flex-grow w-full md:w-auto">
-                    {/* Icon or Service Badge */}
+                    {/* Icon or Service Logo */}
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/30 flex flex-col items-center justify-center flex-shrink-0 shadow-sm">
                       <span className="text-[10px] md:text-xs font-black text-[#792CA2] dark:text-[#C084FC] uppercase">{rec.service}</span>
                     </div>
@@ -217,7 +217,7 @@ export default function RecommendationsList({ recommendations = [], activeCatego
                                     return parts.map((step, idx) => {
                                       const cleanStep = step.replace(/^[\*\-\s]+/, '').replace(/^\d+[\.\)]\s*/, '').trim();
                                       if (!cleanStep) return null;
-                                      // Ensure each step ends with a period for consistency
+                                      
                                       const finalStep = cleanStep.endsWith('.') ? cleanStep : cleanStep + '.';
                                       return <li key={idx} className="leading-relaxed pl-1 text-gray-600 dark:text-slate-350">{finalStep}</li>;
                                     });

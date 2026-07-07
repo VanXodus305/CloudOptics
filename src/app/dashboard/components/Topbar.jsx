@@ -31,7 +31,7 @@ export default function Topbar({
   const [isGenerating, setIsGenerating] = useState(null);
   const reportRef = useRef(null);
 
-  // Close report dropdown on outside click
+
   React.useEffect(() => {
     function handler(e) {
       if (reportRef.current && !reportRef.current.contains(e.target)) {
@@ -84,7 +84,7 @@ export default function Topbar({
             />
           </div>
 
-          {/* Go Back to Home Tab */}
+          {/* Home Tab */}
           <button
             onClick={() => router.push("/")}
             className="hidden md:flex text-xs font-bold text-gray-500 dark:text-gray-300 hover:text-[#792CA2] dark:hover:text-[#C084FC] transition-colors items-center gap-1.5 px-2.5 py-2 rounded-xl hover:bg-gray-100/50 dark:hover:bg-slate-800/50"
@@ -95,13 +95,13 @@ export default function Topbar({
         </div>
 
         <div className="flex items-center gap-3 md:gap-4">
-          {/* Current Date Badge */}
+          {/* Current Date */}
           <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 text-xs font-bold text-gray-500 dark:text-gray-300 shadow-sm whitespace-nowrap">
             <CalendarIcon className="w-4 h-4 text-[#792CA2] dark:text-[#C084FC]" />
             <span>{currentDate}</span>
           </div>
 
-          {/* ── Report Dropdown ── */}
+          {/* Report Dropdown-Excel or PDF*/}
           {!hideReportButton && (
             <div className="hidden md:block relative" ref={reportRef}>
               <button
@@ -157,7 +157,7 @@ export default function Topbar({
             </div>
           )}
 
-          {/* User Image Logo in Navbar */}
+          {/* User profile logo*/}
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -191,7 +191,7 @@ export default function Topbar({
                     <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">{session?.user?.email}</p>
                   </div>
 
-                  {/* Mobile-Only section */}
+                  {/* For Mobile Responsiveness*/}
                   <div className="md:hidden border-b border-gray-100 dark:border-slate-800 py-2 flex flex-col gap-2">
                     <div className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-gray-50/80 dark:bg-slate-800/80 border border-gray-100/50 dark:border-slate-700/50 text-[10px] font-bold text-gray-500 dark:text-gray-300">
                       <CalendarIcon className="w-4 h-4 text-[#792CA2] dark:text-[#C084FC]" />

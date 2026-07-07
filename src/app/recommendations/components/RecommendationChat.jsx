@@ -15,13 +15,12 @@ const SUGGESTED_PROMPTS = [
   "What is my total potential monthly savings?",
 ];
 
-// Helper to parse inline formatting (**bold**, *italic*, `code`)
 const parseInline = (text) => {
   if (!text) return "";
 
   let parts = [{ type: "text", content: text }];
 
-  // 1. Parse Bold (**bold**)
+  
   parts = parts.flatMap((part) => {
     if (part.type !== "text") return part;
     const splitParts = part.content.split(/\*\*([^*]+)\*\*/g);
@@ -31,7 +30,7 @@ const parseInline = (text) => {
     }));
   });
 
-  // 2. Parse Code (`code`)
+  
   parts = parts.flatMap((part) => {
     if (part.type !== "text") return part;
     const splitParts = part.content.split(/`([^`]+)`/g);
@@ -41,7 +40,7 @@ const parseInline = (text) => {
     }));
   });
 
-  // 3. Parse Italic (*italic*)
+
   parts = parts.flatMap((part) => {
     if (part.type !== "text") return part;
     const splitParts = part.content.split(/\*([^*]+)\*/g);
@@ -130,18 +129,17 @@ const renderHtmlTable = (tableObj, key) => {
 const formatMessage = (text) => {
   if (!text) return "";
 
-  // Strip single backticks to prevent literal backtick characters in the UI
-  // while preserving triple backtick code blocks.
+
   let cleanedText = text;
   cleanedText = cleanedText.replace(/```/g, "___TRIPLE_BACKTICK___");
   cleanedText = cleanedText.replace(/`/g, "");
   cleanedText = cleanedText.replace(/___TRIPLE_BACKTICK___/g, "```");
 
-  // First, parse code blocks (```code block```)
+  
   const parts = cleanedText.split(/```/g);
 
   return parts.map((part, idx) => {
-    // Code blocks are at odd indices
+    
     if (idx % 2 === 1) {
       const lines = part.split("\n");
       const firstLine = lines[0].trim();
@@ -165,7 +163,7 @@ const formatMessage = (text) => {
       );
     }
 
-    // Regular text block: split by newlines
+    
     const lines = part.split("\n");
     const renderedElements = [];
     let currentTable = null;
@@ -184,7 +182,7 @@ const formatMessage = (text) => {
       const isTableRow = trimmed.startsWith("|") && trimmed.endsWith("|") && trimmed.length > 1;
       
       if (isTableRow) {
-        // Split by '|' and remove empty edge items
+       
         const rawCells = trimmed.split("|").map(c => c.trim());
         const cells = rawCells.slice(1, rawCells.length - 1);
         
@@ -212,7 +210,7 @@ const formatMessage = (text) => {
         
         if (!trimmed) continue;
 
-        // 1. Headers: # Header
+   
         const headerMatch = line.match(/^(#{1,6})\s+(.*)$/);
         if (headerMatch) {
           const level = headerMatch[1].length;
@@ -232,7 +230,7 @@ const formatMessage = (text) => {
           continue;
         }
 
-        // 2. Bullet lists: * item or - item (allowing spaces at front)
+
         const bulletMatch = line.match(/^(\s*)[*+-]\s+(.*)$/);
         if (bulletMatch) {
           const content = bulletMatch[2];
@@ -250,7 +248,7 @@ const formatMessage = (text) => {
           continue;
         }
 
-        // 3. Numbered lists: 1. item
+
         const numberMatch = line.match(/^(\s*)(\d+)\.\s+(.*)$/);
         if (numberMatch) {
           const num = numberMatch[2];
@@ -271,7 +269,6 @@ const formatMessage = (text) => {
           continue;
         }
 
-        // 4. Default paragraph
         renderedElements.push(
           <p
             key={`p-${lineIdx}`}
@@ -332,7 +329,7 @@ export default function RecommendationChat() {
     setIsSending(true);
 
     try {
-      // Include current conversation history for context (role user or model)
+      // Include current conversation history for context 
       const chatHistory = [...messages, userMessage].map((m) => ({
         role: m.role,
         content: m.content,
@@ -393,12 +390,12 @@ export default function RecommendationChat() {
       </div>
 
       <div className="relative mt-2 flex-grow flex flex-col min-h-[480px]">
-        {/* Glowing backdrop */}
+        
         <div className="absolute inset-0 bg-gradient-to-br from-[#792CA2]/5 via-blue-500/5 to-[#9A4DCC]/10 rounded-3xl blur-xl" />
 
         {/* Main Chat Box */}
         <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex-grow flex flex-col relative z-10 h-full overflow-hidden">
-          {/* Status header */}
+         
           <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-3">
             <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
               <SparklesIcon className="w-4 h-4 text-[#792CA2] animate-pulse" />
@@ -480,7 +477,7 @@ export default function RecommendationChat() {
             )}
           </div>
 
-          {/* Suggested Prompts Banner */}
+          {/* Suggested Prompts Part */}
           {messages.length === 1 && (
             <div className="mb-3 space-y-1.5">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">

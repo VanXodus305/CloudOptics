@@ -28,7 +28,7 @@ export default function CategoryTabs({ activeCategory, setActiveCategory }) {
 
   return (
     <div className="w-full mt-4 px-2">
-      {/* Mobile Custom Dropdown */}
+      {/* DropDown for mobile responsiveness */}
       <div className="block md:hidden mb-4 relative z-30" ref={dropdownRef}>
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">
           Select Category
@@ -70,7 +70,7 @@ export default function CategoryTabs({ activeCategory, setActiveCategory }) {
         </div>
       </div>
 
-      {/* Desktop Tabs */}
+      {/* Tabs */}
       <div className="hidden md:flex md:justify-center gap-6 overflow-x-auto pb-4 scrollbar-hide">
         {categories.map((cat, idx) => {
 

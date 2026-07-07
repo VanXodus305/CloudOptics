@@ -26,7 +26,7 @@ export default function DashboardPage() {
   const userName = session?.user?.name || "Admin User";
   const userImage = session?.user?.image || null;
 
-  // Dropdown & Hover states
+  // Dropdown
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
   const profileRef = useRef(null);
 
-  // Clipboard copy state helper
+  
   const [copiedId, setCopiedId] = useState(null);
 
   const handleCopy = (idText) => {
@@ -58,7 +58,7 @@ export default function DashboardPage() {
     setTimeout(() => setCopiedId(null), 1000);
   };
 
-  // Close dropdowns on click-away
+  // Close dropdowns on clicking
   useEffect(() => {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -92,7 +92,7 @@ export default function DashboardPage() {
     await generateXLSX();
   };
 
-  // Cost Timeframes & Donut Resource filter state
+  // Cost Timeframes & Donut Resource filter
   const [chartTimeframe, setChartTimeframe] = useState("Daily");
   const [hoveredBar, setHoveredBar] = useState(null);
   const [donutFilter, setDonutFilter] = useState("All");
@@ -122,7 +122,7 @@ export default function DashboardPage() {
   const [isServicesLoading, setIsServicesLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Client-side cache and request coordinator
+  // Client-side cache and request coordination
   const cacheRef = useRef({});
   const currentRequestFilter = useRef(null);
 
@@ -133,7 +133,7 @@ export default function DashboardPage() {
     const cachedServices = cacheRef.current[filter];
     const cachedGlobal = cacheRef.current["global"];
 
-    // Check if we have cached data for instantaneous transition
+    // Checking if we have cached data for transition
     if (cachedGlobal && !isPolling) {
       setSummaryData(cachedGlobal.summary);
       setTrendsData(cachedGlobal.trends);
@@ -175,7 +175,7 @@ export default function DashboardPage() {
         }
       }
 
-      // Check if this response belongs to the current selected filter
+      // Check if the response belongs to the current selected filter
       if (currentRequestFilter.current !== filter) {
         return;
       }
@@ -271,7 +271,7 @@ export default function DashboardPage() {
       };
     };
 
-    // Calculate spend trends (lower is positive/green, higher is negative/red)
+    // Calculate spend trends (lower is positive-green, higher is negative-red)
     const totalSpendTrend = calcTrend("spend");
     const computeSpendTrend = calcTrend("computeSpend");
     const storageSpendTrend = calcTrend("storageSpend");
@@ -293,20 +293,20 @@ export default function DashboardPage() {
     };
   }, [trendsData, summaryData]);
 
-  // Chart datasets compiled dynamically from trendsData
+
   const chartDatasets = useMemo(() => {
     if (!trendsData || trendsData.length === 0) {
       return { Monthly: [], Weekly: [], Daily: [] };
     }
 
-    // Daily: Last 7 days from daily trends
+    // Daily
     const daily = trendsData.slice(-7).map((t) => {
       const d = new Date(t.date);
       const label = d.toLocaleDateString("en-US", { weekday: "short" });
       return { label, value: Math.round(t.spend) };
     });
 
-    // Weekly: Group last 28 days of trends into 4 weeks (7 days each)
+    // Weekly
     const weekly = [];
     const fmt = (dateStr) => {
       const d = new Date(dateStr);
@@ -324,7 +324,7 @@ export default function DashboardPage() {
       weekly.push({ label: rangeLabel, value: Math.round(weekSum) });
     }
 
-    // Monthly: Group by calendar month name
+    // Monthly
     const monthlyMap = {};
     trendsData.forEach((t) => {
       const d = new Date(t.date);
@@ -348,7 +348,7 @@ export default function DashboardPage() {
     return Math.max(...currentChartData.map((d) => d.value)) * 1.1 || 100;
   }, [currentChartData]);
 
-  // Donut data compiled dynamically from servicesData
+  // Donut chart
   const donutData = useMemo(() => {
     if (!servicesData || servicesData.length === 0) {
       return [
@@ -395,7 +395,7 @@ export default function DashboardPage() {
     return servicesData.reduce((sum, item) => sum + item.value, 0);
   }, [servicesData]);
 
-  // Alerts array formatted for view layout
+ 
   const formattedAlerts = useMemo(() => {
     if (!alertsData || alertsData.length === 0) return [];
 
@@ -439,7 +439,7 @@ export default function DashboardPage() {
 
   return (
     <div className="h-screen relative overflow-hidden bg-[#F9F7F7] dark:bg-[#080A1A] text-[#111844] dark:text-[#F9F7F7] transition-colors duration-300 flex flex-col dashboard-layout">
-      {/* SIGN OUT TRANSITION SCREEN */}
+      {/* Sign Out Transition Screen */}
       <AnimatePresence>
         {isSigningOut && (
           <motion.div
@@ -463,16 +463,16 @@ export default function DashboardPage() {
         )}
       </AnimatePresence>
 
-      {/* CANVAS BACKGROUND DRAPES */}
+     
       <ParticleBackground />
 
-      {/* DYNAMIC BACKDROP BLOBS */}
+      {/* Dynamic Background*/}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#792CA2]/15 blur-[120px]" />
         <div className="absolute bottom-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-[#DCCBFF]/20 blur-[120px]" />
       </div>
 
-      {/* NAVBAR (TOPBAR) */}
+      {/* Navbar-Topbar*/}
       <Topbar
         userName={userName}
         userImage={userImage}
@@ -486,9 +486,9 @@ export default function DashboardPage() {
         onDownloadXLSX={handleDownloadXLSX}
       />
 
-      {/* LOWER AREA (SIDEBAR + MAIN CONTENT AREA) */}
+      
       <div className="flex flex-grow w-full overflow-hidden relative">
-        {/* SIDEBAR */}
+        {/* Sidebar */}
         <Sidebar
           isSidebarExpanded={isSidebarExpanded}
           setIsSidebarExpanded={setIsSidebarExpanded}
@@ -499,18 +499,17 @@ export default function DashboardPage() {
           setIsAlertsModalOpen={setIsAlertsModalOpen}
         />
 
-        {/* MAIN CONTENT AREA */}
+        {/* Main Content Area */}
         <div className="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden relative">
-          {/* MAIN DASHBOARD CONTENT */}
+          {/* Main Dashboard Content */}
           <main className="flex-grow p-4 md:p-6 pb-24 md:pb-8 relative">
             <div className="flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
-              {/* WELCOME BANNER */}
+              {/* Welcome Banner */}
               <WelcomeBanner userName={userName} />
 
-              {/* KPI CARDS */}
+              {/* Kpi Cards */}
               <KPICards summaryData={summaryData} kpiTrends={kpiTrends} isLoading={isLoading} />
 
-              {/* ANALYTICS SECTION */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Cost Trends Card */}
                 <CostTrendsChart
@@ -540,7 +539,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* LOWER GRIDS: TABLES & ALERTS */}
+              
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Top Cost Resources Table */}
                 <ResourcesTable
@@ -565,7 +564,7 @@ export default function DashboardPage() {
             <Footer reduced={true} />
           </div>
 
-          {/* VIEW ALL MODALS */}
+          {/* View ALL */}
           <Modals
             isResourcesModalOpen={isResourcesModalOpen}
             setIsResourcesModalOpen={setIsResourcesModalOpen}

@@ -44,7 +44,7 @@ export default function ActiveAlerts() {
       const data = await res.json();
       setAlerts(data);
 
-      // The new useEffect will handle selecting the default alert
+   
     } catch (err) {
       console.error("Error loading alerts:", err);
     } finally {
@@ -100,7 +100,7 @@ export default function ActiveAlerts() {
       if (!res.ok) throw new Error("Failed to update status");
       const updated = await res.json();
 
-      // Snappily update state in UI
+  
       setAlerts(prev => prev.map(a => a._id === alertId ? updated : a));
       setSelectedAlert(updated);
     } catch (err) {
@@ -139,7 +139,7 @@ export default function ActiveAlerts() {
       <div className="bg-white/70 dark:bg-[#0F122B]/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white dark:border-white/10 flex flex-col md:flex-row gap-6 relative z-0">
 
 
-        {/* Left Side: Details View */}
+        {/* Left Side Details */}
         <div className="hidden md:flex order-2 md:order-1 flex-1 bg-gradient-to-br from-white to-[#F9F7F7] dark:from-[#111844] dark:to-[#080A1A] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-white/10 flex-col min-h-[350px] relative overflow-hidden shadow-inner">
           <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#9A4DCC]/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -277,7 +277,7 @@ export default function ActiveAlerts() {
           )}
         </div>
 
-        {/* Right Side: List and Filters */}
+        {/* Right Side */}
         <div className="order-1 md:order-2 flex-grow flex-1 flex flex-col pt-4 md:pt-0">
           <div className="mb-4">
             <div className="relative">
@@ -336,7 +336,7 @@ export default function ActiveAlerts() {
               })}
             </div>
 
-            {/* Sort & Refresh controls */}
+            {/* Sort & Refresh Portion*/}
             <div className="flex items-center gap-2.5">
               <div className="relative" ref={envRef}>
                 <motion.button
@@ -466,7 +466,7 @@ export default function ActiveAlerts() {
                       </div>
                     </div>
 
-                    {/* Collapsible Mobile Accordion Details View */}
+                    {/* For Mobile Responsiveness*/}
                     <AnimatePresence initial={false}>
                       {selectedAlert?._id === alert._id && (
                         <motion.div

@@ -34,10 +34,10 @@ export default function AiSummary({
       </div>
       
       <div className="relative mt-2 flex-grow flex flex-col">
-        {/* Glowing backdrop */}
+       
         <div className="absolute inset-0 bg-gradient-to-br from-[#792CA2]/5 to-[#9A4DCC]/10 rounded-3xl blur-xl" />
 
-        {/* Main Box */}
+        {/* Main content*/}
         <div className="bg-white/60 dark:bg-[#0F122B]/60 backdrop-blur-xl rounded-3xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white dark:border-white/5 flex-grow flex flex-col gap-4 sm:gap-5 relative z-0">
           <div className="flex justify-between items-center w-full border-b border-gray-100 dark:border-slate-800 pb-4">
             
@@ -51,7 +51,7 @@ export default function AiSummary({
             </button>
           </div>
 
-          {/* Highlights Banner */}
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Actions Card */}
             <div className="relative overflow-hidden bg-gradient-to-r from-purple-500/10 to-indigo-500/5 dark:from-purple-950/20 dark:to-indigo-950/10 p-3 rounded-2xl border border-[#792CA2]/15 flex flex-col items-center justify-center">
@@ -92,7 +92,7 @@ export default function AiSummary({
 
           
           <div className="bg-white/80 dark:bg-[#0F122B]/40 backdrop-blur-md rounded-2xl p-5 md:p-6 shadow-sm border border-white dark:border-white/5 flex-grow min-h-[120px] relative overflow-hidden flex flex-col justify-center">
-            {/* Inner glowing element */}
+            
             <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
             
             {isRegenerating || isLoading ? (

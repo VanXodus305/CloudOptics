@@ -295,7 +295,7 @@ export default function TopCostChart({
           }
         }
       `}</style>
-      {/* Subtle loading overlay */}
+     
       {isLoading && (
         <div className="absolute inset-0 bg-white/40 dark:bg-[#080A1A]/40 rounded-3xl flex items-center justify-center z-[999] backdrop-blur-[0.5px]">
           <div className="w-8 h-8 border-3 border-[#792CA2] border-t-transparent rounded-full animate-spin"></div>
