@@ -1,5 +1,5 @@
 // XLSX report generator for CloudOptics
-// Uses exceljs + file-saver (client-side only)
+// Uses exceljs (client-side only)
 
 const PURPLE_HEX   = "792CA2";
 const LIGHT_PURPLE = "F3ECFF";
@@ -94,9 +94,20 @@ function addBrandedTitle(sheet, title, subtitle, colCount) {
   return 4; // next data starts at row 4
 }
 
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.rel = "noopener";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 export async function generateXLSX() {
   const ExcelJS = (await import("exceljs")).default;
-  const { saveAs } = await import("file-saver");
 
   // ── Fetch all data from APIs ────────────────────────────────────────────────
   let summaryData = null, trendsData = [], donutData = [], resourcesData = [], formattedAlerts = [], recommendations = [];
@@ -572,5 +583,5 @@ export async function generateXLSX() {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
   const filename = `CloudOptics_Report_${now.toISOString().slice(0, 10)}.xlsx`;
-  saveAs(blob, filename);
+  downloadBlob(blob, filename);
 }
